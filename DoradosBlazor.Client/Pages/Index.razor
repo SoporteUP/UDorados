@@ -1,0 +1,37 @@
+﻿@page "/Index"
+
+@using Microsoft.AspNetCore.Authorization;
+@using Microsoft.AspNetCore.Components.Authorization;
+@attribute [Authorize]
+@using Blazored.SessionStorage;
+@using DoradosBlazor.Shared;
+@using System.Security.Claims;
+@using DoradosBlazor.Client.Services;
+
+@inject IUsuarioService usuarioService;
+@inject IRolesService rolesService;
+@inject NavigationManager navegacion;
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject SweetAlertService Swal;
+
+
+<PageTitle>Index</PageTitle>
+
+<h1 class="text-center">Universidad Dorados</h1>
+
+
+
+
+<AuthorizeView>
+    <Authorized>
+        <h3 class="text-center"> Bienvenido: @context.User.Identity!.Name</h3>
+        <h5 class="text-center"> @context.User.FindFirst(ClaimTypes.Email).Value</h5>
+
+    </Authorized>
+</AuthorizeView>
+
+
+@code
+{
+   
+}

@@ -1,0 +1,102 @@
+﻿@page "/usuario"
+@page "/usuario/{idUsuarioEditar:int}"
+
+@using DoradosBlazor.Shared;
+@using DoradosBlazor.Client.Services;
+
+@inject IUsuarioService usuarioService;
+@inject IRolesService rolesService;
+@inject NavigationManager navegacion;
+
+
+<h3>@titulo</h3>
+
+<EditForm Model="usuario" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator></DataAnnotationsValidator>
+
+     <div class="mb-3">
+        <label class="form-label">Nombre</label>
+        <InputText class="form-control" @bind-Value="usuario.Nombre"></InputText>
+        <ValidationMessage For="@(() => usuario.Nombre)"></ValidationMessage>
+    </div>
+      <div class="mb-3">
+        <label class="form-label">Roles</label>
+        <InputSelect class="form-select" @bind-Value="usuario.IdRol">
+            <option value="0">-- Seleccionar --</option>
+            @foreach(var item in listaRoles)
+            {
+                <option value="@item.IdRol">@item.NombreRol</option>
+            }
+        </InputSelect>
+        <ValidationMessage For="@(() => usuario.IdRol)"></ValidationMessage>
+    </div>
+     <div class="mb-3">
+        <label class="form-label">Correo</label>
+        <InputText class="form-control" @bind-Value="usuario.Correo"></InputText>
+        <ValidationMessage For="@(() => usuario.Correo)"></ValidationMessage>
+    </div>
+     <div class="mb-3">
+        <label class="form-label">Password</label>
+        <InputText class="form-control" @bind-Value="usuario.Password"></InputText>
+        <ValidationMessage For="@(() => usuario.Password)"></ValidationMessage>
+    </div>
+     <div class="mb-3">
+        <label class="form-label">Fecha de Registro</label>
+        <InputDate class="form-control" @bind-Value="usuario.FechaReg"></InputDate>
+        <ValidationMessage For="@(() => usuario.FechaReg)"></ValidationMessage>
+    </div>
+
+     <button class="btn btn-primary" type="submit">
+        @btnTexto
+    </button>
+
+    <a class="btn btn-warning" href="usuarios">Volver</a>
+
+
+</EditForm>
+
+
+@code
+{
+        [Parameter]
+        public int idUsuarioEditar { get; set; } = 0;
+
+
+        string titulo = string.Empty;
+        string btnTexto = string.Empty;
+
+        UsuarioDTO usuario = new UsuarioDTO();
+        List<RolesDTO> listaRoles = new List<RolesDTO>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if(idUsuarioEditar != 0)
+        {
+            btnTexto = "Actualizar Usuario";
+            titulo = "Editar Usuario";
+            usuario = await usuarioService.Buscar(idUsuarioEditar);
+           
+        }
+        else
+        {
+            usuario.FechaReg = DateTime.Today;
+            btnTexto = "Guardar Usuario";
+            titulo = "Nuevo Usuario";
+        }
+        listaRoles = await rolesService.Lista();
+    }
+
+        private async Task OnValidSubmit()
+        {
+              int idDevuelto = 0;
+                if (idUsuarioEditar == 0)
+                    idDevuelto = await usuarioService.Guardar(usuario);
+                else
+                    idDevuelto = await usuarioService.Editar(usuario);
+
+
+                if (idDevuelto != 0)
+                    navegacion.NavigateTo("/usuarios");
+
+        }
+    }

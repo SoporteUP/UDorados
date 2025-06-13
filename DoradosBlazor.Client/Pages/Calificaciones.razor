@@ -1,0 +1,164 @@
+﻿@page "/Calificaciones"
+
+@inject SesionEmail mySesionEmail;
+@using DoradosBlazor.Shared;
+@using CurrieTechnologies.Razor.SweetAlert2;
+@using DoradosBlazor.Client.Services;
+
+@inject SweetAlertService Swal;
+@inject IUsuarioService usuarioService;
+
+@inject HttpClient httpClient
+@using DoradosBlazor.Client.Extensiones
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider autenticacionProvider
+@inject NavigationManager navManager
+@inject IUsuarioService usuarioService;
+
+
+
+<h3>Calificaciones</h3>
+
+
+<div class="overflow-scroll">
+
+    <div class="overflow-y-scroll">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>CicloID</th>
+                    <th>CarreraID</th>
+                    <th>Carrera</th>
+                    <th>Fecha de Inscripción</th>
+                    <th>Tipo Ciclo</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @if (listaCiclos == null)
+                {
+
+                    <tr>
+                        <td colspan="5" align="center">
+                            <img style="width:50px" src="https://media.tenor.com/On7kvXhzml4AAAAj/loading-gif.gif" />
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in listaCiclos)
+                    {
+                        <tr>
+
+                            <td>@item.CicloID</td>
+                            <td>@item.CarreraID</td>
+                            <td>@item.Carrera</td>
+                            <td>@item.fechaInsc.ToString("dd/MM/yyyy")</td>
+                            <td>@item.TipoCiclo</td>
+                            <td>
+                                <a class="btn btn-outline-primary" href="@sTipoCalif/@sEmail/@item.CarreraID/@item.CicloID">
+                                    <i>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrow-right-circle-fill" viewBox="0 0 16 16">
+                                            <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0M4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5z" />
+                                        </svg>
+                                    </i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+
+
+
+            </tbody>
+        </table>
+    </div>
+
+
+
+</div>
+
+@code {
+
+    [Parameter]
+    public string sEmail { get; set; } = "";
+
+    string sTipoCalif { get; set; } = "";
+
+    List<CiclosDTO>? listaCiclos = null;
+    List<ConAdeudoDTO>? listaConAdeudo = null;
+
+    private CiclosVarDTO ciclosVar = new CiclosVarDTO();    
+    private AdeudosVarDTO adeudosVarDTO = new AdeudosVarDTO();
+
+    protected override async Task OnInitializedAsync()
+    {
+        sEmail = mySesionEmail.Email;
+
+        adeudosVarDTO.iTipoOperacion = 6;
+        adeudosVarDTO.sMatricula = sEmail;
+        adeudosVarDTO.dFechaIni = DateTime.Today;
+        adeudosVarDTO.dFechaFin = DateTime.Today;
+
+
+        listaConAdeudo = await usuarioService.ListaConAdeudo(adeudosVarDTO);
+
+        if (listaConAdeudo != null)
+        {
+
+            if (sEmail != "")
+            {
+                ciclosVar.TipoOperacion = 1;
+                ciclosVar.MatriculaID = sEmail;
+
+                listaCiclos = await usuarioService.ListaCiclos(ciclosVar);
+
+                if (listaCiclos.Count == 0)
+                {
+                    var resultado = await Swal.FireAsync(new SweetAlertOptions
+                        {
+                            Title = "Boletas",
+                            Text = "El usuario no esta inscrito o no tiene boletas",
+                            Icon = SweetAlertIcon.Warning,
+                            ShowCancelButton = false
+                        });
+
+                }
+                else
+                {
+                    if (listaCiclos[0].TipoCiclo == "Anual")
+                    {
+                        sTipoCalif = "BoletaCalifMens";
+                    }
+                    else
+                    {
+                        sTipoCalif = "BoletaCalifPar";
+                    }
+
+
+                }
+
+
+            }
+
+
+
+        }
+        else
+        {
+            var resultado = await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Adeudos",
+                    Text = "El usuario no puede acceder por que tiene adeudos pendientes,",
+                    Icon = SweetAlertIcon.Warning,
+                    ShowCancelButton = false
+                });
+            
+        }
+
+      
+ 
+    }
+
+}

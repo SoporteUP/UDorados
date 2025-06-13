@@ -1,0 +1,141 @@
+﻿@page "/EditaCalifMens"
+@page "/EditaCalifMens/{matriculaID}/{grupoID}/{cicloID}/{materiaID}"
+
+
+@using DoradosBlazor.Client.Services;
+@using DoradosBlazor.Shared;
+@inject SesionEmail mySesionEmail;
+@inject IUsuarioService usuarioService;
+
+<!-- Scrollable modal -->
+<div class="modal-dialog modal-dialog-scrollable" id="ModalCalif">
+
+    <h3 style="text-align:center">Editar las Calificaciones</h3>
+
+    <h5 style="text-align:left">ID. @matriculaID</h5>
+    <h5 style="text-align:left">ALUMNO: @Nombre</h5>
+    <h5 style="text-align:left">CICLO: @CicloID</h5>
+    <h5 style="text-align:left">GRUPO: @GrupoID</h5>
+    <h5 style="text-align:left">MATERIA: @materia</h5>
+
+    <div class="overflow-scroll">
+
+        <div class="overflow-y-scroll">
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Septiembre</th>
+                        <th>Octubre</th>
+                        <th>PromBim1</th>
+                        <th>Noviembre</th>
+                        <th>Diciembre</th>
+                        <th>PromBim2</th>
+                        <th>Enero</th>
+                        <th>Febrero</th>
+                        <th>PromBim3</th>
+                        <th>Marzo</th>
+                        <th>Abril</th>
+                        <th>PromBim4</th>
+                        <th>Mayo</th>
+                        <th>Junio</th>
+                        <th>PromBim5</th>
+                        <th>Observaciones</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @if (listaCalificacionMateriaAppDTO == null)
+                    {
+
+                        <tr>
+                            <td colspan="5" align="center">
+                                <img style="width:50px" src="https://media.tenor.com/On7kvXhzml4AAAAj/loading-gif.gif" />
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in listaCalificacionMateriaAppDTO)
+                        {
+                            <tr>
+                                <td>@item.Septiembre</td>
+                                <td>@item.Octubre</td>
+                                <td>@item.PromBim1</td>
+                                <td>@item.Noviembre</td>
+                                <td>@item.Diciembre</td>
+                                <td>@item.PromBim2</td>
+                                <td>@item.Enero</td>
+                                <td>@item.Febrero</td>
+                                <td>@item.PromBim3</td>
+                                <td>@item.Marzo</td>
+                                <td>@item.Abril</td>
+                                <td>@item.PromBim4</td>
+                                <td>@item.Mayo</td>
+                                <td>@item.Junio</td>
+                                <td>@item.PromBim5</td>
+                                <td>@item.Observaciones</td>
+                                <td>
+                                    <a class="btn btn-outline-primary" href="">
+                                        <i class="oi oi-pencil"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+
+
+
+                </tbody>
+            </table>
+        </div>
+
+
+    </div>
+
+</div>
+
+
+@code {
+
+    [Parameter]
+    public string matriculaID { get; set; } = "";
+
+    [Parameter]
+    public string grupoID { get; set; } = "";
+
+    [Parameter]
+    public string cicloID { get; set; } = "";
+
+    [Parameter]
+    public string materiaID { get; set; } = "";
+
+    public string MatriculaID;
+    public string Nombre;
+    public string CicloID;
+    public string GrupoID;
+    public string materia;
+
+    List<CalificacionMateriaAppDTO>? listaCalificacionMateriaAppDTO = null;
+
+    private CalificacionMateriaAppVarDTO calificacionMateriaAppVar = new CalificacionMateriaAppVarDTO();
+
+    protected override async Task OnInitializedAsync()
+    {
+        calificacionMateriaAppVar.iTipoConsulta = 1;
+        calificacionMateriaAppVar.sMatriculaID = matriculaID;
+        calificacionMateriaAppVar.sGrupoID = grupoID;
+        calificacionMateriaAppVar.sCicloID = cicloID;
+        calificacionMateriaAppVar.sMateriaID = materiaID;
+
+        listaCalificacionMateriaAppDTO = await usuarioService.ListaCalificacionMateriaApp(calificacionMateriaAppVar);
+
+
+        MatriculaID = listaCalificacionMateriaAppDTO[0].MatriculaID.ToString();
+        Nombre = listaCalificacionMateriaAppDTO[0].Nombre.ToString();
+        CicloID = listaCalificacionMateriaAppDTO[0].CicloID.ToString();
+        materia = listaCalificacionMateriaAppDTO[0].Materia.ToString();
+    }
+
+}

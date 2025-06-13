@@ -1,0 +1,389 @@
+﻿@page "/CalificacionParcAlum"
+@page "/CalificacionParcAlum/{matriculaID}/{grupoID}/{cicloID}/{carreraID}/{profesorID}/{materiaID}"
+
+@inject IJSRuntime JS;
+@inject HttpClient httpClient
+@inject SweetAlertService Swal;
+
+@using DoradosBlazor.Client.Services;
+@using DoradosBlazor.Shared;
+@inject SesionEmail mySesionEmail;
+@inject IUsuarioService usuarioService;
+
+<div class="container text-start">
+
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <a class="btn btn-outline-dark" href="GruposAlum/@carreraID/@cicloID/@grupoID/Parcial/@profesorID/@materiaID">
+            <i>
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-arrow-left-square" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm11.5 5.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z" />
+                </svg>
+                Regresar
+            </i>
+
+        </a>
+
+    </div>
+</div>
+
+<h3 style="text-align:center">Calificaciones del Alumno</h3>
+
+<h5 style="text-align:left">ID. @matriculaID</h5>
+<h5 style="text-align:left">ALUMNO: @Nombre</h5>
+<h5 style="text-align:left">CICLO: @CicloID</h5>
+<h5 style="text-align:left">GRUPO: @GrupoID</h5>
+
+<div class="overflow-scroll">
+
+    <div class="overflow-y-scroll">
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>CalificacionID</th>
+                    <th>ID</th>
+                    <th>Asignatura</th>
+                    <th>Parcial1</th>
+                    <th>Parcial2</th>
+                    <th>Parcial3</th>
+                    <th>PromediodeParciales</th>
+                    <th>ExamenFinal</th>
+                    <th>CalificacionFinal</th>
+                    <th>Observaciones</th>                    
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @if (listaCalificacionParcAlumAppDTO == null)
+                {
+
+                    <tr>
+                        <td colspan="5" align="center">
+                            <img style="width:50px" src="https://media.tenor.com/On7kvXhzml4AAAAj/loading-gif.gif" />
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in listaCalificacionParcAlumAppDTO)
+                    {
+                        <tr>
+                            <td>@item.CalificacionID</td>
+                            <td>@item.MateriaID</td>
+                            <td>@item.Materia</td>
+                            <td>@item.Parcial1</td>
+                            <td>@item.Parcial2</td>
+                            <td>@item.Parcial3</td>
+                            <td>@item.PromediodeParciales</td>
+                            <td>@item.ExamenFinal</td>
+                            <td>@item.CalificacionFinal</td>                                                     
+                            <td>@item.Observaciones</td>
+                            <td>
+                                <button type="button" @onclick="@(()=> ShowModal("staticBackdrop",@item.Parcial1,@item.Parcial2,@item.Parcial3,
+                                                                                      @item.PromediodeParciales,@item.ExamenFinal,@item.CalificacionFinal,
+                                                                                      @item.Observaciones,@item.CalificacionID.ToString()))" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                                    <i class="oi oi-pencil"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                }
+
+
+
+            </tbody>
+        </table>
+    </div>
+
+
+</div>
+
+
+<div class="modal fade show" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" style="display:none; background:#0000000;">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fs-5" id="staticBackdropLabel">Calificaciones Parciales</h5>
+                <button type="button" @onclick='eventArgs=>HideModal("staticBackdrop")' class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col">
+                        <label for="inputEmail4" class="form-label">Parcial 1 </label>
+                        @if (editaCalifParc.Parcial1 == "" || editaCalifParc.Parcial1 == "0")
+                        {
+                            <input type="text" class="form-control" txtPar1 @bind="editaCalifParc.Parcial1">
+                        }
+                        else
+                        {
+                            <input type="text" id="disabledTextInput" class="form-control" txtPar1 @bind="editaCalifParc.Parcial1" disabled>
+                        }
+
+                    </div>
+                    <div class="col">
+                        <label for="inputEmail4" class="form-label">Parcial 2</label>
+                        @if (editaCalifParc.Parcial2 == "" || editaCalifParc.Parcial2 == "0")
+                        {
+                            <input type="text" class="form-control" txtPar2 @bind="editaCalifParc.Parcial2">
+                        }
+                        else
+                        {
+                            <input type="text" id="disabledTextInput" class="form-control" txtPar2 @bind="editaCalifParc.Parcial2" disabled>
+                        }
+
+                    </div>
+                    <div class="col">
+                        <label for="inputEmail4" class="form-label">Parcial 3</label>
+                        @if (editaCalifParc.Parcial3 == "" || editaCalifParc.Parcial3 == "0")
+                        {
+                            <input type="text" class="form-control" txtPar3 @bind="editaCalifParc.Parcial3">
+                        }
+                        else
+                        {
+                            <input type="text" id="disabledTextInput" class="form-control" txtPar3 @bind="editaCalifParc.Parcial3" disabled>
+                        }                       
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label for="inputEmail4" class="form-label">Promedio de Parciales</label>
+                        <input type="text" id="disabledTextInput" class="form-control" txtPromPar @bind="editaCalifParc.PromediodeParciales" disabled>
+                    </div>
+                    <form>
+                        <div class="col">
+                            <label for="inputEmail4" class="form-label">Examen Final</label>
+                            @if (editaCalifParc.ExamenFinal == "" || editaCalifParc.ExamenFinal == "0")
+                            {
+                                <input type="text" class="form-control" txtExamFin @bind="editaCalifParc.ExamenFinal">
+                            }
+                            else
+                            {
+                                <input type="text" id="disabledTextInput" class="form-control" txtExamFin @bind="editaCalifParc.ExamenFinal" disabled>
+                            }
+                          
+                        </div>
+                    </form>
+
+                </div>
+
+                <div>
+                    <label for="inputEmail4" class="form-label">Calificacion Final </label>
+                    <input type="text" id="disabledTextInput" class="form-control" txtCalifFin @bind="editaCalifParc.CalificacionFinal" disabled>
+                </div>
+
+                <div class="mb-3">
+                    <label for="exampleFormControlTextarea1" class="form-label">Observaciones</label>
+                    <textarea class="form-control" @bind="editaCalifParc.Observaciones" id="exampleFormControlTextarea1" rows="3"></textarea>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" @onclick='eventArgs=>HideModal("staticBackdrop")' class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" @onclick="@(()=> U_CalificaParcialesApp(editaCalifParc.Parcial1,editaCalifParc.Parcial2,editaCalifParc.Parcial3,
+                                                              editaCalifParc.PromediodeParciales,editaCalifParc.ExamenFinal,editaCalifParc.CalificacionFinal,
+                                                              editaCalifParc.Observaciones))" class="btn btn-primary">
+                    Guardar y Salir
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@code {
+    private IJSObjectReference module;
+
+    [Parameter]
+    public string matriculaID { get; set; } = "";
+
+    [Parameter]
+    public string grupoID { get; set; } = "";
+
+    [Parameter]
+    public string cicloID { get; set; } = "";
+
+    [Parameter]
+    public string carreraID { get; set; } = ""; 
+
+    [Parameter]
+    public string profesorID { get; set; } = "";
+
+    [Parameter]
+    public string materiaID { get; set; } = "";
+
+
+    public int CalifID;
+
+
+    private string Email;
+
+
+    public string MatriculaID;
+    public string Nombre;
+    public string CicloID;
+    public string GrupoID;
+
+    List<CalificacionParcAlumAppDTO>? listaCalificacionParcAlumAppDTO = null;
+
+    private CalificacionAlumAppVarDTO CalificacionParcAlumAppVar = new CalificacionAlumAppVarDTO();
+
+    private EditaCalifParcDTO editaCalifParc = new EditaCalifParcDTO();
+
+    private UCalifParcAppVarDTO uCalifParcAppVar = new UCalifParcAppVarDTO();
+
+    List<ST_S_GposEmpaquetadosListosDTO>? ListaGposEmpaquetadosListos = null;
+
+    private ST_S_GposEmpaquetadosVarDTO sT_S_GposEmpaquetadosVarDTO = new ST_S_GposEmpaquetadosVarDTO();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Email = mySesionEmail.Email;
+
+        CalificacionParcAlumAppVar.iTipoConsulta = 1;
+        CalificacionParcAlumAppVar.sMatriculaID = matriculaID;
+        CalificacionParcAlumAppVar.sGrupoID = grupoID;
+        CalificacionParcAlumAppVar.sCicloID = cicloID;
+        CalificacionParcAlumAppVar.Email = Email;
+        CalificacionParcAlumAppVar.MateriaID = materiaID;
+
+        listaCalificacionParcAlumAppDTO = await usuarioService.ListaCalificacionParcAlumApp(CalificacionParcAlumAppVar);
+
+
+        MatriculaID = listaCalificacionParcAlumAppDTO[0].MatriculaID.ToString();
+        Nombre = listaCalificacionParcAlumAppDTO[0].Nombre.ToString();
+        CicloID = listaCalificacionParcAlumAppDTO[0].CicloID.ToString();
+        GrupoID = listaCalificacionParcAlumAppDTO[0].GrupoID.ToString();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender != null)
+        {
+            module = await JS.InvokeAsync<IJSObjectReference>("import", "./Pages/CalificacionAlum.razor.js");
+
+        }
+
+
+    }
+
+    protected async void ShowModal(string elementID, string Parc1, string Parc2, string Parc3, string PromediodeParciales, string ExamenFinal, 
+                                   string CalificacionFinal, string Obse, string CalificacionID)
+    {
+            editaCalifParc.Parcial1 = Parc1;
+            editaCalifParc.Parcial2 = Parc2;
+            editaCalifParc.Parcial3 = Parc3;
+            editaCalifParc.PromediodeParciales = PromediodeParciales;
+            editaCalifParc.ExamenFinal = ExamenFinal;
+            editaCalifParc.CalificacionFinal = CalificacionFinal;
+            editaCalifParc.Observaciones = Obse;
+
+        sT_S_GposEmpaquetadosVarDTO.iTipoOperacion = 1;
+        sT_S_GposEmpaquetadosVarDTO.CarreraID = Convert.ToDecimal(carreraID);
+        sT_S_GposEmpaquetadosVarDTO.CicloID = cicloID;
+        sT_S_GposEmpaquetadosVarDTO.GrupoID = grupoID;
+        sT_S_GposEmpaquetadosVarDTO.ProfesorID = Convert.ToInt32(profesorID);
+        sT_S_GposEmpaquetadosVarDTO.MateriaID = materiaID;
+
+        ListaGposEmpaquetadosListos = await usuarioService.ListaGposEmpaquetadosListos(sT_S_GposEmpaquetadosVarDTO);
+
+
+
+        if (ListaGposEmpaquetadosListos[0].Empaquetado > 0)
+        {
+
+            var resultado = await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Error",
+                    Text = "No se pueden editar las calficaciones, el grupo ya fue empaquetado",
+                    Icon = SweetAlertIcon.Error,
+                    ShowCancelButton = true
+                });
+
+        }
+        else
+        {          
+
+            CalifID = int.Parse(CalificacionID);              
+
+
+            if (module != null)
+            {
+               
+                await module.InvokeAsync<string>("showModal", elementID);
+
+            }
+            else
+            {                
+                module = await JS.InvokeAsync<IJSObjectReference>("import", "./Pages/CalificacionParcAlum.razor.js");
+                await module.InvokeAsync<string>("showModal", elementID);
+            }
+        }
+
+
+
+    }
+
+    protected async void HideModal(string elementID)
+    {
+
+        if (module != null)
+        {
+            await module.InvokeAsync<string>("hideModal", elementID);
+
+        }
+        else
+        {
+            module = await JS.InvokeAsync<IJSObjectReference>("import", "./Pages/CalificacionAlum.razor.js");
+            await module.InvokeAsync<string>("hideModal", elementID);
+        }
+
+
+
+    }
+
+    private async Task U_CalificaParcialesApp(string Parc1, string Parc2, string Parc3, string PromParc, string ExamFin, string CalifFin,
+                               string Obse)
+    {
+        uCalifParcAppVar.iTipoOperacion = 1;
+        uCalifParcAppVar.iCalificacionID = CalifID;
+        uCalifParcAppVar.Parcial1 = Parc1;
+        uCalifParcAppVar.Parcial2 = Parc2;
+        uCalifParcAppVar.Parcial3 = Parc3;
+        uCalifParcAppVar.PromediodeParciales = PromParc;
+        uCalifParcAppVar.ExamenFinal = ExamFin;
+        uCalifParcAppVar.CalificacionFinal = CalifFin;
+        uCalifParcAppVar.Observaciones = Obse;
+
+        var loginResponse = await httpClient.PostAsJsonAsync<UCalifParcAppVarDTO>($"/api/Usuario/U_CalificaParcialesApp/", uCalifParcAppVar);
+        if (loginResponse.IsSuccessStatusCode)
+        {
+            CalificacionParcAlumAppVar.iTipoConsulta = 1;
+            CalificacionParcAlumAppVar.sMatriculaID = matriculaID;
+            CalificacionParcAlumAppVar.sGrupoID = grupoID;
+            CalificacionParcAlumAppVar.sCicloID = cicloID;
+
+            listaCalificacionParcAlumAppDTO = await usuarioService.ListaCalificacionParcAlumApp(CalificacionParcAlumAppVar);
+
+
+            MatriculaID = listaCalificacionParcAlumAppDTO[0].MatriculaID.ToString();
+            Nombre = listaCalificacionParcAlumAppDTO[0].Nombre.ToString();
+            CicloID = listaCalificacionParcAlumAppDTO[0].CicloID.ToString();
+            GrupoID = listaCalificacionParcAlumAppDTO[0].GrupoID.ToString();
+
+            HideModal("staticBackdrop");
+        }
+        else
+        {
+            var resultado = await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Error al Calificar",
+                    Text = "No se Guardaron las Calificaciones",
+                    Icon = SweetAlertIcon.Error,
+                    ShowCancelButton = true
+                });
+        }
+    }
+
+}

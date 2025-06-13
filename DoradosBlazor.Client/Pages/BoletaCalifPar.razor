@@ -1,0 +1,162 @@
+﻿@page "/BoletaCalifPar"
+@page "/BoletaCalifPar/{matriculaID}/{carreraID}/{cicloID}"
+
+@using DoradosBlazor.Shared;
+@using CurrieTechnologies.Razor.SweetAlert2;
+@using DoradosBlazor.Client.Services;
+
+@inject SweetAlertService Swal;
+@inject IUsuarioService usuarioService;
+
+@inject HttpClient httpClient
+@using DoradosBlazor.Client.Extensiones
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider autenticacionProvider
+@inject NavigationManager navManager
+@inject IUsuarioService usuarioService;
+
+
+<div class="container text-start">
+
+
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <a class="btn btn-outline-dark" href="/Calificaciones">
+                <i>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-arrow-left-square" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm11.5 5.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z" />
+                    </svg>
+                    Regresar
+                </i>
+
+            </a>
+
+        </div>
+
+    <div>
+            
+        <div>
+
+        </div>
+        
+        <figure>
+                <blockquote class="text-start">
+                  <h5>MatriculaID @MatID</h5>
+                </blockquote>
+         </figure>
+
+          
+    </div>  
+            
+
+  </div>  <div class="row">
+
+  <div class="row">
+    <div class="col-sm">
+        <h5>Grupo @Grupo</h5>
+    </div>
+ </div>
+   <div class="row">
+    <div class="col-sm">
+     <h5>Alumno @Alumno</h5>
+    </div> 
+   </div>
+</div>
+
+
+<h2 style="text-align:center">BOLETA DE CALIFICACIONES</h2>
+<div class="overflow-scroll">
+
+    <div class="overflow-y-scroll">
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Asignatura</th>
+                    <th>Parcial1</th>                    
+                    <th>Parcial2</th>                    
+                    <th>Parcial3</th>                    
+                    <th>PromediodeParciales</th>
+                    <th>ExamenFinal</th>
+                    <th>CalificacionFinal</th>
+                    <th>Observaciones</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @if (listaCalifPar == null)
+                {
+
+                    <tr>
+                        <td colspan="5" align="center">
+                            <img style="width:50px" src="https://media.tenor.com/On7kvXhzml4AAAAj/loading-gif.gif" />
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in listaCalifPar)
+                    {
+                        <tr>
+                            <td>@item.Materia</td>
+                            <td>@item.Parcial1</td>                           
+                            <td>@item.Parcial2</td>                           
+                            <td>@item.Parcial3</td>                          
+                            <td>@item.PromediodeParciales</td>
+                            <td>@item.ExamenFinal</td>
+                            <td>@item.CalificacionFinal</td>
+                            <td>@item.Observaciones</td>
+                        </tr>
+                    }
+                }
+
+
+
+            </tbody>
+        </table>
+
+    </div>
+   
+
+</div>
+
+
+@code {
+    [Parameter]
+    public string matriculaID { get; set; } = "";
+
+    [Parameter]
+    public string carreraID { get; set; } = "";
+
+    [Parameter]
+    public string cicloID { get; set; } = "";
+
+      public string MatID { get; set; } = "";
+
+      public string Grupo { get; set; } = "";
+
+      public string Alumno { get; set; } = "";
+
+    List<CaliParcDTO>? listaCalifPar = null;
+
+    private CalifVarDTO califVar = new CalifVarDTO();       
+
+    protected override async Task OnInitializedAsync()
+    {
+        califVar.iTipoConsulta = 1;
+        califVar.sMatriculaID = matriculaID;
+        califVar.iCarreraID = carreraID;
+        califVar.sCiclo = cicloID;
+
+        listaCalifPar =   await usuarioService.ListaCaliParc(califVar);
+
+
+        MatID = listaCalifPar[0].MatriculaID.ToString();  
+        Grupo = listaCalifPar[0].GrupoID.ToString();  
+        Alumno = listaCalifPar[0].Alumno.ToString();  
+
+      
+ 
+    }
+
+}

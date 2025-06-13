@@ -1,0 +1,139 @@
+﻿@page "/AdeudosAlumno"
+
+@inject SesionEmail mySesionEmail;
+@using DoradosBlazor.Shared;
+@using CurrieTechnologies.Razor.SweetAlert2;
+@using DoradosBlazor.Client.Services;
+@using System.Globalization;
+
+@inject SweetAlertService Swal;
+@inject IUsuarioService usuarioService;
+
+@inject HttpClient httpClient
+@using DoradosBlazor.Client.Extensiones
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider autenticacionProvider
+@inject NavigationManager navManager
+@inject IUsuarioService usuarioService;
+
+<h3>AdeudosAlumno</h3>
+
+<div class="overflow-scroll">
+    
+    <div class="overflow-y-scroll">
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Carrera</th>
+                    <th>Fecha de Vencimiento</th>
+                    <th>Abono</th>
+                    <th>Saldo</th>
+                    <th>Importe Total</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @if (listaAdeudos == null)
+                {
+                    <tr>
+                        <td colspan="5" align="center">
+                            <img style="width:50px" src="https://media.tenor.com/On7kvXhzml4AAAAj/loading-gif.gif" />
+
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in listaAdeudos)
+                    {
+                        <tr>
+
+                            <td>@item.Carrera</td>
+                            <td>@item.FechaVencimiento.ToString("dd/MM/yyyy")</td>
+                            <td>@item.Abono.ToString("###,###.00", CultureInfo.CreateSpecificCulture("en-US"))</td>
+                            <td>@item.Saldo.ToString("###,###.00", CultureInfo.CreateSpecificCulture("en-US"))</td>
+                            <td>@item.ImporteTotal.ToString("###,###.00", CultureInfo.CreateSpecificCulture("en-US"))</td>
+
+                        </tr>
+                    }
+                    <tr>
+                        <td />
+                        <td />
+                        <td />
+                        <td />
+                        <td style="font-weight: bold;">TOTAL: $@Total</td>
+
+                    </tr>
+                }
+
+
+
+            </tbody>
+        </table>
+
+    </div>
+
+
+
+</div>
+
+@code {
+
+    [Parameter]
+    public string sEmail { get; set; } = "";
+
+    List<AdeudosAlumDTO>? listaAdeudos = null;
+
+    List<TotalAdeudosDTO>? listaTotalAdeudos = null;
+
+    public string Total { get; set; } = "0";
+
+    private AdeudosVarDTO adeudosVar = new AdeudosVarDTO();       
+
+    protected override async Task OnInitializedAsync()
+    {
+        sEmail = mySesionEmail.Email;
+
+        if (sEmail != "")
+        {
+            adeudosVar.iTipoOperacion = 6;
+            adeudosVar.sMatricula = sEmail;
+            adeudosVar.dFechaIni = DateTime.Today;
+            adeudosVar.dFechaFin = DateTime.Today;
+
+            listaAdeudos =   await usuarioService.ListaAdeudosAlum(adeudosVar);
+
+            if (listaAdeudos.Count > 0)
+            {
+                listaTotalAdeudos = await usuarioService.TotalAdeudos(adeudosVar);
+
+                Total = listaTotalAdeudos[0].TotalNeto.ToString("###,###.00", CultureInfo.CreateSpecificCulture("en-US"));
+
+            }
+            else
+            {
+                
+                
+                var resultado = await Swal.FireAsync(new SweetAlertOptions
+                    {
+                        Title = "Adeudos",
+                        Text = "El usuario no tiene adeudos que mostrar",
+                        Icon = SweetAlertIcon.Warning,
+                        ShowCancelButton = false
+                });
+            }
+
+
+
+           
+        }
+
+      
+ 
+    }
+
+
+
+}

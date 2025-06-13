@@ -1,0 +1,280 @@
+﻿@page "/registro"
+
+@layout LoginLayout
+@inject HttpClient httpClient
+@using DoradosBlazor.Client.Extensiones
+@using DoradosBlazor.Shared
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider autenticacionProvider
+@inject NavigationManager navManager
+@using DoradosBlazor.Client.Services;
+
+@using CurrieTechnologies.Razor.SweetAlert2;
+
+@using System;
+@using System.Globalization;
+@using System.Text.RegularExpressions;
+
+@inject SweetAlertService Swal;
+@inject IUsuarioService usuarioService;
+
+@inject HttpClient httpClient
+@inject AuthenticationStateProvider autenticacionProvider
+@inject SweetAlertService Swal;
+@inject IUsuarioService usuarioService;
+
+<div class="register-bg">
+    <div class="register-box animate__animated animate__fadeInDown">
+        <div class="register-logo">
+            <img src="LogoUDN.png" alt="Logo UD" />
+        </div>
+        <h2 class="register-title">Registro</h2>
+        <p class="register-desc">Crea tu cuenta para acceder a <span class="school-highlight">UD</span></p>
+        
+        <!-- Matricula -->
+        <div class="mb-3 text-start">
+            <label>Matricula</label>
+            <div class="input-group">
+                <input class="form-control register-input" @bind="@matr.MatriculaID" placeholder="Tu matrícula">
+                <button type="button" class="btn btn-icon-lg" @onclick="SiExisteMatr" title="Verificar matrícula">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="11" stroke="#0074D9" stroke-width="2" />
+                        <path d="M17 12l-5 5-5-5" stroke="#FFD700" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div class="mb-3 text-start">
+            <label>Nombre</label>
+            <input class="form-control register-input" @bind="@matr.Nombre" placeholder="Tu nombre completo" />
+        </div>
+        <div class="mb-3 text-start">
+            <label>Correo</label>
+            <input class="form-control register-input" @bind="correo.Email" placeholder="correo@ejemplo.com" />
+        </div>
+        <!-- Contraseña -->
+        <div class="mb-3 text-start">
+            <label>Contraseña</label>
+            <div class="input-group">
+                <input class="form-control register-input"
+                       @bind="passDTO.Password"
+                       placeholder="Crea una contraseña"
+                       type="@passwordInputType" />
+                <button type="button" class="btn btn-icon-lg" tabindex="-1" @onclick="TogglePassword" title="Mostrar/Ocultar contraseña">
+                    @if (showPassword)
+                    {
+                        <!-- OJO ABIERTO -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none" viewBox="0 0 24 24">
+                            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z" stroke="#0074D9" stroke-width="2" />
+                            <circle cx="12" cy="12" r="3.5" stroke="#FFD700" stroke-width="2" />
+                        </svg>
+                    }
+                    else
+                    {
+                        <!-- OJO CERRADO -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none" viewBox="0 0 24 24">
+                            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z" stroke="#0074D9" stroke-width="2" />
+                            <circle cx="12" cy="12" r="3.5" stroke="#FFD700" stroke-width="2" />
+                            <line x1="4" y1="20" x2="20" y2="4" stroke="#FFD700" stroke-width="2" />
+                        </svg>
+                    }
+                </button>
+            </div>
+        </div>
+        <button class="btn btn-register" @onclick="SiExisteCorreo" id="btnRegistro">Registrarse</button>        
+    </div>
+</div>
+
+@code {
+
+    private MatriculaDTO matr = new MatriculaDTO();
+    private CorreoDTO correo = new CorreoDTO();
+    private PasswordDTO passDTO = new PasswordDTO();
+
+    private bool showPassword = false;
+    private string passwordInputType => showPassword ? "text" : "password";
+
+    int iRolID = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    private void TogglePassword()
+    {
+        showPassword = !showPassword;
+    }
+
+    private void Volver()
+    {
+        navManager.NavigateTo("/");
+    }
+
+    private async Task SiExisteMatr()
+    {       
+        var loginResponse = await httpClient.GetFromJsonAsync<MatriculaDTO>($"api/Usuario/SiExisteMatricula/{matr.MatriculaID}");
+
+        if (loginResponse.RolID != null)
+        {
+            if (loginResponse.RolID == 0)
+            {
+                var resultado = await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Matricula Existente",
+                    Text = "La matricula ya esta registrada, favor de iniciar sesion",
+                    Icon = SweetAlertIcon.Error,
+                    ShowCancelButton = true
+                });
+
+                iRolID = 0;  
+                matr.Nombre = loginResponse.Nombre;             
+                matr.MatriculaID = loginResponse.MatriculaID;
+
+            }
+
+            if (loginResponse.RolID == 1000)
+            {
+
+                var resultado = await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Matricula incorrecta",
+                    Text = "La matricula no existe, favor de verificarla",
+                    Icon = SweetAlertIcon.Error,
+                    ShowCancelButton = true
+                });  
+
+                iRolID = 0;  
+                matr.Nombre = loginResponse.Nombre;             
+                matr.MatriculaID = loginResponse.MatriculaID;
+            }
+
+            iRolID = loginResponse.RolID;  
+            matr.Nombre = loginResponse.Nombre;             
+            matr.MatriculaID = loginResponse.MatriculaID;
+
+        }
+
+    }
+
+    private async Task SiExisteCorreo()
+    {
+        if (iRolID == 0)
+        {
+            var resultado = await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Error",
+                    Text = "No se puede hacer el registro ya que los datos no son correctos",
+                    Icon = SweetAlertIcon.Error,
+                    ShowCancelButton = true
+                });
+            return;
+        }
+
+        var loginResponse = await httpClient.GetFromJsonAsync<CorreoDTO>($"api/Usuario/SiExisteCorreo/{correo.Email}");
+
+        if (loginResponse.ExisteCorreo == 0)
+        {        
+            correo.Email = loginResponse.Email;
+
+            if (IsValidEmail(correo.Email) == true)
+            {
+                IUDUsuario();
+            }
+            else
+            {
+                    var resultado = await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "El correo es Invalido",
+                    Text = "Favor de Escribir un Correo Valido",
+                    Icon = SweetAlertIcon.Error,
+                    ShowCancelButton = true
+                });
+            }
+
+           
+
+        }
+        else
+        {
+            var resultado = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "El correo ya existe",
+                Text = "Este correo ya esta registrado, favor de Iniciar sesion",
+                Icon = SweetAlertIcon.Error,
+                ShowCancelButton = true
+            });
+        }
+    }
+
+    private async Task IUDUsuario()
+    {
+            passDTO.UsuarioID = 0;
+            passDTO.Nombre = matr.Nombre;
+            passDTO.RolID = iRolID;
+            passDTO.Correo = correo.Email;
+            passDTO.Password = passDTO.Password;
+            passDTO.MatriculaID = matr.MatriculaID;
+
+        var loginResponse = await httpClient.PostAsJsonAsync<PasswordDTO>($"/api/Usuario/IUD_Usuario/",passDTO);
+        if (loginResponse.IsSuccessStatusCode)
+        {
+             navManager.NavigateTo("/");
+        }
+        else
+        {
+          var resultado = await Swal.FireAsync(new SweetAlertOptions
+              {
+                  Title = "Error al registrarse",
+                  Text = "No se pudo hacer el registro",
+                  Icon = SweetAlertIcon.Error,
+                  ShowCancelButton = true
+              });
+        }
+    }
+
+    public static bool IsValidEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                return false;
+
+            try
+            {
+                // Normalize the domain
+                email = Regex.Replace(email, @"(@)(.+)$", DomainMapper,
+                                      RegexOptions.None, TimeSpan.FromMilliseconds(200));
+
+                // Examines the domain part of the email and normalizes it.
+                string DomainMapper(Match match)
+                {
+                    // Use IdnMapping class to convert Unicode domain names.
+                    var idn = new IdnMapping();
+
+                    // Pull out and process domain name (throws ArgumentException on invalid)
+                    string domainName = idn.GetAscii(match.Groups[2].Value);
+
+                    return match.Groups[1].Value + domainName;
+                }
+            }
+            catch (RegexMatchTimeoutException e)
+            {
+                return false;
+            }
+            catch (ArgumentException e)
+            {
+                return false;
+            }
+
+            try
+            {
+                return Regex.IsMatch(email,
+                    @"^[^@\s]+@[^@\s]+\.[^@\s]+$",
+                    RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
+            }
+            catch (RegexMatchTimeoutException)
+            {
+                return false;
+            }
+        }
+    
+}

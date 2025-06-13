@@ -1,0 +1,1542 @@
+﻿@page "/preinscripciones"
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize(Roles = "Reclutador")]
+
+@using DoradosBlazor.Shared;
+@using DoradosBlazor.Client.Services;
+@using System.Security.Claims;
+@using CurrieTechnologies.Razor.SweetAlert2;
+@using DoradosBlazor.Client.Extensiones
+@using Blazored.SessionStorage;
+@using System.Net.Http.Headers
+@using Microsoft.AspNetCore.Components.Authorization;
+@using System.Globalization;
+@using System.Text;
+@using System.Net;
+
+@inject SweetAlertService Swal;
+@inject SesionEmail mySesionEmail;
+@inject IUsuarioService usuarioService;
+@inject QRService QRService
+@inject HttpClient httpClient
+@inject HttpClient Http
+@inject IJSRuntime JS
+@inject IJSRuntime JSRuntime
+@inject AuthenticationStateProvider autenticacionProvider
+@inject NavigationManager navManager
+@inject AuthenticationStateProvider AuthenticationStateProvide
+
+
+
+<div class="container-preinscripciones">
+
+
+    <div class="d-flex justify-content-end align-items-center mb-3">
+        <button @onclick="ToggleModoOscuro" class="btn btn-outline-secondary">
+            <i class="bi bi-moon-stars"></i> Modo oscuro
+        </button>
+    </div>
+
+    <h3 class="main-title">Preinscripciones</h3>
+
+    @if (!mostrarFormulario)
+    {
+        
+        <div class="d-flex flex-column align-items-center mb-4">
+             <button class="btn btn-azul mb-3 px-5 py-2 fs-5 rounded-3" @onclick="NuevaPreinscrip">
+                 <i class="bi bi-plus-circle"></i> Nueva
+             </button>
+             <div class="input-group mb-3" style="max-width: 450px;">
+                 <input class="form-control modern-input buscador"
+                        @bind-value="BusquedaAlumno.Nombre"
+                        type="text"
+                        placeholder="Buscar alumno por nombre..."
+                        @oninput="FiltrarPreinscrip"
+                        bind-value="@filtroInscrip" />
+             
+                 <!-- Botón de filtro -->
+                 <button class="btn btn-filtro-dropdown" type="button" @onclick="ToggleFiltro">
+                     <i class="bi bi-funnel"></i>
+                 </button>
+             
+                 <!-- Dropdown de filtro -->
+                <div class="filtro-dropdown" style="@(mostrarFiltro ? "display:block;" : "display:none;")">
+                    <label class="checkbox-label mb-2">
+                        <input type="checkbox" class="form-check-input me-2"
+                               checked="@filtroIncompleto"
+                               @onchange="OnFiltroIncompletoChanged" />
+                        Incompletas
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" class="form-check-input me-2"
+                               checked="@filtroCompletas"
+                               @onchange="OnFiltroCompletasChanged" />
+                        Completas
+                    </label>
+                </div>
+             </div>
+        </div>
+
+        <div class="row">
+
+
+            @if (_IsvisibleInscripTodas)
+            {
+                @foreach (var item in listaPREINSCRIP)
+                {
+                    <div class="col-12 col-md-6 mb-4">
+                        <div class="modern-card tarjeta-alumno tarjeta-completa d-flex flex-column flex-md-row align-items-center gap-3 p-3">
+                            <div class="avatar-alumno me-md-3 mb-2 mb-md-0">
+                                <i class="bi bi-person-circle fs-1 text-primary"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold mb-1">@item.Nombre</h5>
+                                <div class="text-muted small mb-1">Matrícula: @item.MatriculaID</div>
+                                <div class="mb-1">@item.Carrera</div>
+                                <div class="text-secondary small">@item.fechaInsc</div>
+                            </div>
+                            <div class="ms-auto d-flex gap-2">
+                                <button class="btn btn-outline-primary btn-sm rounded-pill" @onclick="() => BtnEditarComp(item)">Editar</button>
+                            </div>
+                        </div>
+                    </div>
+                }
+                @foreach (var item in listaPREINSC_INCOMP)
+                {
+                    <div class="col-12 col-md-6 mb-4">
+                        <div class="modern-card tarjeta-alumno tarjeta-incompleta d-flex flex-column flex-md-row align-items-center gap-3 p-3">
+                            <div class="avatar-alumno me-md-3 mb-2 mb-md-0">
+                                <i class="bi bi-person-circle fs-1 text-primary"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold mb-1">@item.Nombre</h5>
+                                <div class="text-muted small mb-1">Matrícula: @item.MatriculaID</div>
+                                <div class="mb-1">@item.Carrera</div>
+                                <div class="text-secondary small">@item.fechaInsc</div>
+                            </div>
+                            <div class="ms-auto d-flex gap-2">
+                                <button class="btn btn-outline-primary btn-sm rounded-pill" @onclick="() => BtnEditarIncomp(item)">Editar</button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+
+
+
+            @if (_IsvisibleInscripIncompletas == true)
+            {
+
+                @foreach (var item in listaPREINSC_INCOMP)
+                {
+                    <div class="col-12 col-md-6 mb-4">
+                        <div class="modern-card tarjeta-alumno tarjeta-incompleta d-flex flex-column flex-md-row align-items-center gap-3 p-3">
+                            <div class="avatar-alumno me-md-3 mb-2 mb-md-0">
+                                <i class="bi bi-person-circle fs-1 text-primary"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold mb-1">@item.Nombre</h5>
+                                <div class="text-muted small mb-1">Matrícula: @item.MatriculaID</div>
+                                <div class="mb-1">@item.Carrera</div>
+                                <div class="text-secondary small">@item.fechaInsc</div>
+                            </div>
+                            <div class="ms-auto d-flex gap-2">
+                                <button class="btn btn-outline-primary btn-sm rounded-pill" @onclick="() => BtnEditarIncomp(item)">Editar</button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+
+            @if (_IsvisibleInscripCompletas == true)
+            {
+
+                @foreach (var item in listaPREINSCRIP)
+                {
+                    <div class="col-12 col-md-6 mb-4">
+                        <div class="modern-card tarjeta-alumno tarjeta-completa d-flex flex-column flex-md-row align-items-center gap-3 p-3">
+                            <div class="avatar-alumno me-md-3 mb-2 mb-md-0">
+                                <i class="bi bi-person-circle fs-1 text-primary"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold mb-1">@item.Nombre</h5>
+                                <div class="text-muted small mb-1">Matrícula: @item.MatriculaID</div>
+                                <div class="mb-1">@item.Carrera</div>
+                                <div class="text-secondary small">@item.fechaInsc</div>
+                            </div>
+                            <div class="ms-auto d-flex gap-2">
+                                <button class="btn btn-outline-primary btn-sm rounded-pill" @onclick="() => BtnEditarComp(item)">Editar</button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }    
+            
+
+
+        </div>
+    }
+    else
+    {
+        <div class="modern-form position-relative">
+
+            
+
+            @if(GuardarFab)
+            {
+                <!-- Botón Sticky (desktop) -->
+                <button class="btn btn-azul btn-guardar-sticky d-none d-md-block"
+                        @onclick="GuardarFormulario">
+                    <i class="bi bi-save"></i> Guardar
+                </button>
+
+                 <!-- FAB (móvil, aparece cuando no estás hasta abajo) -->
+                 <button class="btn btn-azul btn-fab-guardar d-md-none"
+                         @onclick="GuardarFormulario"
+                         style="display:none;" id="fabGuardar">
+                     <i class="bi bi-save2-fill"></i>
+                 </button>
+            }
+
+            @if (EditarFab)
+            {
+                <!-- Botón Sticky (desktop) -->
+                <button class="btn btn-dorado btn-guardar-sticky d-none d-md-block"
+                        @onclick="GuardarPreIncompleta">
+                    <i class="bi bi-pencil-square"></i> Editar
+                </button>
+
+                 <!-- FAB (móvil, aparece cuando no estás hasta abajo) -->
+                <button class="btn btn-dorado btn-fab-editar d-md-none"     
+                        @onclick="GuardarPreIncompleta"
+                        style="display:none;" id="fabEditar">
+                    <i class="bi bi-pencil-square"></i>
+                </button>
+            }
+           
+
+            <button class="btn btn-secondary mt-4" @onclick="OcultarFormulario">
+                <i class="bi bi-arrow-left"></i> Volver
+            </button>
+
+            <div class="row g-4">
+
+                <!-- Datos del Alumno -->
+                <div class="col-12">
+                    <div class="modern-card sombra-azul">
+                        <div class="modern-card-title">
+                            <i class="bi bi-person-circle"></i> Datos del Alumno
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-12 col-md-4">
+                                <label class="modern-label">MatriculaID</label>
+                                <input type="text" class="form-control modern-input" @bind-value="ALUMNOSPREINSCDTO.cMatriculaID" placeholder="MatriculaID" readonly>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label class="modern-label">Nombre</label>
+                                <input type="text" class="form-control modern-input" @bind-value="ALUMNOSPREINSCDTO.cNombre" placeholder="Nombre">
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label class="modern-label">Apellido Paterno</label>
+                                <input type="text" class="form-control modern-input" @bind-value="ALUMNOSPREINSCDTO.cApellido_Paterno" placeholder="Apellido Paterno">
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label class="modern-label">Apellido Materno</label>
+                                <input type="text" class="form-control modern-input" @bind-value="ALUMNOSPREINSCDTO.cApellido_Materno" placeholder="Apellido Materno">
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label class="modern-label">Edad</label>
+                                <input type="number" class="form-control modern-input" @bind-value="ALUMNOSPREINSCDTO.fEdad" placeholder="Edad">
+                            </div>
+                            <div class="col-12 col-md-8">
+                                <label class="modern-label">Dirección</label>
+                                <input type="text" class="form-control modern-input" @bind-value="ALUMNOSPREINSCDTO.Direccion" placeholder="Dirección">
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label class="modern-label">Colonia</label>
+                                <input type="text" class="form-control modern-input" @bind-value="ALUMNOSPREINSCDTO.Colonia" placeholder="Colonia">
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label class="modern-label">Municipio</label>
+                                <input type="text" class="form-control modern-input" @bind-value="ALUMNOSPREINSCDTO.Ciudad" placeholder="Municipio">
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label class="modern-label">CP</label>
+                                <input type="text" class="form-control modern-input" @bind-value="ALUMNOSPREINSCDTO.CodigoPostal" placeholder="Código Postal">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="modern-label">Celular</label>
+                                <input type="tel" class="form-control modern-input" @bind-value="ALUMNOSPREINSCDTO.Telefono" placeholder="Celular">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="modern-label">Email</label>
+                                <input type="email" class="form-control modern-input" @bind-value="ALUMNOSPREINSCDTO.Email" placeholder="Email">
+                            </div>
+                            <div class="col-12">
+                                <label class="modern-label">Escuela de procedencia</label>
+                                <input type="text" class="form-control modern-input" @bind-value="ALUMNOSPREINSCDTO.EscuelaProcedencia" placeholder="Escuela de procedencia">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Datos Adicionales del Alumno -->
+                <div class="col-12 col-lg-6">
+                    <div class="modern-card sombra-dorada">
+                        <div class="modern-card-title">
+                            <i class="bi bi-person-vcard"></i> Datos Adicionales del Alumno
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="modern-label">Lugar de nacimiento</label>
+                                <input type="text" class="form-control modern-input" @bind-value="ALUMNOSPREINSCDTO.sLugarNacimiento" placeholder="Lugar de nacimiento">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="modern-label">Nacionalidad</label>
+                                <input type="text" class="form-control modern-input" @bind-value="ALUMNOSPREINSCDTO.sNacionalidad" placeholder="Nacionalidad">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="modern-label">Sexo</label>
+                                <select class="form-control modern-input" @bind="@ALUMNOSPREINSCDTO.Sexo">
+                                    <option value="">Seleccione</option>
+                                    <option value="Ma">Masculino</option>
+                                    <option value="Fe">Femenino</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="modern-label">Fecha de nacimiento</label>
+                                <input type="date" class="form-control modern-input" @bind-value="ALUMNOSPREINSCDTO.FechaNacimiento" />
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="modern-label">Estado Civil</label>
+                                <input type="text" class="form-control modern-input" @bind-value="ALUMNOSPREINSCDTO.Estado" placeholder="Estado Civil">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="modern-label">Ocupación</label>
+                                <input type="text" class="form-control modern-input" @bind-value="ALUMNOSPREINSCDTO.sOcupacion" placeholder="Ocupación">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="modern-label">Sector</label>
+                                <input type="text" class="form-control modern-input" @bind-value="ALUMNOSPREINSCDTO.sSector" placeholder="Sector">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="modern-label">Servicio Médico</label>
+                                <input type="text" class="form-control modern-input" @bind-value="ALUMNOSPREINSCDTO.sServicioMedico" placeholder="Servicio Médico">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="modern-label">CURP</label>
+                                <input type="text" class="form-control modern-input" @bind-value="ALUMNOSPREINSCDTO.Curp" placeholder="CURP" maxlength="18">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Área Solicitada -->
+                <div class="col-12 col-lg-6">
+                    <div class="modern-card sombra-azul">
+                        <div class="modern-card-title">
+                            <i class="bi bi-mortarboard"></i> Área Solicitada
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="modern-label">Carrera</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control modern-input" @bind-value="CarreraNombre" readonly placeholder="Carrera seleccionada">
+                                    <button class="btn btn-azul px-3 py-2" type="button"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalCarreras"
+                                            @onclick="MostrarModalCarreras">
+                                        <i class="bi bi-search"></i> Buscar Carrera
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="modern-label">Fecha de inscripción</label>
+                                <input type="date" @bind-value="FechaActual" class="form-control modern-input" />
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="modern-label">Atendió</label>
+                                <input type="text" class="form-control modern-input" @bind-value="AtendioText" placeholder="Atendió" readonly>
+                            </div>
+                            <div class="col-12">
+                                <label class="modern-label">Ciclo Escolar</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control modern-input" @bind-value="textoCicloI" placeholder="Inicio">
+                                    <span class="mx-2">-</span>
+                                    <input type="text" class="form-control modern-input" @bind-value="textoCicloF" placeholder="Fin">
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label class="modern-label">Medio</label>
+                                <select class="form-control modern-input" @bind="PREINSCRIPDTO.sMedioEntero">
+                                    <option value="">Seleccione</option>
+                                    <option value="Facebook">Facebook</option>
+                                    <option value="Instagram">Instagram</option>
+                                    <option value="Via Online">Via Online</option>
+                                    <option value="Radio">Radio</option>
+                                    <option value="Television">Television</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Datos del Padre o Tutor -->
+                <div class="col-12 col-lg-6">
+                    <div class="modern-card sombra-dorada">
+                        <div class="modern-card-title">
+                            <i class="bi bi-people"></i> Datos del Padre o Tutor
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <label class="modern-label">Nombre del Padre, Madre o Tutor</label>
+                                <input type="text" class="form-control modern-input" @bind-value="TUTORPREINSCDTO.sNombre" placeholder="Nombre">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="modern-label">Apellido Paterno</label>
+                                <input type="text" class="form-control modern-input" @bind-value="TUTORPREINSCDTO.sApellidoPaterno" placeholder="Apellido Paterno">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="modern-label">Apellido Materno</label>
+                                <input type="text" class="form-control modern-input" @bind-value="TUTORPREINSCDTO.sApellidoMaterno" placeholder="Apellido Materno">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="modern-label">Ocupación</label>
+                                <input type="text" class="form-control modern-input" @bind-value="TUTORPREINSCDTO.sOcupacion" placeholder="Ocupación">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="modern-label">Parentesco</label>
+                                <input type="text" class="form-control modern-input" @bind-value="TUTORPREINSCDTO.sParentesco" placeholder="Parentesco">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="modern-label">Tel. Casa</label>
+                                <input type="tel" class="form-control modern-input" @bind-value="textoTelTutor" placeholder="Tel. Casa">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="modern-label">Celular</label>
+                                <input type="tel" class="form-control modern-input" @bind-value="textoCelTutor" placeholder="Celular">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="modern-label">Email</label>
+                                <input type="email" class="form-control modern-input" @bind-value="TUTORPREINSCDTO.sCorreo" placeholder="Email">
+                            </div>
+                            <div class="col-12">
+                                <label class="modern-label">Dirección</label>
+                                <input type="text" class="form-control modern-input" @bind-value="TUTORPREINSCDTO.sDireccion" placeholder="Dirección">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Caso de Emergencia -->
+                <div class="col-12 col-lg-6">
+                    <div class="modern-card sombra-azul">
+                        <div class="modern-card-title">
+                            <i class="bi bi-exclamation-triangle"></i> Caso de Emergencia
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <label class="modern-label">Nombre</label>
+                                <input type="text" class="form-control modern-input" @bind-value="ALUMNOSPREINSCDTO.sCasoEmergencia" placeholder="Nombre">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="modern-label">Parentesco</label>
+                                <input type="text" class="form-control modern-input" @bind-value="ALUMNOSPREINSCDTO.sParentesco" placeholder="Parentesco">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="modern-label">Teléfono</label>
+                                <input type="tel" class="form-control modern-input" @bind-value="textoCelEmergenciaAluI" placeholder="Teléfono">
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="modern-label">Email</label>
+                                <input type="email" class="form-control modern-input" @bind-value="ALUMNOSPREINSCDTO.sCorreoEmergencia" placeholder="Email">
+                            </div>
+                            <div class="col-12">
+                                <label class="modern-label">Celular</label>
+                                <input type="tel" class="form-control modern-input" @bind-value="textoCelEmergencia" placeholder="Celular">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botón guardar al final (solo móvil) -->
+            <div class="d-md-none text-center mt-4" id="footerBtnGuardar" style="display:none;">
+                <button class="btn btn-azul btn-block" @onclick="GuardarFormulario">
+                    <i class="bi bi-save"></i> Guardar
+                </button>
+            </div>
+
+            <div class="d-md-none text-center mt-4" id="footerBtnEditar" style="display:none;">
+                <button class="btn btn-dorado btn-block" @onclick="GuardarPreIncompleta">
+                    <i class="bi bi-pencil-square"></i> Editar
+                </button>
+            </div>
+
+        </div>
+    }
+</div>
+
+
+@* ------------------------------------MODALS------------------------------- *@
+
+
+<div class="modal fade" id="modalCarreras" tabindex="-1" aria-labelledby="modalCarrerasLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-carrera-escolar">
+        <div class="modal-content shadow modal-glass modal-carreras-exclusivo">
+            <div class="modal-header border-0 pt-3 pb-2">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-mortarboard-fill fs-4 text-azul-vital"></i>
+                    <h5 class="modal-title fw-bold text-dorado" id="modalCarrerasLabel">Explorar Carreras</h5>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <div class="modal-body py-2 px-3 modal-body-scrollable" style="max-height: 600px; overflow-y: auto;">
+                <div class="input-group mb-3 modern-search-carrera">
+                    <input type="text" class="form-control modern-input-carrera"
+                           placeholder="Buscar carrera por nombre o ID..."
+                           @bind-value="textoCarreraBuscada" @oninput="FiltrarCarreras">
+                    <span class="input-group-text buscador-carrera-icono">
+                        <i class="bi bi-search"></i>
+                    </span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table tabla-carreras align-middle mb-0 tabla-carreras-exclusiva">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre de Carrera</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (listaCARRERAS == null || listaCARRERAS.Count == 0)
+                            {
+                                <tr>
+                                    <td colspan="2" class="text-center text-muted py-4">
+                                        <i class="bi bi-emoji-frown fs-3"></i>
+                                        <div>No se encontró ninguna carrera</div>
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var carrera in listaCARRERAS)
+                                {
+                                    <tr @onclick="() => SeleccionarCarrera(carrera)"
+                                        class="fila-carrera @(carreraSeleccionada?.CarreraID == carrera.CarreraID ? "fila-carrera-seleccionada" : "")"
+                                        style="cursor: pointer;">
+                                        <td class="fw-bold">@carrera.CarreraID</td>
+                                        <td>@carrera.Carrera</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-carrera-listo" @onclick="ConfirmarCarrera">
+                    <i class="bi bi-check2-circle me-2"></i>Listo
+                </button>
+                <button type="button" class="btn btn-carrera-cancelar" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-2"></i>Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+@code {
+
+    [Parameter]
+    public string sEmail { get; set; } = "";
+
+
+    private bool mostrarFormulario = false;
+    private bool mostrarFiltro = false;
+
+    private bool _IsvisibleInscripTodas = true;
+    private bool _IsvisibleInscripIncompletas = false;
+    private bool _IsvisibleInscripCompletas = false;
+
+    private string textoCarreraBuscada = "";
+    private string textoBusqueda = "";
+    private string textoCelEmergencia = "";
+    private string textoCelEmergenciaAluI = "";
+    private string textoTelTutor = "";
+    private string textoCelTutor = "";
+    private string textoCicloI = "";
+    private string textoCicloF = "";
+    private string CarreraNombre = "";
+    private string AtendioText = "";
+
+    private bool filtroCompletas = false;
+    private bool filtroIncompleto = false;
+    private bool GuardarFab = false;
+    private bool EditarFab = false;
+
+    private void OcultarFormulario() => mostrarFormulario = false;
+
+    private List<ST_S_PREINSCRIPDTO> listaPREINSCRIP = new(); // Lista de resultados
+    private List<ST_S_PREINSC_INCOMPDTO> listaPREINSC_INCOMP = new(); // Lista de resultados
+    private List<ST_S_CARRERASDTO> listaCARRERAS = new(); // Lista de resultados
+
+    private ST_S_CARRERASDTO? carreraSeleccionada;
+
+    private ST_S_PREINSCRIPDTO BusquedaAlumno = new ST_S_PREINSCRIPDTO();
+
+
+    private ST_IUE_ALUMNOSPREINSCDTO ALUMNOSPREINSCDTO = new ST_IUE_ALUMNOSPREINSCDTO();
+    private ST_IUD_TUTORPREINSCDTO TUTORPREINSCDTO = new ST_IUD_TUTORPREINSCDTO();
+    private ST_IUD_PREINSCRIPDTO PREINSCRIPDTO = new ST_IUD_PREINSCRIPDTO();
+
+    private string filtroInscrip = "";
+
+    private DateTime FechaActual = DateTime.Now;
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        sEmail = mySesionEmail.Email;
+
+        listaPREINSCRIP = await usuarioService.ST_S_PREINSCRIP(3, "-", 0, "-");     
+        listaPREINSC_INCOMP = await usuarioService.ST_S_PREINSC_INCOMP(1, "-");
+
+    }
+
+
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (mostrarFormulario)
+        {
+            await JSRuntime.InvokeVoidAsync("initGuardarScroll");
+            await JSRuntime.InvokeVoidAsync("initEditarScroll");
+        }
+    }
+
+
+    private async Task FiltrarPreinscrip(ChangeEventArgs e)
+    {
+        var filtro = e.Value?.ToString();
+
+        // Filtrar solo incompletas
+        if (_IsvisibleInscripIncompletas)
+        {
+            if (!string.IsNullOrWhiteSpace(filtro))
+            {
+                listaPREINSC_INCOMP = await usuarioService.ST_S_PREINSC_INCOMP(1, filtro);
+            }
+            else
+            {
+                listaPREINSC_INCOMP = await usuarioService.ST_S_PREINSC_INCOMP(1, "-");
+            }
+            StateHasChanged();
+            return;
+        }
+
+        // Filtrar solo completas
+        if (_IsvisibleInscripCompletas)
+        {
+            if (!string.IsNullOrWhiteSpace(filtro))
+            {
+                listaPREINSCRIP = await usuarioService.ST_S_PREINSCRIP(3, "-", 0, filtro);
+            }
+            else
+            {
+                listaPREINSCRIP = await usuarioService.ST_S_PREINSCRIP(3, "-", 0, "-");
+            }
+            StateHasChanged();
+            return;
+        }
+
+        // Filtrar ambas (cuando tienes activadas las dos, o modo "todas")
+        if (_IsvisibleInscripTodas)
+        {
+            if (!string.IsNullOrWhiteSpace(filtro))
+            {
+                // Ambos filtros al mismo tiempo
+                listaPREINSCRIP = await usuarioService.ST_S_PREINSCRIP(3, "-", 0, filtro);
+                listaPREINSC_INCOMP = await usuarioService.ST_S_PREINSC_INCOMP(1, filtro);
+            }
+            else
+            {
+                listaPREINSCRIP = await usuarioService.ST_S_PREINSCRIP(3, "-", 0, "-");
+                listaPREINSC_INCOMP = await usuarioService.ST_S_PREINSC_INCOMP(1, "-");
+            }
+            StateHasChanged();
+            return;
+        }
+    }
+
+
+    private async Task NuevaPreinscrip()
+    {
+        var resultado = await Swal.FireAsync(new SweetAlertOptions
+        {
+            Title = "Nueva Preinscripción",
+            Text = "Desea hacer una nueva preinscripción?",
+            Icon = SweetAlertIcon.Info,
+            ShowCancelButton = true
+        });
+
+        if (resultado.IsConfirmed)
+        {
+            mostrarFormulario = true;
+            EditarFab = false;
+            GuardarFab = true;
+            ALUMNOSPREINSCDTO = new ST_IUE_ALUMNOSPREINSCDTO();
+
+        }
+
+    }
+
+
+    private async Task ToggleModoOscuro()
+    {
+        await JSRuntime.InvokeVoidAsync("document.body.classList.toggle", "modo-oscuro");
+    }
+
+
+    private async Task MostrarModalCarreras()
+    {
+        listaCARRERAS = await usuarioService.ST_S_CARRERAS(1, "-");
+    }
+
+    private void SeleccionarCarrera(ST_S_CARRERASDTO carrera)
+    {
+        if (carreraSeleccionada == carrera)
+        {
+            carreraSeleccionada = null;
+            textoCarreraBuscada = "";
+            CarreraNombre = "";
+
+        }
+        else
+        {
+            carreraSeleccionada = carrera; // Guardar el renglón seleccionado
+            textoCarreraBuscada = carreraSeleccionada.Carrera;
+        }        
+    }
+
+    private async void FiltrarCarreras(ChangeEventArgs e)
+    {
+        // Obtener el valor ingresado en el input
+        var filtro = e.Value?.ToString();
+
+        if (!string.IsNullOrWhiteSpace(filtro))
+        {
+            // Enviar el valor al servidor y actualizar la lista
+            listaCARRERAS = await usuarioService.ST_S_CARRERAS(1, filtro);
+        }
+        else
+        {
+            // Si no hay texto, INICIA la lista
+            listaCARRERAS = await usuarioService.ST_S_CARRERAS(1, "-");
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task ConfirmarCarrera()
+    {
+        if (carreraSeleccionada != null)
+        {
+
+            PREINSCRIPDTO.sCarreraID = Convert.ToInt32(carreraSeleccionada.CarreraID);
+            CarreraNombre = carreraSeleccionada.Carrera;
+            await JSRuntime.InvokeVoidAsync("cerrarModal", "#modalCarreras");
+        }
+        else
+        {
+            var resultado = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Error",
+                Text = "No ha seleccionado una Carrera",
+                Icon = SweetAlertIcon.Error
+            });
+            return;
+        }
+
+    }
+
+    private void ToggleFiltro()
+    {
+        mostrarFiltro = !mostrarFiltro;
+    }
+
+
+    private async Task OnFiltroIncompletoChanged(ChangeEventArgs e)
+    {
+        filtroIncompleto = (bool)e.Value!;
+        if (filtroIncompleto)
+        {
+            filtroCompletas = false; // Desmarca "Completas"
+            mostrarFiltro = false;
+            _IsvisibleInscripIncompletas = true;
+            _IsvisibleInscripTodas = false;
+            _IsvisibleInscripCompletas = false;
+            // Aquí tu lógica, por ejemplo:
+            listaPREINSC_INCOMP = await usuarioService.ST_S_PREINSC_INCOMP(1, "-");
+        }
+        else
+        {
+            // Si quitas la selección, podrías mostrar todas o ninguna.
+            _IsvisibleInscripIncompletas = false;
+            _IsvisibleInscripTodas = true;
+        }
+        StateHasChanged();
+    }
+
+    private async Task OnFiltroCompletasChanged(ChangeEventArgs e)
+    {
+        filtroCompletas = (bool)e.Value!;
+        if (filtroCompletas)
+        {
+            filtroIncompleto = false; // Desmarca "Incompletas"
+            mostrarFiltro = false;
+            _IsvisibleInscripTodas = false;
+            _IsvisibleInscripIncompletas = false;
+            _IsvisibleInscripCompletas = true;
+            // Aquí tu lógica, por ejemplo:
+            listaPREINSCRIP = await usuarioService.ST_S_PREINSCRIP(3, "-", 0, "-");
+        }
+        else
+        {
+            _IsvisibleInscripTodas = true;            
+            _IsvisibleInscripCompletas = false;
+        }
+        StateHasChanged();
+    }
+
+
+    private async Task BtnEditarIncomp(ST_S_PREINSC_INCOMPDTO incompleto)
+    {
+        var resultado = await Swal.FireAsync(new SweetAlertOptions
+        {
+            Title = "Editar Preinscripción",
+            Text = "Desea editar esta preinscripción?",
+            Icon = SweetAlertIcon.Info,
+            ShowCancelButton = true
+        });
+
+        if (resultado.IsConfirmed)
+        {
+            mostrarFormulario = true;
+            GuardarFab = false;
+            EditarFab = true;
+            ALUMNOSPREINSCDTO.cMatriculaID = incompleto.MatriculaID;
+            ALUMNOSPREINSCDTO.cNombre = incompleto.Nombre;
+            ALUMNOSPREINSCDTO.cApellido_Paterno = incompleto.Apellido_paterno;
+            ALUMNOSPREINSCDTO.cApellido_Materno = incompleto.Apellido_materno;
+            ALUMNOSPREINSCDTO.fEdad = incompleto.Edad;
+            ALUMNOSPREINSCDTO.Direccion = incompleto.Direccion;
+            ALUMNOSPREINSCDTO.Colonia = incompleto.Colonia;
+            ALUMNOSPREINSCDTO.Ciudad = incompleto.Ciudad;
+            ALUMNOSPREINSCDTO.CodigoPostal = incompleto.CodigoPostal;
+            ALUMNOSPREINSCDTO.Telefono = incompleto.Telefono;
+            ALUMNOSPREINSCDTO.Email = incompleto.Email;
+            ALUMNOSPREINSCDTO.EscuelaProcedencia = incompleto.EscuelaProcedencia;
+            ALUMNOSPREINSCDTO.sLugarNacimiento = incompleto.LugardeNacimiento;
+            ALUMNOSPREINSCDTO.sNacionalidad = incompleto.Nacionalidad;
+            ALUMNOSPREINSCDTO.Sexo = incompleto.Sexo;
+            ALUMNOSPREINSCDTO.FechaNacimiento = incompleto.FechaNacimiento;
+            ALUMNOSPREINSCDTO.Estado = incompleto.EstadoCivil;
+            ALUMNOSPREINSCDTO.sOcupacion = incompleto.Ocupacion;
+            ALUMNOSPREINSCDTO.sSector = incompleto.Sector;
+            ALUMNOSPREINSCDTO.sServicioMedico = incompleto.ServicioMedico;
+            ALUMNOSPREINSCDTO.Curp = incompleto.Curp;
+            ALUMNOSPREINSCDTO.sCasoEmergencia = incompleto.CasoEmergencia;
+            ALUMNOSPREINSCDTO.sParentesco = incompleto.Parentesco;
+            if (incompleto.TelEmergencia.Contains("-"))
+            {
+                var partes = incompleto.TelEmergencia.Split('-', 2, StringSplitOptions.TrimEntries);
+
+                textoCelEmergenciaAluI = partes[0];           // Antes del guion
+                textoCelEmergencia = partes.Length > 1 ? partes[1] : "";  // Después del guion (si existe)
+
+            }
+            else
+            {
+                textoCelEmergenciaAluI = incompleto.TelEmergencia; // Si no hay guion, guarda todo en telefono
+                textoCelEmergencia = "";
+            }
+            ALUMNOSPREINSCDTO.sCorreoEmergencia = incompleto.CorreoEmergencia; 
+
+            // Inscrip
+
+            CarreraNombre = incompleto.Carrera;
+            FechaActual = incompleto.fechaInsc;
+            AtendioText = incompleto.Atendio;
+
+            if (incompleto.CicloID.Contains("-"))
+            {
+                var partes = incompleto.CicloID.Split('-', 2, StringSplitOptions.TrimEntries);
+
+                textoCicloI = partes[0];           // Antes del guion
+                textoCicloF = partes.Length > 1 ? partes[1] : "";  // Después del guion (si existe)
+
+            }
+            else
+            {
+                textoCicloI = incompleto.CicloID; // Si no hay guion, guarda todo en telefono
+                textoCicloF = "";
+            }
+            PREINSCRIPDTO.sMedioEntero = incompleto.MedioEntero;
+            PREINSCRIPDTO.sCarreraID = incompleto.CarreraID;
+
+            //Tutor datod
+            TUTORPREINSCDTO.sNombre = incompleto.NombreTutor;
+            TUTORPREINSCDTO.sApellidoPaterno = incompleto.APTutor;
+            TUTORPREINSCDTO.sApellidoMaterno = incompleto.AMTutor;
+            TUTORPREINSCDTO.sOcupacion = incompleto.OcupacionTutor;
+            TUTORPREINSCDTO.sParentesco = incompleto.ParentescoTutor;
+
+            if (incompleto.TelTutor.Contains("-"))
+            {
+                var partes = incompleto.TelTutor.Split('-', 2, StringSplitOptions.TrimEntries);
+
+                textoTelTutor = partes[0];           // Antes del guion
+                textoCelTutor = partes.Length > 1 ? partes[1] : "";  // Después del guion (si existe)
+
+            }
+            else
+            {
+                textoTelTutor = incompleto.TelTutor; // Si no hay guion, guarda todo en telefono
+                textoCelTutor = "";
+            }
+            TUTORPREINSCDTO.sCorreo = incompleto.CorreoTutor;
+            TUTORPREINSCDTO.sDireccion = incompleto.DireccionTutor;
+
+        }
+
+    }
+
+    private async Task BtnEditarComp(ST_S_PREINSCRIPDTO completo)
+    {
+        var resultado = await Swal.FireAsync(new SweetAlertOptions
+        {
+            Title = "Editar Preinscripción",
+            Text = "Desea editar esta preinscripción?",
+            Icon = SweetAlertIcon.Info,
+            ShowCancelButton = true
+        });
+
+        if (resultado.IsConfirmed)
+        {
+            mostrarFormulario = true;
+            GuardarFab = false;
+            EditarFab = true;
+            ALUMNOSPREINSCDTO.cMatriculaID = completo.MatriculaID;
+            ALUMNOSPREINSCDTO.cNombre = completo.Nombre;
+            ALUMNOSPREINSCDTO.cApellido_Paterno = completo.Apellido_paterno;
+            ALUMNOSPREINSCDTO.cApellido_Materno = completo.Apellido_materno;
+            ALUMNOSPREINSCDTO.fEdad = completo.Edad;
+            ALUMNOSPREINSCDTO.Direccion = completo.Direccion;
+            ALUMNOSPREINSCDTO.Colonia = completo.Colonia;
+            ALUMNOSPREINSCDTO.Ciudad = completo.Ciudad;
+            ALUMNOSPREINSCDTO.CodigoPostal = completo.CodigoPostal;
+            ALUMNOSPREINSCDTO.Telefono = completo.Telefono;
+            ALUMNOSPREINSCDTO.Email = completo.Email;
+            ALUMNOSPREINSCDTO.EscuelaProcedencia = completo.EscuelaProcedencia;
+            ALUMNOSPREINSCDTO.sLugarNacimiento = completo.LugardeNacimiento;
+            ALUMNOSPREINSCDTO.sNacionalidad = completo.Nacionalidad;
+            ALUMNOSPREINSCDTO.Sexo = completo.Sexo;
+            ALUMNOSPREINSCDTO.FechaNacimiento = completo.FechaNacimiento;
+            ALUMNOSPREINSCDTO.Estado = completo.EstadoCivil;
+            ALUMNOSPREINSCDTO.sOcupacion = completo.Ocupacion;
+            ALUMNOSPREINSCDTO.sSector = completo.Sector;
+            ALUMNOSPREINSCDTO.sServicioMedico = completo.ServicioMedico;
+            ALUMNOSPREINSCDTO.Curp = completo.Curp;
+            ALUMNOSPREINSCDTO.sCasoEmergencia = completo.CasoEmergencia;
+            ALUMNOSPREINSCDTO.sParentesco = completo.Parentesco;
+            if (completo.TelEmergencia.Contains("-"))
+            {
+                var partes = completo.TelEmergencia.Split('-', 2, StringSplitOptions.TrimEntries);
+
+                textoCelEmergenciaAluI = partes[0];           // Antes del guion
+                textoCelEmergencia = partes.Length > 1 ? partes[1] : "";  // Después del guion (si existe)
+
+            }
+            else
+            {
+                textoCelEmergenciaAluI = completo.TelEmergencia; // Si no hay guion, guarda todo en telefono
+                textoCelEmergencia = "";
+            }
+            ALUMNOSPREINSCDTO.sCorreoEmergencia = completo.CorreoEmergencia;
+
+            // Inscrip
+
+            CarreraNombre = completo.Carrera;           
+            FechaActual = completo.fechaInsc;
+            AtendioText = completo.Atendio;
+
+            if (completo.CicloID.Contains("-"))
+            {
+                var partes = completo.CicloID.Split('-', 2, StringSplitOptions.TrimEntries);
+
+                textoCicloI = partes[0];           // Antes del guion
+                textoCicloF = partes.Length > 1 ? partes[1] : "";  // Después del guion (si existe)
+
+            }
+            else
+            {
+                textoCicloI = completo.CicloID; // Si no hay guion, guarda todo en telefono
+                textoCicloF = "";
+            }
+            PREINSCRIPDTO.sMedioEntero = completo.MedioEntero;
+            PREINSCRIPDTO.sCarreraID = completo.CarreraID;
+
+            //Tutor datod
+            TUTORPREINSCDTO.sNombre = completo.NombreTutor;
+            TUTORPREINSCDTO.sApellidoPaterno = completo.APTutor;
+            TUTORPREINSCDTO.sApellidoMaterno = completo.AMTutor;
+            TUTORPREINSCDTO.sOcupacion = completo.OcupacionTutor;
+            TUTORPREINSCDTO.sParentesco = completo.ParentescoTutor;
+
+            if (completo.TelTutor.Contains("-"))
+            {
+                var partes = completo.TelTutor.Split('-', 2, StringSplitOptions.TrimEntries);
+
+                textoTelTutor = partes[0];           // Antes del guion
+                textoCelTutor = partes.Length > 1 ? partes[1] : "";  // Después del guion (si existe)
+
+            }
+            else
+            {
+                textoTelTutor = completo.TelTutor; // Si no hay guion, guarda todo en telefono
+                textoCelTutor = "";
+            }
+            TUTORPREINSCDTO.sCorreo = completo.CorreoTutor;
+            TUTORPREINSCDTO.sDireccion = completo.DireccionTutor;
+
+        }
+
+    }
+
+
+    private async Task GuardarFormulario()
+    {
+
+        //ST_IUE_ALUMNOSPREINSC
+        ALUMNOSPREINSCDTO.iTipoOperacion = 1;
+        ALUMNOSPREINSCDTO.cMatriculaID = 0;
+        ALUMNOSPREINSCDTO.cNombre = ALUMNOSPREINSCDTO.cNombre;
+        ALUMNOSPREINSCDTO.cApellido_Paterno = ALUMNOSPREINSCDTO.cApellido_Paterno;
+        ALUMNOSPREINSCDTO.cApellido_Materno = ALUMNOSPREINSCDTO.cApellido_Materno;
+        ALUMNOSPREINSCDTO.fEdad = ALUMNOSPREINSCDTO.fEdad;
+        ALUMNOSPREINSCDTO.Direccion = ALUMNOSPREINSCDTO.Direccion;
+        ALUMNOSPREINSCDTO.Colonia = ALUMNOSPREINSCDTO.Colonia;
+        ALUMNOSPREINSCDTO.Ciudad = ALUMNOSPREINSCDTO.Ciudad;
+        ALUMNOSPREINSCDTO.CodigoPostal = ALUMNOSPREINSCDTO.CodigoPostal;
+        ALUMNOSPREINSCDTO.Telefono = ALUMNOSPREINSCDTO.Telefono;
+        ALUMNOSPREINSCDTO.Email = ALUMNOSPREINSCDTO.Email;
+        ALUMNOSPREINSCDTO.EscuelaProcedencia = ALUMNOSPREINSCDTO.EscuelaProcedencia;
+        ALUMNOSPREINSCDTO.sLugarNacimiento = ALUMNOSPREINSCDTO.sLugarNacimiento;
+        ALUMNOSPREINSCDTO.sNacionalidad = ALUMNOSPREINSCDTO.sNacionalidad;
+        ALUMNOSPREINSCDTO.Sexo = ALUMNOSPREINSCDTO.Sexo;
+        ALUMNOSPREINSCDTO.FechaNacimiento = ALUMNOSPREINSCDTO.FechaNacimiento;
+        ALUMNOSPREINSCDTO.Estado = ALUMNOSPREINSCDTO.Estado;
+        ALUMNOSPREINSCDTO.sOcupacion = ALUMNOSPREINSCDTO.sOcupacion;
+        ALUMNOSPREINSCDTO.sSector = ALUMNOSPREINSCDTO.sSector;
+        ALUMNOSPREINSCDTO.sServicioMedico = ALUMNOSPREINSCDTO.sServicioMedico;
+        ALUMNOSPREINSCDTO.Curp = ALUMNOSPREINSCDTO.Curp;
+        ALUMNOSPREINSCDTO.sCorreo = ALUMNOSPREINSCDTO.sCorreo;
+        ALUMNOSPREINSCDTO.sCasoEmergencia = ALUMNOSPREINSCDTO.sCasoEmergencia;
+        ALUMNOSPREINSCDTO.sParentesco = ALUMNOSPREINSCDTO.sParentesco;
+
+        // Si ambos están vacíos, queda string vacío. Si uno u otro tiene valor, se asigna correctamente.
+        // Si ambos tienen valor, se concatena con el guion.
+        ALUMNOSPREINSCDTO.sTelEmergencia =
+        string.Join(
+            textoCelEmergenciaAluI != "" && textoCelEmergencia != "" ? "-" : "",
+            textoCelEmergenciaAluI,
+            textoCelEmergencia
+        );
+
+        ALUMNOSPREINSCDTO.sCorreoEmergencia = ALUMNOSPREINSCDTO.sCorreoEmergencia;
+        ALUMNOSPREINSCDTO.RFC = "";
+        ALUMNOSPREINSCDTO.GradoMaximo = "";
+        ALUMNOSPREINSCDTO.cMatriculaNueva = "";
+        ALUMNOSPREINSCDTO.sFirma = "";
+        ALUMNOSPREINSCDTO.sUsuario = sEmail;
+
+        if (ALUMNOSPREINSCDTO.cNombre == null || ALUMNOSPREINSCDTO.cNombre == "")
+        {
+            var resultado = await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Campo Vacio",
+                    Text = "Favor de Llenar el Nombre",
+                    Icon = SweetAlertIcon.Error
+                });
+            return;
+        }
+
+        if (ALUMNOSPREINSCDTO.cApellido_Paterno == null || ALUMNOSPREINSCDTO.cApellido_Paterno == "")
+        {
+            var resultado = await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Campo Vacio",
+                    Text = "Favor de Llenar el Apellido paterno",
+                    Icon = SweetAlertIcon.Error
+                });
+            return;
+        }
+
+        if (ALUMNOSPREINSCDTO.cApellido_Materno == null || ALUMNOSPREINSCDTO.cApellido_Materno == "")
+        {
+            var resultado = await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Campo Vacio",
+                    Text = "Favor de Llenar el Apellido materno",
+                    Icon = SweetAlertIcon.Error
+                });
+            return;
+        }
+
+        //ST_IUD_TUTORPREINSC
+        TUTORPREINSCDTO.iTipoOperacion = 2;
+        TUTORPREINSCDTO.sMatriculaID = 0;
+        TUTORPREINSCDTO.sNombre = TUTORPREINSCDTO.sNombre;
+        TUTORPREINSCDTO.sApellidoPaterno = TUTORPREINSCDTO.sApellidoPaterno;
+        TUTORPREINSCDTO.sApellidoMaterno = TUTORPREINSCDTO.sApellidoMaterno;
+        TUTORPREINSCDTO.sParentesco = TUTORPREINSCDTO.sParentesco;
+        TUTORPREINSCDTO.sOcupacion = TUTORPREINSCDTO.sOcupacion;
+        TUTORPREINSCDTO.sTelefono = textoTelTutor + "-" + textoCelTutor;
+
+        // Si ambos están vacíos, queda string vacío. Si uno u otro tiene valor, se asigna correctamente.
+        // Si ambos tienen valor, se concatena con el guion.
+        TUTORPREINSCDTO.sTelefono =
+        string.Join(
+            textoTelTutor != "" && textoCelTutor != "" ? "-" : "",
+            textoTelTutor,
+            textoCelTutor
+        );
+
+        TUTORPREINSCDTO.sDireccion = TUTORPREINSCDTO.sDireccion;
+        TUTORPREINSCDTO.sCorreo = TUTORPREINSCDTO.sCorreo;
+        TUTORPREINSCDTO.sColonia = TUTORPREINSCDTO.sColonia;
+        TUTORPREINSCDTO.sCiudad = TUTORPREINSCDTO.sCiudad;
+        TUTORPREINSCDTO.sEstado = TUTORPREINSCDTO.sEstado;
+        TUTORPREINSCDTO.sCodigoPostal = TUTORPREINSCDTO.sCodigoPostal;
+        TUTORPREINSCDTO.sFirma = TUTORPREINSCDTO.sFirma;
+        TUTORPREINSCDTO.sUsuario = sEmail;
+
+        if (TUTORPREINSCDTO.sNombre == null || TUTORPREINSCDTO.sNombre == "")
+        {
+            var resultado2 = await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Campo Vacio",
+                    Text = "Favor de Llenar el Nombre del Tutor",
+                    Icon = SweetAlertIcon.Error
+                });
+            return;
+        }
+
+        if (TUTORPREINSCDTO.sApellidoMaterno == null || TUTORPREINSCDTO.sApellidoMaterno == "")
+        {
+            var resultado2 = await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Campo Vacio",
+                    Text = "Favor de Llenar el Apellido materno",
+                    Icon = SweetAlertIcon.Error
+                });
+            return;
+        }
+
+        if (TUTORPREINSCDTO.sApellidoPaterno == null || TUTORPREINSCDTO.sApellidoPaterno == "")
+        {
+            var resultado2 = await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Campo Vacio",
+                    Text = "Favor de Llenar el Apellido paterno",
+                    Icon = SweetAlertIcon.Error
+                });
+            return;
+        }
+
+
+        //ST_IUD_PREINSCRIP
+        PREINSCRIPDTO.iTipoOperacion = 1;
+        PREINSCRIPDTO.sMatriculaID = "0";
+        PREINSCRIPDTO.sCarreraID = PREINSCRIPDTO.sCarreraID;
+        PREINSCRIPDTO.dFecha = FechaActual;
+        PREINSCRIPDTO.sCicloID = textoCicloI + " - " + textoCicloF;
+
+        // Si ambos están vacíos, queda string vacío. Si uno u otro tiene valor, se asigna correctamente.
+        // Si ambos tienen valor, se concatena con el guion.
+        PREINSCRIPDTO.sCicloID =
+        string.Join(
+            textoCicloI != "" && textoCicloF != "" ? "-" : "",
+            textoCicloI,
+            textoCicloF
+        );
+
+        PREINSCRIPDTO.sMedioEntero = PREINSCRIPDTO.sMedioEntero;
+        PREINSCRIPDTO.fBecaDesc = PREINSCRIPDTO.fBecaDesc;
+        PREINSCRIPDTO.fColegiatura = PREINSCRIPDTO.fColegiatura;
+        PREINSCRIPDTO.sUsuario = sEmail;
+        PREINSCRIPDTO.fAbono = PREINSCRIPDTO.fAbono;
+
+        if (PREINSCRIPDTO.sCarreraID == 0 || PREINSCRIPDTO.sCarreraID == null)
+        {
+            var resultado2 = await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Campo Vacio",
+                    Text = "Favor de selecconar la carrera",
+                    Icon = SweetAlertIcon.Error
+                });
+            return;
+        }
+
+
+        var loginResponse = await httpClient.PostAsJsonAsync<ST_IUE_ALUMNOSPREINSCDTO>($"/api/Usuario/ST_IUE_ALUMNOSPREINSC/", ALUMNOSPREINSCDTO);
+
+        if (loginResponse.IsSuccessStatusCode)
+        {
+
+            var loginResponse2 = await httpClient.PostAsJsonAsync<ST_IUD_TUTORPREINSCDTO>($"/api/Usuario/ST_IUD_TUTORPREINSC/", TUTORPREINSCDTO);
+            if (loginResponse2.IsSuccessStatusCode)
+            {
+                
+                var loginResponse3 = await httpClient.PostAsJsonAsync<ST_IUD_PREINSCRIPDTO>($"/api/Usuario/ST_IUD_PREINSCRIP/", PREINSCRIPDTO);
+                if (loginResponse3.IsSuccessStatusCode)
+                {
+                    var resultado = await Swal.FireAsync(new SweetAlertOptions
+                    {
+                        Title = "Hecho",
+                        Text = "Se guardo la Preinscripción correctamente",
+                        Icon = SweetAlertIcon.Success
+                    });
+
+                    ALUMNOSPREINSCDTO = new ST_IUE_ALUMNOSPREINSCDTO();
+                    TUTORPREINSCDTO = new ST_IUD_TUTORPREINSCDTO();
+                    PREINSCRIPDTO = new ST_IUD_PREINSCRIPDTO();
+                    CarreraNombre = "";
+                    textoCicloI = "";
+                    textoCicloF = "";
+                    textoCelEmergencia = "";
+                    textoCelEmergenciaAluI = "";
+                    textoTelTutor = "";
+                    textoCelTutor = "";
+                    listaPREINSCRIP = await usuarioService.ST_S_PREINSCRIP(3, "-", 0, "-");
+                    OcultarFormulario();
+                }
+                else
+                {
+                    var errorContent = await loginResponse3.Content.ReadAsStringAsync();
+                    var resultado = await Swal.FireAsync(new SweetAlertOptions
+                    {
+                        Title = "Error al guardar",
+                        Text = $"No se pudo guardar (CRR)",
+                        Icon = SweetAlertIcon.Error,
+                        ShowCancelButton = true
+                    });                    
+
+                }               
+
+            }
+            else
+            {
+                var errorContent = await loginResponse2.Content.ReadAsStringAsync();
+                var resultado = await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Error al guardar",
+                    Text = $"No se pudo guardar (Tut1)",
+                    Icon = SweetAlertIcon.Error,
+                    ShowCancelButton = true
+                });
+            }
+
+
+        }
+        else
+        {
+            var errorContent = await loginResponse.Content.ReadAsStringAsync();
+
+            var resultado = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Error al guardar",
+                Text = $"No se pudo guardar (AL1): {errorContent}",
+                Icon = SweetAlertIcon.Error,
+                ShowCancelButton = true
+            });
+
+            Console.WriteLine("Error al guardar preinscripción:");
+            Console.WriteLine(errorContent);
+        }
+
+
+
+    }
+
+    private async Task GuardarPreIncompleta()
+    {
+
+        //ST_IUE_ALUMNOSPREINSC
+        ALUMNOSPREINSCDTO.iTipoOperacion = 2;
+        ALUMNOSPREINSCDTO.cMatriculaID = ALUMNOSPREINSCDTO.cMatriculaID;
+        ALUMNOSPREINSCDTO.cNombre = ALUMNOSPREINSCDTO.cNombre;
+        ALUMNOSPREINSCDTO.cApellido_Paterno = ALUMNOSPREINSCDTO.cApellido_Paterno;
+        ALUMNOSPREINSCDTO.cApellido_Materno = ALUMNOSPREINSCDTO.cApellido_Materno;
+        ALUMNOSPREINSCDTO.fEdad = ALUMNOSPREINSCDTO.fEdad;
+        ALUMNOSPREINSCDTO.Direccion = ALUMNOSPREINSCDTO.Direccion;
+        ALUMNOSPREINSCDTO.Colonia = ALUMNOSPREINSCDTO.Colonia;
+        ALUMNOSPREINSCDTO.Ciudad = ALUMNOSPREINSCDTO.Ciudad;
+        ALUMNOSPREINSCDTO.CodigoPostal = ALUMNOSPREINSCDTO.CodigoPostal;
+        ALUMNOSPREINSCDTO.Telefono = ALUMNOSPREINSCDTO.Telefono;
+        ALUMNOSPREINSCDTO.Email = ALUMNOSPREINSCDTO.Email;
+        ALUMNOSPREINSCDTO.EscuelaProcedencia = ALUMNOSPREINSCDTO.EscuelaProcedencia;
+        ALUMNOSPREINSCDTO.sLugarNacimiento = ALUMNOSPREINSCDTO.sLugarNacimiento;
+        ALUMNOSPREINSCDTO.sNacionalidad = ALUMNOSPREINSCDTO.sNacionalidad;
+        ALUMNOSPREINSCDTO.Sexo = ALUMNOSPREINSCDTO.Sexo;
+        ALUMNOSPREINSCDTO.FechaNacimiento = ALUMNOSPREINSCDTO.FechaNacimiento;
+        ALUMNOSPREINSCDTO.Estado = ALUMNOSPREINSCDTO.Estado;
+        ALUMNOSPREINSCDTO.sOcupacion = ALUMNOSPREINSCDTO.sOcupacion;
+        ALUMNOSPREINSCDTO.sSector = ALUMNOSPREINSCDTO.sSector;
+        ALUMNOSPREINSCDTO.sServicioMedico = ALUMNOSPREINSCDTO.sServicioMedico;
+        ALUMNOSPREINSCDTO.Curp = ALUMNOSPREINSCDTO.Curp;
+        ALUMNOSPREINSCDTO.sCorreo = ALUMNOSPREINSCDTO.sCorreo;
+        ALUMNOSPREINSCDTO.sCasoEmergencia = ALUMNOSPREINSCDTO.sCasoEmergencia;
+        ALUMNOSPREINSCDTO.sParentesco = ALUMNOSPREINSCDTO.sParentesco;
+
+        // Si ambos están vacíos, queda string vacío. Si uno u otro tiene valor, se asigna correctamente.
+        // Si ambos tienen valor, se concatena con el guion.
+        ALUMNOSPREINSCDTO.sTelEmergencia =
+        string.Join(
+            textoCelEmergenciaAluI != "" && textoCelEmergencia != "" ? "-" : "",
+            textoCelEmergenciaAluI,
+            textoCelEmergencia
+        );
+
+        ALUMNOSPREINSCDTO.sCorreoEmergencia = ALUMNOSPREINSCDTO.sCorreoEmergencia;
+        ALUMNOSPREINSCDTO.RFC = "";
+        ALUMNOSPREINSCDTO.GradoMaximo = "";
+        ALUMNOSPREINSCDTO.cMatriculaNueva = "";
+        ALUMNOSPREINSCDTO.sFirma = "";
+        ALUMNOSPREINSCDTO.sUsuario = sEmail;
+
+        if (ALUMNOSPREINSCDTO.cNombre == null || ALUMNOSPREINSCDTO.cNombre == "")
+        {
+            var resultado = await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Campo Vacio",
+                    Text = "Favor de Llenar el Nombre",
+                    Icon = SweetAlertIcon.Error
+                });
+            return;
+        }
+
+        if (ALUMNOSPREINSCDTO.cApellido_Paterno == null || ALUMNOSPREINSCDTO.cApellido_Paterno == "")
+        {
+            var resultado = await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Campo Vacio",
+                    Text = "Favor de Llenar el Apellido paterno",
+                    Icon = SweetAlertIcon.Error
+                });
+            return;
+        }
+
+        if (ALUMNOSPREINSCDTO.cApellido_Materno == null || ALUMNOSPREINSCDTO.cApellido_Materno == "")
+        {
+            var resultado = await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Campo Vacio",
+                    Text = "Favor de Llenar el Apellido materno",
+                    Icon = SweetAlertIcon.Error
+                });
+            return;
+        }
+
+
+        //ST_IUD_TUTORPREINSC
+        TUTORPREINSCDTO.iTipoOperacion = 2;
+        TUTORPREINSCDTO.sMatriculaID = ALUMNOSPREINSCDTO.cMatriculaID;
+        TUTORPREINSCDTO.sNombre = TUTORPREINSCDTO.sNombre;
+        TUTORPREINSCDTO.sApellidoPaterno = TUTORPREINSCDTO.sApellidoPaterno;
+        TUTORPREINSCDTO.sApellidoMaterno = TUTORPREINSCDTO.sApellidoMaterno;
+        TUTORPREINSCDTO.sParentesco = TUTORPREINSCDTO.sParentesco;
+        TUTORPREINSCDTO.sOcupacion = TUTORPREINSCDTO.sOcupacion;
+        TUTORPREINSCDTO.sTelefono = textoTelTutor + "-" + textoCelTutor;
+
+        // Si ambos están vacíos, queda string vacío. Si uno u otro tiene valor, se asigna correctamente.
+        // Si ambos tienen valor, se concatena con el guion.
+        TUTORPREINSCDTO.sTelefono =
+        string.Join(
+            textoTelTutor != "" && textoCelTutor != "" ? "-" : "",
+            textoTelTutor,
+            textoCelTutor
+        );
+
+        TUTORPREINSCDTO.sDireccion = TUTORPREINSCDTO.sDireccion;
+        TUTORPREINSCDTO.sCorreo = TUTORPREINSCDTO.sCorreo;
+        TUTORPREINSCDTO.sColonia = TUTORPREINSCDTO.sColonia;
+        TUTORPREINSCDTO.sCiudad = TUTORPREINSCDTO.sCiudad;
+        TUTORPREINSCDTO.sEstado = TUTORPREINSCDTO.sEstado;
+        TUTORPREINSCDTO.sCodigoPostal = TUTORPREINSCDTO.sCodigoPostal;
+        TUTORPREINSCDTO.sFirma = TUTORPREINSCDTO.sFirma;
+        TUTORPREINSCDTO.sUsuario = sEmail;
+
+        if (TUTORPREINSCDTO.sNombre == null || TUTORPREINSCDTO.sNombre == "")
+        {
+            var resultado2 = await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Campo Vacio",
+                    Text = "Favor de Llenar el Nombre del Tutor",
+                    Icon = SweetAlertIcon.Error
+                });
+            return;
+        }
+
+        if (TUTORPREINSCDTO.sApellidoMaterno == null || TUTORPREINSCDTO.sApellidoMaterno == "")
+        {
+            var resultado2 = await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Campo Vacio",
+                    Text = "Favor de Llenar el Apellido materno",
+                    Icon = SweetAlertIcon.Error
+                });
+            return;
+        }
+
+        if (TUTORPREINSCDTO.sApellidoPaterno == null || TUTORPREINSCDTO.sApellidoPaterno == "")
+        {
+            var resultado2 = await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Campo Vacio",
+                    Text = "Favor de Llenar el Apellido paterno",
+                    Icon = SweetAlertIcon.Error
+                });
+            return;
+        }
+
+        //ST_IUD_PREINSCRIP
+        PREINSCRIPDTO.iTipoOperacion = 2;
+        PREINSCRIPDTO.sMatriculaID = Convert.ToString(ALUMNOSPREINSCDTO.cMatriculaID);
+        PREINSCRIPDTO.sCarreraID = PREINSCRIPDTO.sCarreraID;
+        PREINSCRIPDTO.dFecha = FechaActual;
+        PREINSCRIPDTO.sCicloID = textoCicloI + " - " + textoCicloF;
+
+        // Si ambos están vacíos, queda string vacío. Si uno u otro tiene valor, se asigna correctamente.
+        // Si ambos tienen valor, se concatena con el guion.
+        PREINSCRIPDTO.sCicloID =
+        string.Join(
+            textoCicloI != "" && textoCicloF != "" ? "-" : "",
+            textoCicloI,
+            textoCicloF
+        );
+
+        PREINSCRIPDTO.sMedioEntero = PREINSCRIPDTO.sMedioEntero;
+        PREINSCRIPDTO.fBecaDesc = PREINSCRIPDTO.fBecaDesc;
+        PREINSCRIPDTO.fColegiatura = PREINSCRIPDTO.fColegiatura;
+        PREINSCRIPDTO.sUsuario = sEmail;
+        PREINSCRIPDTO.fAbono = PREINSCRIPDTO.fAbono;
+
+        if (PREINSCRIPDTO.sCarreraID == null || PREINSCRIPDTO.sCarreraID == 0)
+        {
+            var resultado2 = await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Campo Vacio",
+                    Text = "Favor de seleccionar la carrera",
+                    Icon = SweetAlertIcon.Error
+                });
+            return;
+        }
+
+        var loginResponse = await httpClient.PostAsJsonAsync<ST_IUE_ALUMNOSPREINSCDTO>($"/api/Usuario/ST_IUE_ALUMNOSPREINSC/", ALUMNOSPREINSCDTO);
+
+        if (loginResponse.IsSuccessStatusCode)
+        {
+
+            var loginResponse2 = await httpClient.PostAsJsonAsync<ST_IUD_TUTORPREINSCDTO>($"/api/Usuario/ST_IUD_TUTORPREINSC/", TUTORPREINSCDTO);
+            if (loginResponse2.IsSuccessStatusCode)
+            {
+
+                var loginResponse3 = await httpClient.PostAsJsonAsync<ST_IUD_PREINSCRIPDTO>($"/api/Usuario/ST_IUD_PREINSCRIP/", PREINSCRIPDTO);
+                if (loginResponse3.IsSuccessStatusCode)
+                {
+                    var resultado = await Swal.FireAsync(new SweetAlertOptions
+                        {
+                            Title = "Hecho",
+                            Text = "Se Edito la Preinscripción correctamente",
+                            Icon = SweetAlertIcon.Success
+                        });
+
+                    ALUMNOSPREINSCDTO = new ST_IUE_ALUMNOSPREINSCDTO();
+                    TUTORPREINSCDTO = new ST_IUD_TUTORPREINSCDTO();
+                    PREINSCRIPDTO = new ST_IUD_PREINSCRIPDTO();
+                    CarreraNombre = "";
+                    textoCicloI = "";
+                    textoCicloF = "";
+                    textoCelEmergencia = "";
+                    textoCelEmergenciaAluI = "";
+                    textoTelTutor = "";
+                    textoCelTutor = "";
+                    listaPREINSCRIP = await usuarioService.ST_S_PREINSCRIP(3, "-", 0, "-");
+                    OcultarFormulario();
+                }
+                else
+                {
+                    var errorContent = await loginResponse3.Content.ReadAsStringAsync();
+                    var resultado = await Swal.FireAsync(new SweetAlertOptions
+                        {
+                            Title = "Error al guardar",
+                            Text = $"No se pudo guardar (CRR): {errorContent}",
+                            Icon = SweetAlertIcon.Error,
+                            ShowCancelButton = true
+                        });
+                }
+
+
+
+            }
+            else
+            {
+                var errorContent = await loginResponse2.Content.ReadAsStringAsync();
+                var resultado = await Swal.FireAsync(new SweetAlertOptions
+                    {
+                        Title = "Error al guardar",
+                        Text = $"No se pudo guardar (Tut1): {errorContent}",
+                        Icon = SweetAlertIcon.Error,
+                        ShowCancelButton = true
+                    });
+            }
+
+
+        }
+        else
+        {
+            var errorContent = await loginResponse.Content.ReadAsStringAsync();
+
+            var resultado = await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Error al guardar",
+                    Text = $"No se pudo guardar (AL1): {errorContent}",
+                    Icon = SweetAlertIcon.Error,
+                    ShowCancelButton = true
+                });
+
+            Console.WriteLine("Error al guardar preinscripción:");
+            Console.WriteLine(errorContent);
+        }
+
+
+
+    }
+
+
+}

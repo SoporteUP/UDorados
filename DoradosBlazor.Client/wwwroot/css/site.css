@@ -1,0 +1,1014 @@
+﻿/*----------------------- Contenido Exlusivo para Login ----------------------------*/
+
+.login-wrapper {
+    min-height: 100vh;
+    width: 100vw;
+    background: #f5f8fb; /* blanco suave */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.login-box {
+    background: #fff;
+    border-radius: 1.5rem;
+    box-shadow: 0 6px 38px rgba(30, 56, 140, 0.10), 0 1.5px 3.5px #ffd70025;
+    padding: 2.5rem 2rem 2rem 2rem;
+    min-width: 340px;
+    max-width: 370px;
+    width: 100%;
+    text-align: center;
+    border-top: 6px solid #0074D9;
+    border-bottom: 3.5px solid #FFD700;
+    position: relative;
+}
+
+/* Logo */
+.login-logo img {
+    height: 66px;
+    margin-bottom: 1.1rem;
+}
+
+/* Título principal */
+.login-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #0074D9;
+    margin-bottom: 0.25rem;
+}
+
+/* Subtítulo */
+.login-desc {
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 1.6rem;
+    font-weight: 400;
+}
+
+.school-highlight {
+    color: #FFD700;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+}
+
+/* Inputs */
+.login-input {
+    border-radius: 0.9rem;
+    border: 1.5px solid #d6e2f3;
+    background: #f7fafd;
+    font-size: 1rem;
+    padding: 0.92rem 1.15rem;
+    margin-bottom: 0.8rem;
+    transition: border 0.2s;
+}
+
+    .login-input:focus {
+        border: 1.6px solid #0074D9;
+        outline: none;
+        background: #f4faff;
+    }
+
+/* Botón login azul con hover dorado */
+.btn-primary-custom {
+    width: 100%;
+    border-radius: 0.8rem;
+    background: #0074D9;
+    color: #fff;
+    font-weight: 600;
+    padding: 0.9rem 0;
+    border: none;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+    margin-top: 1rem;
+    margin-bottom: 0.8rem;
+    box-shadow: 0 3px 12px #0074d930;
+    transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+}
+
+    .btn-primary-custom:hover {
+        background: #FFD700;
+        color: #0a2240;
+        box-shadow: 0 8px 24px #ffd70055;
+    }
+
+/* Registro */
+.login-register {
+    margin-top: 0.7rem;
+    font-size: 1.01rem;
+    color: #333;
+}
+
+    .login-register a {
+        color: #0074d9;
+        font-weight: 600;
+        text-decoration: underline;
+        transition: color 0.18s;
+    }
+
+        .login-register a:hover {
+            color: #FFD700;
+        }
+
+/* Responsive para móvil */
+@media (max-width: 600px) {
+    .login-box {
+        min-width: 90vw;
+        padding: 1.2rem 0.7rem 1.5rem 0.7rem;
+    }
+
+    .login-logo img {
+        height: 48px;
+    }
+}
+
+/* ------------------------ Contenido exclusivo para Registro ----------------- */
+
+.register-bg {
+    min-height: 100vh;
+    background: #f6f8fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.register-box {
+    background: #fff;
+    border-radius: 1.5rem;
+    box-shadow: 0 8px 38px rgba(0, 90, 180, 0.10), 0 2px 6px #ffd70022;
+    padding: 2.7rem 2.2rem 2.2rem 2.2rem;
+    min-width: 345px;
+    max-width: 390px;
+    width: 100%;
+    text-align: center;
+    border-top: 5px solid #0074D9;
+    border-bottom: 3.5px solid #FFD700;
+    position: relative;
+}
+
+.register-logo img {
+    height: 60px;
+    margin-bottom: 1.2rem;
+}
+
+.register-title {
+    font-size: 1.95rem;
+    font-weight: 800;
+    color: #0074D9;
+    margin-bottom: 0.3rem;
+}
+
+.register-desc {
+    font-size: 1.09rem;
+    color: #646464;
+    margin-bottom: 1.5rem;
+}
+
+.school-highlight {
+    color: #FFD700;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+}
+/* Inputs */
+.register-input {
+    border-radius: 0.85rem;
+    border: 1.5px solid #d6e2f3;
+    background: #f7fafd;
+    font-size: 1rem;
+    padding: 0.89rem 1.12rem;
+    margin-bottom: 0.7rem;
+    transition: border 0.18s;
+}
+
+    .register-input:focus {
+        border: 1.7px solid #0074D9;
+        outline: none;
+        background: #f4faff;
+    }
+/* Input group: íconos */
+.input-group {
+    display: flex;
+    align-items: center;
+}
+
+.btn-icon {
+    border: none;
+    background: none;
+    padding: 0 0.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 2.7rem;
+    margin-left: 0.2rem;
+    cursor: pointer;
+    transition: background 0.14s;
+}
+
+    .btn-icon:active,
+    .btn-icon:focus {
+        outline: none;
+        background: #e7f0fd;
+    }
+
+.btn-icon-lg {
+    border: none;
+    background: none;
+    padding: 0 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 2.7rem;
+    width: 2.8rem;
+    margin-left: 0.2rem;
+    cursor: pointer;
+    border-radius: 0.7rem;
+    font-size: 1.3rem;
+    transition: background 0.12s;
+}
+
+    .btn-icon-lg:hover, .btn-icon-lg:focus {
+        outline: none;
+        background: #f1f9ff;
+    }
+
+.btn-register {
+    width: 100%;
+    border-radius: 0.8rem;
+    background: #0074D9;
+    color: #fff;
+    font-weight: 700;
+    padding: 0.9rem 0;
+    border: none;
+    font-size: 1.12rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.4rem;
+    box-shadow: 0 3px 12px #0074d928;
+    transition: background 0.15s, color 0.15s;
+}
+
+    .btn-register:hover {
+        background: #FFD700;
+        color: #0a2240;
+        box-shadow: 0 8px 24px #ffd70044;
+    }
+
+.btn-volver {
+    width: 100%;
+    border-radius: 0.8rem;
+    background: #fff;
+    color: #0074D9;
+    font-weight: 700;
+    padding: 0.8rem 0;
+    border: 2px solid #0074D9;
+    font-size: 1.05rem;
+    margin-top: 0.25rem;
+    transition: background 0.13s, color 0.13s, border-color 0.13s;
+}
+
+    .btn-volver:hover {
+        background: #0074D9;
+        color: #fff;
+        border-color: #FFD700;
+    }
+
+@media (max-width: 600px) {
+    .register-box {
+        min-width: 95vw;
+        padding: 1.3rem 0.5rem 1.5rem 0.5rem;
+    }
+
+    .register-logo img {
+        height: 42px;
+    }
+}
+
+
+
+
+
+/* ------------------------ Contenido exclusivo para Preinscripciones ----------------- */
+
+
+/* --------------------------------- lista y buscador ---------------------------------*/
+
+.buscador {
+    font-size: 1.1rem !important;
+    padding: 0.8rem 1.1rem !important;
+    border-radius: 1.2rem !important;
+    border: 1.3px solid #d1d7e6 !important;
+    box-shadow: 0 2px 10px rgba(0, 116, 217, 0.04);
+    background: #f7fafc !important;
+}
+
+.tarjeta-alumno {
+    background: linear-gradient(90deg, #f8fafc 70%, #e9f3fc 100%);
+    box-shadow: 0 4px 20px rgba(90,60,200,0.09);
+    border-radius: 1.1rem;
+    transition: box-shadow 0.16s;
+    cursor: pointer;
+    border: 1.2px solid #e3eafc;
+}
+
+    .tarjeta-alumno:hover {
+        box-shadow: 0 12px 38px 0 rgba(0, 116, 217, 0.13), 0 4px 14px 0 rgba(0, 116, 217, 0.09);
+        border-color: #0074D9;
+    }
+
+.avatar-alumno {
+    width: 60px;
+    height: 60px;
+    background: #e8e8fa;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/*----------------------- formulario --------------------*/
+
+.container-preinscripciones {
+    max-width: 1100px;
+    margin: 2.5rem auto;
+    padding: 1rem;
+}
+
+.main-title {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+/* Card visual moderno */
+.modern-card {
+    background: #fff;
+    border-radius: 1.2rem;
+    box-shadow: 0 6px 20px rgba(90,60,200,0.12), 0 1.5px 5px rgba(40,80,160,0.04);
+    padding: 1.6rem 1.2rem 1.2rem 1.2rem;
+    margin-bottom: 1.8rem;
+    transition: box-shadow 0.18s;
+    border: none;
+    min-height: 370px;
+}
+
+    .modern-card.sombra-azul:hover, .modern-card.sombra-azul:focus-within {
+        box-shadow: 0 12px 38px 0 rgba(0, 116, 217, 0.28), /* sombra azul intensa */
+        0 4px 14px 0 rgba(0, 116, 217, 0.16); /* sombra secundaria */
+    }
+
+    .modern-card.sombra-dorada:hover, .modern-card.sombra-dorada:focus-within {
+        box-shadow: 0 12px 38px 0 rgba(220, 182, 35, 0.35), /* dorado más intenso */
+        0 4px 14px 0 rgba(255, 207, 7, 0.22); /* secundaria amarilla */
+    }
+
+.modern-card-title {
+    font-size: 1.18rem;
+    font-weight: 700;
+    color: #0962b8;
+    margin-bottom: 1.2rem;
+    letter-spacing: .5px;
+    display: flex;
+    align-items: center;
+    gap: .7rem;
+}
+
+.modern-label {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: .12rem;
+    color: #272b44;
+    letter-spacing: 0.2px;
+}
+
+.modern-input,
+input[type="date"].modern-input,
+select.modern-input {
+    border-radius: .7rem !important;
+    border: 1.2px solid #d1d7e6 !important;
+    font-size: 1rem !important;
+    padding: .75rem 1rem !important;
+    background: #f8f9fa !important;
+    transition: border-color 0.17s, background 0.17s;
+    box-shadow: none !important;
+}
+
+    .modern-input:focus {
+        border-color: #6c5ce7 !important;
+        background: #fff !important;
+        outline: none !important;
+    }
+
+.input-group > .modern-input,
+.input-group > select.modern-input {
+    flex: 1 1 auto;
+}
+
+.btn-azul {
+    background: #0074D9;
+    color: #fff;
+    border: none;
+    border-radius: .7rem;
+    font-weight: 600;
+    padding: .6rem 1.3rem;
+    font-size: 1.05rem;
+    transition: background 0.18s, box-shadow 0.15s;
+    box-shadow: 0 2px 10px rgba(0, 116, 217, 0.08);
+}
+
+    .btn-azul:hover, .btn-azul:focus {
+        background: #005fa3;
+        box-shadow: 0 6px 16px rgba(0, 116, 217, 0.19);
+    }
+
+.btn-dorado {
+    background: linear-gradient(90deg, #EABE3F 50%, #FFD700 100%);
+    color: #473b0c;
+    border: none;
+    border-radius: .7rem;
+    font-weight: 600;
+    padding: .6rem 1.3rem;
+    font-size: 1.05rem;
+    transition: background 0.18s, box-shadow 0.15s;
+    box-shadow: 0 2px 10px rgba(234,190,63,0.13);
+}
+
+    .btn-dorado:hover, .btn-dorado:focus {
+        background: linear-gradient(90deg, #FFD700 0%, #EABE3F 100%);
+        box-shadow: 0 6px 16px rgba(234,190,63,0.19);
+        color: #332702;
+    }
+
+.row.g-3 > [class*="col-"] {
+    margin-bottom: 0.9rem;
+}
+
+/* Responsividad perfecta con Bootstrap y modern-card */
+@media (max-width: 992px) {
+    .modern-card {
+        min-height: unset;
+        padding: 1.1rem .7rem 1rem .7rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .modern-card {
+        padding: .8rem;
+        margin-bottom: 1.1rem;
+    }
+
+    .container-preinscripciones {
+        padding: 0.5rem;
+    }
+}
+
+/* Puedes agregarle también sombra a los inputs cuando están enfocados si te gusta */
+.modern-input:focus {
+    box-shadow: 0 0 0 2px #1573d7;
+}
+
+/* Iconos en los títulos */
+.modern-card-title i {
+    font-size: 1.3rem;
+    color: #EABE3F;
+}
+
+/* Mejoras en los select (opcional) */
+select.modern-input {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='14' height='8' viewBox='0 0 14 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L7 7L13 1' stroke='%236c5ce7' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1.2rem center;
+    background-size: 1.2rem 0.7rem;
+    padding-right: 2.5rem !important;
+}
+
+
+
+/*------------------ MODO OSCURO --------------------*/
+
+body.modo-oscuro,
+.modo-oscuro .modern-card {
+    background: #181c24 !important;
+    color: #e9eaf3 !important;
+}
+
+.modo-oscuro .modern-input,
+.modo-oscuro input[type="date"].modern-input,
+.modo-oscuro select.modern-input {
+    background: #222632 !important;
+    color: #e9eaf3 !important;
+    border-color: #353b4a !important;
+}
+
+.modo-oscuro .modern-card-title,
+.modo-oscuro .modern-label {
+    color: #ffd700 !important;
+}
+
+.modo-oscuro .btn-azul {
+    background: #09315a;
+    color: #ffd700;
+}
+
+.modo-oscuro .btn-dorado {
+    background: linear-gradient(90deg, #af9d3e 40%, #ffce39 100%);
+    color: #242424;
+}
+/* Sombras más sutiles en modo oscuro */
+.modo-oscuro .sombra-azul, .modo-oscuro .sombra-dorada {
+    box-shadow: 0 12px 38px 0 rgba(0, 116, 217, 0.13), 0 4px 14px 0 rgba(0, 116, 217, 0.07) !important;
+}
+
+/* Botón modo oscuro siempre visible pero nunca encima del navbar */
+.boton-modo-oscuro {
+    position: fixed;
+    top: 1.2rem;
+    right: 1.3rem;
+    z-index: 2000;
+    transition: all 0.25s;
+}
+
+@media (max-width: 992px) {
+    .boton-modo-oscuro {
+        top: 0.8rem;
+        right: 1.1rem;
+    }
+}
+
+/* En móvil: lo ponemos cerca de la parte superior izquierda, ¡nunca tapa el menú hamburguesa! */
+@media (max-width: 576px) {
+    .boton-modo-oscuro {
+        top: 0.7rem;
+        right: auto;
+        left: 1rem;
+        padding: 0.5rem 0.9rem !important;
+        font-size: 1.07rem !important;
+    }
+}
+
+.modo-oscuro .btn-filtro-dropdown {
+    background: linear-gradient(90deg, #0b1a2d 0%, #093d63 100%);
+    color: #ffd700 !important; /* dorado, si quieres resaltar el ícono en oscuro */
+    border-left: 1.8px solid #14285a !important;
+    box-shadow: 0 3px 14px rgba(20,40,90,0.18);
+}
+
+    .modo-oscuro .btn-filtro-dropdown:hover,
+    .modo-oscuro .btn-filtro-dropdown:focus {
+        background: linear-gradient(90deg, #093d63 0%, #0b1a2d 100%);
+        color: #ffd700 !important;
+        box-shadow: 0 7px 22px rgba(40,80,160,0.13);
+    }
+
+/*------------------------------------BOTONES FAB------------------------------------------*/
+
+/* Sticky button para desktop */
+.btn-guardar-sticky {
+    position: sticky;
+    top: 16px;
+    right: 0;
+    z-index: 50;
+    float: right;
+    margin-bottom: 1.2rem;
+    min-width: 120px;
+}
+
+/* FAB para móvil */
+.btn-fab-guardar {
+    position: fixed !important;
+    bottom: 80px;
+    right: 18px;
+    z-index: 1111;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    padding: 0;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.23);
+    font-size: 1.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: box-shadow 0.19s, background 0.18s;
+    background: #0074D9;
+}
+
+    .btn-fab-guardar:hover {
+        box-shadow: 0 7px 32px rgba(0,116,217,0.22);
+        background: #005fa3;
+    }
+
+@media (min-width: 768px) {
+    .btn-fab-guardar, #footerBtnGuardar {
+        display: none !important;
+    }
+}
+
+.btn-fab-editar {
+    position: fixed !important;
+    bottom: 80px;
+    right: 18px;
+    z-index: 1111;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    padding: 0;
+    box-shadow: 0 4px 20px rgba(234,190,63,0.23);
+    font-size: 1.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(90deg, #FFD700 50%, #EABE3F 100%);
+    color: #473b0c;
+    border: none;
+}
+
+    .btn-fab-editar:hover {
+        box-shadow: 0 7px 32px rgba(234,190,63,0.22);
+        background: linear-gradient(90deg, #EABE3F 0%, #FFD700 100%);
+        color: #332702;
+    }
+
+@media (min-width: 768px) {
+    .btn-fab-editar, #footerBtnEditar {
+        display: none !important;
+    }
+}
+
+/* -------- MODAL CARRERAS EXCLUSIVO ----------- */
+.modal-carreras-exclusivo {
+    background: rgba(248, 250, 252, 0.85) !important;
+    border-radius: 1.6rem !important;
+    box-shadow: 0 14px 44px rgba(0,116,217,0.21), 0 4px 24px rgba(220,182,63,0.10);
+    backdrop-filter: blur(17px) saturate(130%);
+    border: 2.5px solid rgba(0, 116, 217, 0.13);
+    padding-bottom: 0 !important;
+    overflow: hidden;
+    position: relative;
+}
+
+    
+    .modal-carreras-exclusivo .modal-header {
+        background: none;
+        border-bottom: none;
+        padding-top: 1.4rem !important;
+    }
+
+.text-azul-vital {
+    color: #0074D9;
+}
+
+.text-dorado {
+    color: #EABE3F;
+    letter-spacing: 0.5px;
+}
+
+.btn-carrera-listo {
+    background: linear-gradient(90deg, #0074D9 0%, #1597e9 100%);
+    color: #fff;
+    font-weight: 700;
+    border-radius: 0.9rem;
+    border: none;
+    box-shadow: 0 2px 12px rgba(0,116,217,0.13);
+    transition: box-shadow 0.14s, transform 0.12s, background 0.18s;
+}
+
+    .btn-carrera-listo:hover, .btn-carrera-listo:focus {
+        background: linear-gradient(90deg, #1597e9 0%, #0074D9 100%);
+        transform: translateY(-2px) scale(1.04);
+        box-shadow: 0 8px 28px rgba(0,116,217,0.17), 0 2px 10px rgba(0,116,217,0.11);
+    }
+
+/* ------- Buscador elegante --------- */
+.modern-search-carrera .modern-input-carrera {
+    background: rgba(255,255,255,0.97) !important;
+    border-radius: 1.2rem 0 0 1.2rem !important;
+    border: 1.8px solid #b4cfff !important;
+    border-right: none !important;
+    font-size: 1.12rem;
+    font-weight: 500;
+    color: #0d2f61;
+    box-shadow: 0 2px 18px rgba(0,116,217,0.10);
+}
+
+.buscador-carrera-icono {
+    background: linear-gradient(90deg, #0074D9 0%, #1597e9 100%);
+    color: #fff !important;
+    border-radius: 0 1.2rem 1.2rem 0 !important;
+    border: 1.8px solid #b4cfff !important;
+    border-left: none !important;
+    font-size: 1.25rem;
+    transition: background 0.21s;
+}
+
+.modern-search-carrera .modern-input-carrera:focus {
+    border-color: #EABE3F !important;
+    background: #fff !important;
+    outline: none !important;
+}
+
+.tabla-carreras-exclusiva th {
+    background: none !important;
+    color: #0074D9;
+    font-weight: 700;
+    letter-spacing: .6px;
+    font-size: 1.09rem;
+    border-bottom: 2px solid #EABE3F33 !important;
+}
+
+.tabla-carreras-exclusiva td {
+    border-top: none !important;
+    font-size: 1.07rem;
+    padding: .6rem 1rem;
+    background: transparent;
+    color: #18314b;
+    transition: background 0.19s, color 0.17s;
+}
+
+/* --- Fila hover y seleccionada con gradiente animado --- */
+.fila-carrera {
+    border-radius: 0.7rem;
+    cursor: pointer;
+    transition: background 0.18s, box-shadow 0.12s;
+    position: relative;
+}
+
+    .fila-carrera:hover:not(.fila-carrera-seleccionada) {
+        background: linear-gradient(90deg, #EABE3F22 0%, #0074D933 100%);
+        color: #0060B7;
+        box-shadow: 0 3px 13px #0074D914;
+    }
+
+.fila-carrera-seleccionada {
+    background: linear-gradient(90deg, #0074D9 0%, #1597e9 85%, #EABE3F 99%);
+    color: #fff !important;
+    box-shadow: 0 6px 24px #0074D960, 0 1.5px 5px #EABE3F44;    
+    animation: brillo-carrera 0.9s cubic-bezier(.24,.72,.61,.89);
+    position: relative;
+    /* Forzar color blanco a todo dentro */
+}
+
+    .fila-carrera-seleccionada td,
+    .fila-carrera-seleccionada th,
+    .fila-carrera-seleccionada .fw-bold,
+    .fila-carrera-seleccionada * {
+        color: #fff !important;
+        /* Si llegas a usar <a> dentro, también pon color blanco: */
+        text-shadow: 0 1px 6px rgba(20,20,60,0.09);
+    }
+
+@keyframes brillo-carrera {
+    0% {
+        box-shadow: 0 0 0 #0074D900, 0 0 0 #EABE3F00;
+    }
+
+    80% {
+        box-shadow: 0 9px 36px #EABE3F77, 0 1.5px 12px #0074D999;
+    }
+
+    100% {
+        box-shadow: 0 6px 24px #0074D960, 0 1.5px 5px #EABE3F44;
+    }
+}
+
+/* --- Modal Glass + bordes y sombreado elegante --- */
+.modal-glass {
+    background: rgba(252,253,255, 0.94) !important;
+    backdrop-filter: blur(11px) saturate(124%);
+    border: 2.5px solid rgba(0,116,217,0.07);
+    box-shadow: 0 10px 36px #EABE3F22, 0 4px 14px #0074D90D;
+}
+
+/* --- Modo oscuro exclusivo para el modal --- */
+body.modo-oscuro .modal-carreras-exclusivo,
+.modo-oscuro .modal-carreras-exclusivo {
+    background: rgba(19,22,31,0.95) !important;
+    border-color: #373f55 !important;
+    color: #e9eaf3 !important;
+}
+
+
+.modo-oscuro .tabla-carreras-exclusiva th {
+    color: #EABE3F !important;
+    border-bottom: 2px solid #EABE3F44 !important;
+}
+
+.modo-oscuro .tabla-carreras-exclusiva td {
+    color: #e4e9f5 !important;
+    background: transparent;
+}
+
+.modo-oscuro .fila-carrera:hover:not(.fila-carrera-seleccionada) {
+    background: linear-gradient(90deg, #EABE3F25 0%, #005fa370 100%);
+    color: #EABE3F !important;
+}
+
+.modo-oscuro .fila-carrera-seleccionada {
+    background: linear-gradient(90deg, #0074D9 0%, #1597e9 87%, #EABE3F 100%) !important;
+    color: #fff !important;
+    border: 2px solid #EABE3F44;
+}
+
+    .modo-oscuro .fila-carrera-seleccionada td,
+    .modo-oscuro .fila-carrera-seleccionada th,
+    .modo-oscuro .fila-carrera-seleccionada * {
+        color: #fff !important;
+        text-shadow: 0 1px 7px rgba(10,10,30,0.15);
+    }
+
+.modo-oscuro .modal-carreras-exclusivo .modal-header {
+    background: none;
+    color: #EABE3F !important;
+}
+
+.modo-oscuro .modal-carreras-exclusivo .modal-title {
+    color: #EABE3F !important;
+}
+
+.modo-oscuro .modern-input-carrera {
+    background: #23283A !important;
+    color: #EABE3F !important;
+    border-color: #0074D9 !important;
+}
+
+.modo-oscuro .buscador-carrera-icono {
+    background: linear-gradient(90deg, #005fa3 0%, #1597e9 100%);
+    color: #fff !important;
+}
+
+.modo-oscuro .btn-carrera-listo {
+    background: linear-gradient(90deg, #005fa3 0%, #1597e9 100%);
+    color: #fff !important;
+}
+
+ .modo-oscuro .btn-carrera-listo:hover,
+ .modo-oscuro .btn-carrera-listo:focus {
+     background: linear-gradient(90deg, #1597e9 0%, #005fa3 100%);
+ }
+
+/* --- Responsive --- */
+@media (max-width: 600px) {
+    .modal-carreras-exclusivo {
+        border-radius: 1rem !important;
+    }
+
+    .tabla-carreras-exclusiva th, .tabla-carreras-exclusiva td {
+        font-size: 0.99rem;
+        padding: .46rem .5rem;
+    }
+
+    .modern-search-carrera .modern-input-carrera {
+        font-size: 1rem;
+    }
+}
+
+.btn-carrera-cancelar {
+    background: linear-gradient(90deg, #e53935 0%, #f48c6f 100%);
+    color: #fff !important;
+    font-weight: 600;
+    border: none;
+    border-radius: 0.9rem;
+    box-shadow: 0 2px 12px rgba(229,57,53,0.13);
+    transition: background 0.17s, box-shadow 0.14s, transform 0.13s;
+}
+
+    .btn-carrera-cancelar:hover, .btn-carrera-cancelar:focus {
+        background: linear-gradient(90deg, #f48c6f 0%, #e53935 100%);
+        color: #fff !important;
+        transform: translateY(-1px) scale(1.03);
+        box-shadow: 0 7px 20px rgba(229,57,53,0.17), 0 2px 10px rgba(229,57,53,0.11);
+    }
+
+.modo-oscuro .btn-carrera-cancelar {
+    background: linear-gradient(90deg, #e53935 0%, #e23c2c 100%);
+    color: #fff !important;
+}
+
+    .modo-oscuro .btn-carrera-cancelar:hover, .modo-oscuro .btn-carrera-cancelar:focus {
+        background: linear-gradient(90deg, #f48c6f 0%, #e53935 100%);
+    }
+/* ------------------- FIN DISEÑO MODAL CARRERAS -------------------- */
+
+
+.btn-filtro-dropdown {
+    background: linear-gradient(90deg, #0074D9 0%, #1597e9 100%);
+    color: #fff !important;
+    border: none;
+    border-radius: 0 1.2rem 1.2rem 0 !important;
+    font-size: 1.22rem;
+    padding: 0.47rem 1rem;
+    box-shadow: 0 2px 10px rgba(0, 116, 217, 0.09);
+    transition: background 0.14s, box-shadow 0.12s;
+    border-left: 1.8px solid #b4cfff !important;
+}
+
+    .btn-filtro-dropdown:hover, .btn-filtro-dropdown:focus {
+        background: linear-gradient(90deg, #1597e9 0%, #0074D9 100%);
+        color: #fff !important;
+        box-shadow: 0 6px 16px rgba(0,116,217,0.14);
+    }
+
+/* -----------------filtros------------------- */
+.filtro-dropdown {
+    position: absolute;
+    right: 0;
+    top: 105%;
+    min-width: 170px;
+    background: rgba(255,255,255,0.98);
+    border: 1.7px solid #0074D9;
+    border-radius: 1.1rem;
+    box-shadow: 0 10px 28px #0074D92a;
+    padding: 0.9rem 1.3rem 0.7rem 1.1rem;
+    z-index: 1001;
+    margin-top: .2rem;
+    animation: filtro-fadein 0.28s;
+}
+
+/* Checkbox moderno */
+.checkbox-label {
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: #093e6c;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+}
+
+.filtro-dropdown input[type="checkbox"] {
+    accent-color: #0074D9;
+    width: 1.1em;
+    height: 1.1em;
+    border-radius: 0.2em;
+    border: 1.5px solid #1597e9;
+}
+
+@keyframes filtro-fadein {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive (ajusta para móvil si lo necesitas) */
+@media (max-width: 600px) {
+    .filtro-dropdown {
+        right: 0;
+        left: unset;
+        min-width: 120px;
+    }
+
+    .checkbox-label {
+        font-size: .97rem;
+    }
+}
+
+
+/* ----------------------------Franjas incompleta y completas ------------------------------*/
+
+.tarjeta-incompleta {
+    position: relative; /* necesario para el after */
+}
+
+    .tarjeta-incompleta::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 10px; /* ancho de la franja, ajústalo */
+        height: 100%;
+        background: linear-gradient(180deg, #e53935 90%, #f9a29b 100%);
+        border-top-right-radius: 1.1rem;
+        border-bottom-right-radius: 1.1rem;
+        z-index: 10;
+        /* Sombra opcional para un efecto sutil */
+        box-shadow: 0 0 6px 1px #e5393555;
+        opacity: 0.94;
+    }
+
+.tarjeta-completa {
+    position: relative;
+}
+
+    .tarjeta-completa::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 10px; /* ancho de la franja */
+        height: 100%;
+        background: linear-gradient(180deg, #28a745 88%, #8be698 100%);
+        border-top-right-radius: 1.1rem;
+        border-bottom-right-radius: 1.1rem;
+        z-index: 10;
+        box-shadow: 0 0 6px 1px #28a74533;
+        opacity: 0.94;
+    }

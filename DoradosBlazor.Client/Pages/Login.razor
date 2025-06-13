@@ -1,0 +1,71 @@
+﻿@page "/"
+@layout LoginLayout
+@inject SesionEmail mySesionEmail;
+@inject HttpClient httpClient
+@using DoradosBlazor.Client.Extensiones
+@using DoradosBlazor.Shared
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider autenticacionProvider
+@inject NavigationManager navManager
+@inject IJSRuntime JsRuntime
+@using CurrieTechnologies.Razor.SweetAlert2;
+@inject SweetAlertService Swal;
+
+<div class="login-wrapper">
+    <div class="login-box animate__animated animate__fadeInDown">
+        <div class="login-logo">
+            <img src="LogoUDN.png" alt="Logo UD" />
+        </div>
+        <h2 class="login-title">Inicia sesión</h2>
+        <p class="login-desc">Bienvenido de nuevo a <span class="school-highlight">UD</span></p>
+
+        <form @onsubmit="HandleFormSubmit">
+            <div class="mb-3">
+                <label>Correo</label>
+                <input @bind="login.Correo" class="form-control login-input" placeholder="correo@ejemplo.com" />
+            </div>
+            <div class="mb-3">
+                <label>Contraseña</label>
+                <input type="password" class="form-control login-input" @bind="login.Password" placeholder="Contraseña" />
+            </div>
+            <button type="submit" class="btn btn-primary-custom">Entrar</button>
+        </form>        
+        <div class="login-register">
+            ¿No tienes cuenta? <a href="/registro">Regístrate</a>
+        </div>
+    </div>
+</div>
+
+@code {
+    private LoginDTO login = new LoginDTO();
+
+
+    private async Task HandleFormSubmit()
+    {
+        await IniciarSesion();
+    }
+
+    private async Task IniciarSesion()
+    {
+        var loginResponse = await httpClient.PostAsJsonAsync<LoginDTO>("/api/Usuario/Login", login);
+        if (loginResponse.IsSuccessStatusCode)
+        {
+            var sesionUsuario = await loginResponse.Content.ReadFromJsonAsync<SesionDTO>();
+            var autenticacionExt = (AutenticacionExtension)autenticacionProvider;
+            await autenticacionExt.ActualizarEstadoAutenticacion(sesionUsuario);
+
+            mySesionEmail.Email = login.Correo;
+            navManager.NavigateTo($"/Index");
+        }
+        else
+        {
+            var resultado = await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Datos incorrectos",
+                    Text = "El usuario o la contraseña son incorrectos",
+                    Icon = SweetAlertIcon.Error,
+                    ShowCancelButton = true
+                });
+        }
+    }
+}

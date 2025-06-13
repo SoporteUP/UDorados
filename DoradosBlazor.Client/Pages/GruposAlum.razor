@@ -1,0 +1,132 @@
+﻿@page "/GruposAlum"
+@page "/GruposAlum/{carreraID}/{cicloID}/{grupoID}/{TipoCiclo}/{profesorID}/{materiaID}"
+@* @page "/GruposAlum/{carreraID}/{cicloID}/{grupoID}" *@
+
+@using DoradosBlazor.Client.Services;
+@using DoradosBlazor.Shared;
+@inject SesionEmail mySesionEmail;
+@inject IUsuarioService usuarioService;
+
+<div class="container text-start">
+
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <a class="btn btn-outline-dark" href="/MateriasProfesores">
+            <i>
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-arrow-left-square" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm11.5 5.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z" />
+                </svg>
+                Regresar
+            </i>
+
+        </a>
+
+    </div>
+</div>
+
+<h3 style="text-align:center">Alumnos Inscritos</h3>
+
+
+<div class="overflow-scroll">
+
+    <div class="overflow-y-scroll">
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>MatriculaID</th>
+                    <th>Nombre</th>
+                    <th>GrupoID</th>
+                    <th>CicloID</th>                  
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @if (listaGruposAlumApp == null)
+                {
+
+                    <tr>
+                        <td colspan="5" align="center">
+                            <img style="width:50px" src="https://media.tenor.com/On7kvXhzml4AAAAj/loading-gif.gif" />
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in listaGruposAlumApp)
+                    {
+                        <tr>
+                            <td>@item.MatriculaID</td>
+                            <td>@item.Nombre</td>
+                            <td>@item.GrupoID</td>
+                            <td>@item.CicloID</td>                          
+                            <td>
+                                <a class="btn btn-outline-primary" href="@sPage/@item.MatriculaID/@item.GrupoID/@item.CicloID/@carreraID/@profesorID/@materiaID">
+                                    <i>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrow-right-circle-fill" viewBox="0 0 16 16">
+                                            <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0M4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5z" />
+                                        </svg>
+                                    </i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+
+
+
+            </tbody>
+        </table>
+    </div>
+
+
+</div>
+
+@code {
+    [Parameter]
+    public string carreraID { get; set; } = "";
+
+    [Parameter]
+    public string cicloID { get; set; } = "";
+
+    [Parameter]
+    public string grupoID { get; set; } = "";
+
+    [Parameter]
+    public string TipoCiclo { get; set; } = "";
+
+    [Parameter]
+    public string profesorID { get; set; } = "";
+
+    [Parameter]
+    public string materiaID { get; set; } = "";
+
+
+    public string sPage;
+
+    List<GruposAlumAppDTO>? listaGruposAlumApp = null;
+
+    private GruposAlumAppVarDTO gruposAlumAppVar = new GruposAlumAppVarDTO();
+
+    protected override async Task OnInitializedAsync()
+    {
+        gruposAlumAppVar.iTipoConsulta = 1;
+        gruposAlumAppVar.iCarreraID = int.Parse(carreraID);
+        gruposAlumAppVar.sCicloID = cicloID;
+        gruposAlumAppVar.sGrupoID = grupoID;
+
+        listaGruposAlumApp = await usuarioService.ListaGruposAlumApp(gruposAlumAppVar);
+
+        if (TipoCiclo == "Mensual")
+        {
+            sPage = "CalificacionAlum";
+
+        }
+        else
+        {
+            
+            sPage = "CalificacionParcAlum";
+        }
+    }
+
+}

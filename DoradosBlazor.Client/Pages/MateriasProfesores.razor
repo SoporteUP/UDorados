@@ -1,0 +1,277 @@
+﻿@page "/MateriasProfesores"
+
+@using DoradosBlazor.Client.Services;
+@using DoradosBlazor.Shared;
+@inject SesionEmail mySesionEmail;
+@inject IUsuarioService usuarioService;
+@inject HttpClient httpClient
+@inject SweetAlertService Swal;
+
+
+<h3 style="text-align:center">Grupos del Profesor</h3>
+<h4 style="text-align:center">Mensual</h4>
+<h5 style="text-align:left">ID:@ProfesorID</h5>
+<h4 style="text-align:left">@Profesor</h4>
+
+
+<div class="overflow-scroll">
+
+    <div class="overflow-y-scroll">
+
+        <table class="table">
+            <thead>
+                <tr>                    
+                    <th>CarreraID</th>
+                    <th>Carrera</th>
+                    <th>MateriaID</th>
+                    <th>Asignatura</th>
+                    <th>CicloID</th>
+                    <th>GrupoID</th>                               
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @if (listaMateriasProfesores == null)
+                {
+
+                    <tr>
+                        <td colspan="5" align="center">
+                            <img style="width:50px" src="https://media.tenor.com/On7kvXhzml4AAAAj/loading-gif.gif" />
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in listaMateriasProfesores)
+                    {
+                        <tr>                         
+                            <td>@item.CarreraID</td>
+                            <td>@item.Carrera</td>                         
+                            <td>@item.MateriaID</td>
+                            <td>@item.Materia</td>
+                            <td>@item.CicloID</td>
+                            <td>@item.GrupoID</td>
+                            <td>
+                                <a class="btn btn-outline-primary" href="GruposAlum/@item.CarreraID/@item.CicloID/@item.GrupoID/Mensual/@ProfesorID/@item.MateriaID">
+                                    <i>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrow-right-circle-fill" viewBox="0 0 16 16">
+                                            <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0M4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5z" />
+                                        </svg>
+                                    </i>
+                                </a>
+                                <a class="btn btn-outline-primary" @onclick="@(()=> IU_GposEmpaquetados(item.CarreraID,item.CicloID,item.GrupoID,int.Parse(item.ProfesorID.ToString()),item.MateriaID.ToString()))">
+                                    <i>
+                                       Empaquetar
+                                    </i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+
+
+
+            </tbody>
+        </table>
+    </div>
+
+
+</div>
+
+<br>
+<h3 style="text-align:center">Parcial</h3>
+
+<div class="overflow-scroll">
+
+    <div class="overflow-y-scroll">
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>CarreraID</th>
+                    <th>Carrera</th>
+                    <th>MateriaID</th>
+                    <th>Asignatura</th>
+                    <th>CicloID</th>
+                    <th>GrupoID</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @if (listaMateriasProfesoresParc == null)
+                {
+
+                    <tr>
+                        <td colspan="5" align="center">
+                            <img style="width:50px" src="https://media.tenor.com/On7kvXhzml4AAAAj/loading-gif.gif" />
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in listaMateriasProfesoresParc)
+                    {
+                        <tr>
+                            <td>@item.CarreraID</td>
+                            <td>@item.Carrera</td>
+                            <td>@item.MateriaID</td>
+                            <td>@item.Materia</td>
+                            <td>@item.CicloID</td>
+                            <td>@item.GrupoID</td>
+                            <td>
+                                <a class="btn btn-outline-primary" href="GruposAlum/@item.CarreraID/@item.CicloID/@item.GrupoID/Parcial/@ProfesorID/@item.MateriaID">
+                                    <i>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrow-right-circle-fill" viewBox="0 0 16 16">
+                                            <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0M4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5z" />
+                                        </svg>
+                                    </i>
+                                </a>
+                                <a class="btn btn-outline-primary" @onclick="@(()=> IU_GposEmpaquetados(item.CarreraID,item.CicloID,item.GrupoID,int.Parse(item.ProfesorID.ToString()),item.MateriaID.ToString()))">
+                                    <i>
+                                        Empaquetar
+                                    </i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+
+
+
+            </tbody>
+        </table>
+    </div>
+
+
+</div>
+
+@code {
+
+    [Parameter]
+    public string sEmail { get; set; } = "";
+
+    public string ProfesorID;
+
+    public string Profesor;
+
+    public string sPage = "GruposAlum";
+
+    public bool Empaquetado = false;
+
+
+    List<MateriasProfesoresDTO>? listaMateriasProfesores = null;
+
+    List<MateriasProfesoresDTO>? listaMateriasProfesoresParc = null;
+
+    private MateriasProfesoresVar materiasProfesoresVar = new MateriasProfesoresVar();
+
+    private GposEmpaquetadosVarDTO gposEmpaquetadosVarDTO = new GposEmpaquetadosVarDTO();
+
+    private ST_S_GposEmpaquetadosVarDTO sT_S_GposEmpaquetadosVarDTO = new ST_S_GposEmpaquetadosVarDTO();
+
+    List<ST_S_GposEmpaquetadosDTO>? listaST_S_GposEmpaquetadosDTO = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        sEmail = mySesionEmail.Email;
+
+        materiasProfesoresVar.iTipoConsulta = 1;
+        materiasProfesoresVar.sCorreo = sEmail;
+
+        listaMateriasProfesores = await usuarioService.ListaMateriasProfesores(materiasProfesoresVar);
+
+        materiasProfesoresVar.iTipoConsulta = 2;
+
+        listaMateriasProfesoresParc = await usuarioService.ListaMateriasProfesores(materiasProfesoresVar);
+
+        if (listaMateriasProfesores.Count > 0)
+        {
+            ProfesorID = listaMateriasProfesores[0].ProfesorID.ToString();
+            Profesor = listaMateriasProfesores[0].Profesor.ToString();
+        }
+        else
+        {
+            
+            if (listaMateriasProfesoresParc.Count > 0)
+            {
+                ProfesorID = listaMateriasProfesoresParc[0].ProfesorID.ToString();
+                Profesor = listaMateriasProfesoresParc[0].Profesor.ToString();
+            
+            }
+        }
+
+        
+
+    }
+
+    private async Task ST_S_GposEmpaquetados(decimal CarreraID, string CicloID, string GrupoID, int ProfesorID, string MateriaID)
+    {
+        sT_S_GposEmpaquetadosVarDTO.iTipoOperacion = 1;
+        sT_S_GposEmpaquetadosVarDTO.CarreraID = CarreraID;
+        sT_S_GposEmpaquetadosVarDTO.CicloID = CicloID;
+        sT_S_GposEmpaquetadosVarDTO.GrupoID = GrupoID;
+        sT_S_GposEmpaquetadosVarDTO.ProfesorID = ProfesorID;
+        sT_S_GposEmpaquetadosVarDTO.MateriaID = MateriaID;
+
+        listaST_S_GposEmpaquetadosDTO = await usuarioService.ListaGposEmpaquetados(sT_S_GposEmpaquetadosVarDTO);
+
+        if (listaST_S_GposEmpaquetadosDTO[0].FaltaCalif > 0)
+        {
+            var resultado = await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Error",
+                    Text = "No se realizó correctamete el empaquetado, Faltan alumnos por calificar",
+                    Icon = SweetAlertIcon.Error,
+                    ShowCancelButton = true
+                });
+                return;
+
+        }
+        if (listaST_S_GposEmpaquetadosDTO[0].FaltaCalif == 0)
+        {
+            var loginResponse = await httpClient.PostAsJsonAsync<GposEmpaquetadosVarDTO>($"/api/Usuario/IU_GposEmpaquetados/", gposEmpaquetadosVarDTO);
+
+            if (loginResponse.IsSuccessStatusCode)
+            {
+                  var resultado = await Swal.FireAsync(new SweetAlertOptions
+                        {
+                            Title = "Exito",
+                            Text = "Se realizó correctamete el empaquetado",
+                            Icon = SweetAlertIcon.Success,
+                            ShowCancelButton = true
+                        });
+
+            }
+            else
+            {
+                var resultado = await Swal.FireAsync(new SweetAlertOptions
+                    {
+                        Title = "Error",
+                        Text = "No se realizó correctamete el empaquetado",
+                        Icon = SweetAlertIcon.Error,
+                        ShowCancelButton = true
+                    });
+            }
+
+        }
+
+
+    }
+
+    private async Task IU_GposEmpaquetados(decimal CarreraID, string CicloID, string GrupoID, int ProfesorID, string MateriaID)
+    {
+
+        gposEmpaquetadosVarDTO.iTipoOperacion = 1;
+        gposEmpaquetadosVarDTO.CarreraID = CarreraID;
+        gposEmpaquetadosVarDTO.CicloID = CicloID;
+        gposEmpaquetadosVarDTO.GrupoID = GrupoID;
+        gposEmpaquetadosVarDTO.ProfesorID = ProfesorID;
+        gposEmpaquetadosVarDTO.MateriaID = MateriaID;
+
+        ST_S_GposEmpaquetados(CarreraID,CicloID,GrupoID,ProfesorID,MateriaID);
+
+       
+    }
+}

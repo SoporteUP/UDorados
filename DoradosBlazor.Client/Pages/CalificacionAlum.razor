@@ -1,0 +1,512 @@
+﻿@page "/CalificacionAlum"
+@page "/CalificacionAlum/{matriculaID}/{grupoID}/{cicloID}/{carreraID}/{profesorID}/{materiaID}"
+
+@inject IJSRuntime JS;
+@inject HttpClient httpClient
+@inject SweetAlertService Swal;
+
+@using DoradosBlazor.Client.Services;
+@using DoradosBlazor.Shared;
+@inject SesionEmail mySesionEmail;
+@inject IUsuarioService usuarioService;
+
+<div class="container text-start">
+
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <a class="btn btn-outline-dark" href="GruposAlum/@carreraID/@cicloID/@grupoID/Mensual/@profesorID/@materiaID">
+            <i>
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-arrow-left-square" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm11.5 5.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z" />
+                </svg>
+                Regresar
+            </i>
+
+        </a>
+
+    </div>
+</div>
+
+<h3 style="text-align:center">Calificaciones del Alumno</h3>
+
+<h5 style="text-align:left">ID. @matriculaID</h5>
+<h5 style="text-align:left">ALUMNO: @Nombre</h5>
+<h5 style="text-align:left">CICLO: @CicloID</h5>
+<h5 style="text-align:left">GRUPO: @GrupoID</h5>
+
+<div class="overflow-scroll">
+
+    <div class="overflow-y-scroll">
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>CalificacionID</th>
+                    <th>ID</th>
+                    <th>Asignatura</th>
+                    <th>Septiembre</th>                    
+                    <th>Octubre</th>                    
+                    <th>PromBim1</th>
+                    <th>Noviembre</th>
+                    <th>Diciembre</th>                    
+                    <th>PromBim2</th>
+                    <th>Enero</th>                   
+                    <th>Febrero</th>                    
+                    <th>PromBim3</th>
+                    <th>Marzo</th>                    
+                    <th>Abril</th>                    
+                    <th>PromBim4</th>
+                    <th>Mayo</th>
+                    <th>Junio</th>
+                    <th>PromBim5</th>
+                    <th>Observaciones</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @if (listaCalificacionAlumAppDTO == null)
+                {
+
+                    <tr>
+                        <td colspan="5" align="center">
+                            <img style="width:50px" src="https://media.tenor.com/On7kvXhzml4AAAAj/loading-gif.gif" />
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in listaCalificacionAlumAppDTO)
+                    {
+                        <tr>
+                            <td>@item.CalificacionID</td>
+                            <td>@item.MateriaID</td>
+                            <td>@item.Materia</td>
+                            <td>@item.Septiembre</td>                            
+                            <td>@item.Octubre</td>                      
+                            <td>@item.PromBim1</td>
+                            <td>@item.Noviembre</td>                            
+                            <td>@item.Diciembre</td>                            
+                            <td>@item.PromBim2</td>
+                            <td>@item.Enero</td>                            
+                            <td>@item.Febrero</td>                            
+                            <td>@item.PromBim3</td>
+                            <td>@item.Marzo</td>                            
+                            <td>@item.Abril</td>                            
+                            <td>@item.PromBim4</td>
+                            <td>@item.Mayo</td>                            
+                            <td>@item.Junio</td>                            
+                            <td>@item.PromBim5</td>
+                            <td>@item.Observaciones</td>
+                            <td>
+                                <button type="button" @onclick="@(()=> ShowModal("staticBackdrop",@item.Septiembre,@item.Octubre,@item.PromBim1,
+                                                                                      @item.Noviembre,@item.Diciembre,@item.PromBim2,
+                                                                                      @item.Enero,@item.Febrero,@item.PromBim3,
+                                                                                      @item.Marzo,@item.Abril,@item.PromBim4,
+                                                                                      @item.Mayo,@item.Junio,@item.PromBim5,item.Observaciones,@item.CalificacionID.ToString()))" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                                    <i class="oi oi-pencil"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                }
+
+
+
+            </tbody>
+        </table>
+    </div>
+
+
+</div>
+
+<div class="modal fade show" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" style="display:none; background:#0000000;">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fs-5" id="staticBackdropLabel">Calificaciones Mensuales</h5>
+                <button type="button" @onclick='eventArgs=>HideModal("staticBackdrop")' class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col">
+                        <label for="inputEmail4" class="form-label">Septiembre</label>
+                        @if (editaCalifMens.Septiembre == "" || editaCalifMens.Septiembre == "0")
+                        {
+                            <input type="text" class="form-control" txtSep @bind="editaCalifMens.Septiembre">
+                        }
+                        else
+                        {
+                            <input type="text" id="disabledTextInput" class="form-control" txtSep @bind="editaCalifMens.Septiembre" disabled>
+                        }
+                        
+                    </div>
+                    <div class="col">
+                        <label for="inputEmail4" class="form-label">Octubre</label>
+                        @if (editaCalifMens.Octubre == "" || editaCalifMens.Octubre == "0")
+                        {
+                            <input type="text" class="form-control" txtOct @bind="editaCalifMens.Octubre">
+                        }
+                        else
+                        {
+                            <input type="text" id="disabledTextInput" class="form-control" txtOct @bind="editaCalifMens.Octubre" disabled>
+                        }                      
+                    </div>
+                </div>
+                <div>
+                    <label for="inputEmail4" class="form-label">Promedio Bimestral 1</label>
+                    <input type="text" class="form-control" txtPB1 @bind="editaCalifMens.PromBim1" disabled>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label for="inputEmail4" class="form-label">Noviembre</label>
+                        @if (editaCalifMens.Noviembre == "" || editaCalifMens.Noviembre == "0")
+                        {
+                            <input type="text" class="form-control" txtNov @bind="editaCalifMens.Noviembre">
+                        }
+                        else
+                        {
+                            <input type="text" id="disabledTextInput" class="form-control" txtNov @bind="editaCalifMens.Noviembre" disabled>
+                        }                
+                    </div>
+                    <div class="col">
+                        <label for="inputEmail4" class="form-label">Diciembre</label>
+                        @if (editaCalifMens.Diciembre == "" || editaCalifMens.Diciembre == "0")
+                        {
+                            <input type="text" class="form-control" txtDic @bind="editaCalifMens.Diciembre">
+                        }
+                        else
+                        {
+                            <input type="text" id="disabledTextInput" class="form-control" txtDic @bind="editaCalifMens.Diciembre" disabled>
+                        }                       
+                    </div>
+                </div>
+                <div>
+                    <label for="inputEmail4" class="form-label">Promedio Bimestral 2</label>
+                    <input type="text" class="form-control" txtSep @bind="editaCalifMens.PromBim2" disabled>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <label for="inputEmail4" class="form-label">Enero</label>
+                        @if (editaCalifMens.Enero == "" || editaCalifMens.Enero == "0")
+                        {
+                            <input type="text" class="form-control" txtEne @bind="editaCalifMens.Enero">
+                        }
+                        else
+                        {
+                            <input type="text" id="disabledTextInput" class="form-control" txtEne @bind="editaCalifMens.Enero" disabled>
+                        }                       
+                    </div>
+                    <div class="col">
+                        <label for="inputEmail4" class="form-label">Febrero</label>
+                        @if (editaCalifMens.Febrero == "" || editaCalifMens.Febrero == "0")
+                        {
+                            <input type="text" class="form-control" txtFeb @bind="editaCalifMens.Febrero">
+                        }
+                        else
+                        {
+                            <input type="text" id="disabledTextInput" class="form-control" txtFeb @bind="editaCalifMens.Febrero" disabled>
+                        }                  
+                    </div>
+                </div>
+                <div>
+                    <label for="inputEmail4" class="form-label">Promedio Bimestral 3</label>
+                    <input type="text" class="form-control" txtSep @bind="editaCalifMens.PromBim3" disabled>
+                </div>
+
+
+                <div class="row">
+                    <div class="col">
+                        <label for="inputEmail4" class="form-label">Marzo</label>
+                        @if (editaCalifMens.Marzo == "" || editaCalifMens.Marzo == "0")
+                        {
+                            <input type="text" class="form-control" txtMar @bind="editaCalifMens.Marzo">
+                        }
+                        else
+                        {
+                            <input type="text" id="disabledTextInput" class="form-control" txtMar @bind="editaCalifMens.Marzo" disabled>
+                        }
+                    </div>
+                    <div class="col">
+                        <label for="inputEmail4" class="form-label">Abril</label>
+                        @if (editaCalifMens.Abril == "" || editaCalifMens.Abril == "0")
+                        {
+                            <input type="text" class="form-control" txtAbri @bind="editaCalifMens.Abril">
+                        }
+                        else
+                        {
+                            <input type="text" id="disabledTextInput" class="form-control" txtAbri @bind="editaCalifMens.Abril" disabled>
+                        }                       
+                    </div>
+                </div>
+                <div>
+                    <label for="inputEmail4" class="form-label">Promedio Bimestral 4</label>
+                    <input type="text" class="form-control" txtSep @bind="editaCalifMens.PromBim4" disabled>
+                </div>
+
+
+
+                <div class="row">
+                    <div class="col">
+                        <label for="inputEmail4" class="form-label">Mayo</label>
+                        @if (editaCalifMens.Mayo == "" || editaCalifMens.Mayo == "0")
+                        {
+                            <input type="text" class="form-control" txtMay @bind="editaCalifMens.Mayo">
+                        }
+                        else
+                        {
+                            <input type="text" id="disabledTextInput" class="form-control" txtMay @bind="editaCalifMens.Mayo" disabled>
+                        }
+                    </div>
+                    <div class="col">
+                        <label for="inputEmail4" class="form-label">Junio</label>
+                        @if (editaCalifMens.Junio == "" || editaCalifMens.Junio == "0")
+                        {
+                            <input type="text" class="form-control" txtJun @bind="editaCalifMens.Junio">
+                        }
+                        else
+                        {
+                            <input type="text" id="disabledTextInput" class="form-control" txtJun @bind="editaCalifMens.Junio" disabled>
+                        }                        
+                    </div>
+                </div>
+                <div>
+                    <label for="inputEmail4" class="form-label">Promedio Bimestral 5</label>
+                    <input type="text" class="form-control" txtPB5 @bind="editaCalifMens.PromBim5" disabled>
+                </div>
+
+                <div class="mb-3">
+                    <label for="exampleFormControlTextarea1" class="form-label">Observaciones</label>
+                    <textarea class="form-control" @bind="editaCalifMens.Observaciones" id="exampleFormControlTextarea1" rows="3"></textarea>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" @onclick='eventArgs=>HideModal("staticBackdrop")' class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" @onclick="@(()=> U_CalificaMensualesApp(editaCalifMens.Septiembre,editaCalifMens.Octubre,editaCalifMens.PromBim1,
+                                                                              editaCalifMens.Noviembre,editaCalifMens.Diciembre,editaCalifMens.PromBim2,
+                                                                              editaCalifMens.Enero,editaCalifMens.Febrero,editaCalifMens.PromBim3,
+                                                                              editaCalifMens.Marzo,editaCalifMens.Abril,editaCalifMens.PromBim4,
+                                                                              editaCalifMens.Mayo,editaCalifMens.Junio,editaCalifMens.PromBim5,editaCalifMens.Observaciones))" class="btn btn-primary">
+                Guardar y Salir </button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@code {
+    private IJSObjectReference module;
+
+    [Parameter]
+    public string matriculaID { get; set; } = "";
+
+    [Parameter]
+    public string grupoID { get; set; } = "";
+
+    [Parameter]
+    public string cicloID { get; set; } = "";
+
+    public int CalifID;
+
+    [Parameter]
+    public string carreraID { get; set; } = "";
+
+    [Parameter]
+    public string profesorID { get; set; } = "";
+
+    [Parameter]
+    public string materiaID { get; set; } = "";
+
+
+
+
+    public string MatriculaID;
+    public string Nombre;
+    public string CicloID;
+    public string GrupoID;
+
+    List<CalificacionAlumAppDTO>? listaCalificacionAlumAppDTO = null;
+
+    List<ST_S_GposEmpaquetadosListosDTO>? ListaGposEmpaquetadosListos = null;
+
+    private CalificacionAlumAppVarDTO CalificacionAlumAppVar = new CalificacionAlumAppVarDTO();
+
+    private ST_S_GposEmpaquetadosVarDTO sT_S_GposEmpaquetadosVarDTO = new ST_S_GposEmpaquetadosVarDTO();
+
+    private EditaCalifMensDTO editaCalifMens = new EditaCalifMensDTO();
+
+    private UCalifMenAppVarDTO uCalifMenAppVar = new UCalifMenAppVarDTO();
+
+    private string Email;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        Email = mySesionEmail.Email;
+
+        CalificacionAlumAppVar.iTipoConsulta = 1;
+        CalificacionAlumAppVar.sMatriculaID = matriculaID;
+        CalificacionAlumAppVar.sGrupoID = grupoID;
+        CalificacionAlumAppVar.sCicloID = cicloID;
+        CalificacionAlumAppVar.Email = Email;
+        CalificacionAlumAppVar.MateriaID = materiaID;
+
+        listaCalificacionAlumAppDTO = await usuarioService.ListaCalificacionAlumApp(CalificacionAlumAppVar);
+
+        if (listaCalificacionAlumAppDTO != null)
+        {
+            MatriculaID = listaCalificacionAlumAppDTO[0].MatriculaID.ToString();
+            Nombre = listaCalificacionAlumAppDTO[0].Nombre.ToString();
+            CicloID = listaCalificacionAlumAppDTO[0].CicloID.ToString();
+            GrupoID = listaCalificacionAlumAppDTO[0].GrupoID.ToString();
+        }
+    
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender!=null)
+        {
+            module = await JS.InvokeAsync<IJSObjectReference>("import", "./Pages/CalificacionAlum.razor.js");
+
+        }
+
+
+    }
+
+    protected async void ShowModal(string elementID, string Sep, string Oct, string Prombim1, string Nov, string Dic, string Prombim2,
+                                   string Ene, string Feb, string Prombim3, string Mar, string Abri, string Prombim4, string May, string Jun,
+                                   string Prombim5, string Obse, string CalifiacionID)
+    {
+        editaCalifMens.Septiembre = Sep;
+        editaCalifMens.Octubre = Oct;
+        editaCalifMens.PromBim1 = Prombim1;
+        editaCalifMens.Noviembre = Nov;
+        editaCalifMens.Diciembre = Dic;
+        editaCalifMens.PromBim2 = Prombim2;
+        editaCalifMens.Enero = Ene;
+        editaCalifMens.Febrero = Feb;
+        editaCalifMens.PromBim3 = Prombim3;
+        editaCalifMens.Marzo = Mar;
+        editaCalifMens.Abril = Abri;
+        editaCalifMens.PromBim4 = Prombim4;
+        editaCalifMens.Mayo = May;
+        editaCalifMens.Junio = Jun;
+        editaCalifMens.PromBim5 = Prombim5;
+        editaCalifMens.Observaciones = Obse;
+
+
+        sT_S_GposEmpaquetadosVarDTO.iTipoOperacion = 1;
+        sT_S_GposEmpaquetadosVarDTO.CarreraID = Convert.ToDecimal(carreraID);
+        sT_S_GposEmpaquetadosVarDTO.CicloID = cicloID;
+        sT_S_GposEmpaquetadosVarDTO.GrupoID = grupoID;
+        sT_S_GposEmpaquetadosVarDTO.ProfesorID = Convert.ToInt32(profesorID);
+        sT_S_GposEmpaquetadosVarDTO.MateriaID = materiaID;
+
+        ListaGposEmpaquetadosListos = await usuarioService.ListaGposEmpaquetadosListos(sT_S_GposEmpaquetadosVarDTO);
+
+        if (ListaGposEmpaquetadosListos[0].Empaquetado > 0)
+        {
+
+            var resultado = await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Error",
+                    Text = "No se pueden editar las calficaciones, el grupo ya fue empaquetado",
+                    Icon = SweetAlertIcon.Error,
+                    ShowCancelButton = true
+                });
+
+        }
+        else
+        {
+            CalifID = int.Parse(CalifiacionID);          
+
+            if (module != null)
+            {               
+
+                await module.InvokeAsync<string>("showModal", elementID);
+
+            }
+            else
+            {
+                module = await JS.InvokeAsync<IJSObjectReference>("import", "./Pages/CalificacionAlum.razor.js");
+                await module.InvokeAsync<string>("showModal", elementID);
+            }
+            
+        }
+
+    }
+
+    protected async void HideModal(string elementID)
+    {
+        if (module != null)
+        {
+            await module.InvokeAsync<string>("hideModal", elementID);
+
+        }
+        else
+        {
+            module = await JS.InvokeAsync<IJSObjectReference>("import", "./Pages/CalificacionAlum.razor.js");
+            await module.InvokeAsync<string>("hideModal", elementID);
+        }
+
+
+
+    }
+
+    private async Task U_CalificaMensualesApp(string Sep, string Oct, string Prombim1, string Nov, string Dic, string Prombim2,
+                                   string Ene, string Feb, string Prombim3, string Mar, string Abri, string Prombim4, string May, string Jun,
+                                   string Prombim5, string Obse)
+    {
+        uCalifMenAppVar.iTipoOperacion = 1;
+        uCalifMenAppVar.CalificacionID = CalifID;
+        uCalifMenAppVar.Sep = Sep;
+        uCalifMenAppVar.Oct = Oct;
+        uCalifMenAppVar.PromBim1 = Prombim1;
+        uCalifMenAppVar.Nov = Nov;
+        uCalifMenAppVar.Dic = Dic;
+        uCalifMenAppVar.PromBim2 = Prombim2;
+        uCalifMenAppVar.Ene = Ene;
+        uCalifMenAppVar.Feb = Feb;
+        uCalifMenAppVar.PromBim3 = Prombim3;
+        uCalifMenAppVar.Mar = Mar;
+        uCalifMenAppVar.Abr = Abri;
+        uCalifMenAppVar.PromBim4 = Prombim4;
+        uCalifMenAppVar.May = May;
+        uCalifMenAppVar.Jun = Jun;
+        uCalifMenAppVar.PromBim5 = Prombim5;
+        uCalifMenAppVar.Observaciones = Obse;
+
+        var loginResponse = await httpClient.PostAsJsonAsync<UCalifMenAppVarDTO>($"/api/Usuario/U_CalificaMensualesApp/", uCalifMenAppVar);
+        if (loginResponse.IsSuccessStatusCode)
+        {
+            CalificacionAlumAppVar.iTipoConsulta = 1;
+            CalificacionAlumAppVar.sMatriculaID = matriculaID;
+            CalificacionAlumAppVar.sGrupoID = grupoID;
+            CalificacionAlumAppVar.sCicloID = cicloID;
+
+            listaCalificacionAlumAppDTO = await usuarioService.ListaCalificacionAlumApp(CalificacionAlumAppVar);
+
+
+            MatriculaID = listaCalificacionAlumAppDTO[0].MatriculaID.ToString();
+            Nombre = listaCalificacionAlumAppDTO[0].Nombre.ToString();
+            CicloID = listaCalificacionAlumAppDTO[0].CicloID.ToString();
+            GrupoID = listaCalificacionAlumAppDTO[0].GrupoID.ToString();
+
+            HideModal("staticBackdrop");
+        }
+        else
+        {
+            var resultado = await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Error",
+                    Text = "No se guardaron las calficaciones",
+                    Icon = SweetAlertIcon.Error,
+                    ShowCancelButton = true
+                });
+        }
+    }
+
+}
