@@ -11,30 +11,45 @@
 @using CurrieTechnologies.Razor.SweetAlert2;
 @inject SweetAlertService Swal;
 
-<div class="login-wrapper">
-    <div class="login-box animate__animated animate__fadeInDown">
-        <div class="login-logo">
-            <img src="LogoUDN.png" alt="Logo UD" />
-        </div>
-        <h2 class="login-title">Inicia sesión</h2>
-        <p class="login-desc">Bienvenido de nuevo a <span class="school-highlight">UD</span></p>
+<div class="login-nube-container">
+    <div class="login-nube-box">
+        <div class="login-nube-left">
 
-        <form @onsubmit="HandleFormSubmit">
-            <div class="mb-3">
-                <label>Correo</label>
-                <input @bind="login.Correo" class="form-control login-input" placeholder="correo@ejemplo.com" />
+            <div class="login-logo">
+                <img src="UDNL.png" alt="Logo UD" />
             </div>
-            <div class="mb-3">
-                <label>Contraseña</label>
-                <input type="password" class="form-control login-input" @bind="login.Password" placeholder="Contraseña" />
+
+            <h2>Hola!</h2>
+            <p>Inicia sesión con tu cuenta</p>
+
+            <form @onsubmit="HandleFormSubmit">
+                <div class="nube-input">
+                    <div class="icon"><i class="bi bi-envelope-fill"></i></div>
+                    <input @bind="login.Correo" placeholder="E-mail" />
+                </div>
+                <div class="nube-input">
+                    <div class="icon"><i class="bi bi-lock-fill"></i></div>
+                    <input type="password" @bind="login.Password" placeholder="Password" />
+                </div>
+                <div class="nube-options">
+                    <label><input type="checkbox" /> Remember me</label>
+                    <a href="#">Forgot password?</a>
+                </div>
+                <button type="submit" class="nube-btn">INICIAR SESIÓN</button>
+            </form>
+
+            <div class="nube-register">
+                Don’t have an account? <a href="/registro">Create</a>
             </div>
-            <button type="submit" class="btn btn-primary-custom">Entrar</button>
-        </form>        
-        <div class="login-register">
-            ¿No tienes cuenta? <a href="/registro">Regístrate</a>
+        </div>
+
+        <div class="login-nube-right">
+            <h2>Welcome Back!</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed pharetra magna nisl, at posuere sem dapibus sed.</p>
         </div>
     </div>
 </div>
+
 
 @code {
     private LoginDTO login = new LoginDTO();

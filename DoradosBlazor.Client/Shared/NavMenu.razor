@@ -2,20 +2,9 @@
 @using DoradosBlazor.Shared;
 @using DoradosBlazor.Client.Services;
 @using System.Security.Claims;
-
-
-@using Microsoft.AspNetCore.Components.Authorization;
-@using DoradosBlazor.Shared;
-@using Blazored.SessionStorage;
-@using System.Security.Claims;
 @inject AuthenticationStateProvider autenticacionProvider
-@using DoradosBlazor.Shared;
-@using DoradosBlazor.Client.Services;
-
-
-
 @using DoradosBlazor.Client.Extensiones;
-@using Microsoft.AspNetCore.Components.Authorization;
+
 @inject AuthenticationStateProvider autenticacionProvider
 @inject NavigationManager navManager
 
@@ -23,123 +12,74 @@
 @inject IRolesService rolesService;
 @inject NavigationManager navegacion;
 
-<div class="top-row ps-3 navbar navbar-dark">
+
+<nav class="navbar glass-navbar navbar-expand-md">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">Dorados App</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+        <a class="navbar-brand" href="/">
+            <img src="LogoUDN.png" alt="Logo UD" style="height: 38px; margin-right: 0.7rem;" />
+            Dorados App
+        </a>
+        <button class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
-    </div>
-</div>
-
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/Index" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
+        <div class="collapse navbar-collapse @(collapseNavMenu ? "" : "show")">
+            <ul class="navbar-nav w-100 justify-content-center align-items-center gap-1 menu-list">
+                <li class="nav-item">
+                    <NavLink class="nav-link glass-link" href="/index" Match="NavLinkMatch.All">Home</NavLink>
+                </li>
+                <AuthorizeView Roles="Administrador">
+                    <Authorized>
+                        <li class="nav-item">
+                            <NavLink class="nav-link glass-link" href="/usuarios">Usuarios</NavLink>
+                        </li>
+                    </Authorized>
+                </AuthorizeView>
+                <AuthorizeView Roles="Alumno">
+                    <Authorized>
+                        <li class="nav-item">
+                            <NavLink class="nav-link glass-link" href="AdeudosAlumno">Adeudos</NavLink>
+                        </li>
+                    </Authorized>
+                </AuthorizeView>
+                <AuthorizeView Roles="Alumno">
+                    <Authorized>
+                        <li class="nav-item">
+                            <NavLink class="nav-link glass-link" href="Calificaciones">Boletas</NavLink>
+                        </li>
+                    </Authorized>
+                </AuthorizeView>
+                <AuthorizeView Roles="Profesor">
+                    <Authorized>
+                        <li class="nav-item">
+                            <NavLink class="nav-link glass-link" href="MateriasProfesores">MateriasProfesores</NavLink>
+                        </li>
+                    </Authorized>
+                </AuthorizeView>
+                <AuthorizeView Roles="Reclutador">
+                    <Authorized>
+                        <li class="nav-item">
+                            <NavLink class="nav-link glass-link" href="preinscripciones">Pre-inscripciones</NavLink>
+                        </li>
+                    </Authorized>
+                </AuthorizeView>
+                <li class="nav-item">
+                    <a class="nav-link glass-link" href="#" @onclick="CerrarSesion">Salir</a>
+                </li>
+            </ul>
         </div>
-
-        <AuthorizeView Roles="Administrador">
-            <Authorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="usuarios">
-                        <span class="oi oi-person" aria-hidden="true"></span> Usuarios
-                    </NavLink>
-                </div>
-            </Authorized>
-        </AuthorizeView>
-
-        <AuthorizeView Roles="Alumno">
-            <Authorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="AdeudosAlumno">
-                        <span aria-hidden="true">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-cash-stack" viewBox="0 0 25 25">
-                                <path d="M1 3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1zm7 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4" />
-                                <path d="M0 5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1zm3 0a2 2 0 0 1-2 2v4a2 2 0 0 1 2 2h10a2 2 0 0 1 2-2V7a2 2 0 0 1-2-2z" />
-                            </svg>
-                        </span> Adeudos
-                    </NavLink>
-                </div>
-            </Authorized>
-        </AuthorizeView>
-
-        <AuthorizeView Roles="Alumno">
-            <Authorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="Calificaciones">
-                        <span>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-newspaper" viewBox="0 0 25 25">
-                                <path d="M0 2.5A1.5 1.5 0 0 1 1.5 1h11A1.5 1.5 0 0 1 14 2.5v10.528c0 .3-.05.654-.238.972h.738a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 1 1 0v9a1.5 1.5 0 0 1-1.5 1.5H1.497A1.497 1.497 0 0 1 0 13.5zM12 14c.37 0 .654-.211.853-.441.092-.106.147-.279.147-.531V2.5a.5.5 0 0 0-.5-.5h-11a.5.5 0 0 0-.5.5v11c0 .278.223.5.497.5z" />
-                                <path d="M2 3h10v2H2zm0 3h4v3H2zm0 4h4v1H2zm0 2h4v1H2zm5-6h2v1H7zm3 0h2v1h-2zM7 8h2v1H7zm3 0h2v1h-2zm-3 2h2v1H7zm3 0h2v1h-2zm-3 2h2v1H7zm3 0h2v1h-2z" />
-                            </svg>
-                        </span> Boletas
-                    </NavLink>
-                </div>
-            </Authorized>
-        </AuthorizeView>
-
-        <AuthorizeView Roles="Profesor">
-            <Authorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="MateriasProfesores">
-                        <span>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-newspaper" viewBox="0 0 25 25">
-                                <path d="M0 2.5A1.5 1.5 0 0 1 1.5 1h11A1.5 1.5 0 0 1 14 2.5v10.528c0 .3-.05.654-.238.972h.738a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 1 1 0v9a1.5 1.5 0 0 1-1.5 1.5H1.497A1.497 1.497 0 0 1 0 13.5zM12 14c.37 0 .654-.211.853-.441.092-.106.147-.279.147-.531V2.5a.5.5 0 0 0-.5-.5h-11a.5.5 0 0 0-.5.5v11c0 .278.223.5.497.5z" />
-                                <path d="M2 3h10v2H2zm0 3h4v3H2zm0 4h4v1H2zm0 2h4v1H2zm5-6h2v1H7zm3 0h2v1h-2zM7 8h2v1H7zm3 0h2v1h-2zm-3 2h2v1H7zm3 0h2v1h-2zm-3 2h2v1H7zm3 0h2v1h-2z" />
-                            </svg>
-                        </span> MateriasProfesores
-                    </NavLink>
-                </div>
-            </Authorized>
-        </AuthorizeView>
-
-        <AuthorizeView Roles="Reclutador">
-            <Authorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="preinscripciones">
-                        <span>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-newspaper" viewBox="0 0 25 25">
-                                <path d="M0 2.5A1.5 1.5 0 0 1 1.5 1h11A1.5 1.5 0 0 1 14 2.5v10.528c0 .3-.05.654-.238.972h.738a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 1 1 0v9a1.5 1.5 0 0 1-1.5 1.5H1.497A1.497 1.497 0 0 1 0 13.5zM12 14c.37 0 .654-.211.853-.441.092-.106.147-.279.147-.531V2.5a.5.5 0 0 0-.5-.5h-11a.5.5 0 0 0-.5.5v11c0 .278.223.5.497.5z" />
-                                <path d="M2 3h10v2H2zm0 3h4v3H2zm0 4h4v1H2zm0 2h4v1H2zm5-6h2v1H7zm3 0h2v1h-2zM7 8h2v1H7zm3 0h2v1h-2zm-3 2h2v1H7zm3 0h2v1h-2zm-3 2h2v1H7zm3 0h2v1h-2z" />
-                            </svg>
-                        </span> Pre-inscripciones
-                    </NavLink>
-                </div>
-            </Authorized>
-        </AuthorizeView>
-
-    </nav>
-
-    <div class="nav-item px-3" @onclick="CerrarSesion">
-        <NavLink class="nav-link">
-            <a @onclick="CerrarSesion">Salir</a>
-        </NavLink>
     </div>
-</div>
+</nav>
 
 @code {
-
-    string name;
-
-    private readonly ISessionStorageService sessionStorage;
-
     private bool collapseNavMenu = true;
-
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
     }
-
     private async Task CerrarSesion()
     {
         var autenticacionExt = (AutenticacionExtension)autenticacionProvider;
         await autenticacionExt.ActualizarEstadoAutenticacion(null);
         navManager.NavigateTo("/", true);
     }
-
 }

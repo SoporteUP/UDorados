@@ -403,6 +403,80 @@ namespace DoradosBlazorCrud.Server.Controllers
         }
 
 
+        //ST_S_DatosPDF Get
+        [HttpGet]
+        [Route("ST_S_DatosPDF/{iTipoConsulta}/{iID}")]
+        public async Task<IActionResult> ST_S_DatosPDF(int iTipoConsulta, string iID)
+        {
+            var responseApi = new ResponseAPI<List<ST_S_DatosPDFDTO>>();
+            var listaDatosPDF = new List<ST_S_DatosPDFDTO>();
+
+            var Result = _dbContext.sT_S_DatosPDF.FromSql($"ST_S_DatosPDF {iTipoConsulta},{iID}").ToList();
+
+            try
+            {
+                foreach (var item in Result)
+                {
+                    listaDatosPDF.Add(new ST_S_DatosPDFDTO
+                    {
+                        MatriculaID = item.MatriculaID,
+                        Nombre = item.Nombre,
+                        fechadealta = item.fechadealta,
+                        Edad = item.Edad,
+                        Direccion = item.Direccion,
+                        Telefono = item.Telefono,
+                        Colonia = item.Colonia,
+                        Ciudad = item.Ciudad,
+                        CodigoPostal = item.CodigoPostal,                        
+                        Email = item.Email,
+                        EscuelaProcedencia = item.EscuelaProcedencia,
+                        LugardeNacimiento = item.LugardeNacimiento,
+                        Nacionalidad = item.Nacionalidad,
+                        Sexo = item.Sexo,
+                        FechaNacimiento = item.FechaNacimiento,
+                        EstadoCivil = item.EstadoCivil,
+                        Ocupacion = item.Ocupacion,
+                        Sector = item.Sector,
+                        ServicioMedico = item.ServicioMedico,
+                        Curp = item.Curp,
+                        Carrera = item.Carrera,
+                        fechaInsc = item.fechaInsc,
+                        Atendio = item.Atendio,
+                        CicloID = item.CicloID,
+                        MedioEntero = item.MedioEntero,
+                        NombreTutor = item.NombreTutor,
+                        OcupacionTutor = item.OcupacionTutor,
+                        TelefonoTutor = item.TelefonoTutor,
+                        CorreoTutor = item.CorreoTutor,
+                        DireccionTutor = item.DireccionTutor,
+                        CasoEmergencia = item.CasoEmergencia,
+                        Parentesco = item.Parentesco,
+                        CorreoEmergencia = item.CorreoEmergencia,
+                        TelEmergencia = item.TelEmergencia,
+                        FirmaA = item.FirmaA,
+                        FirmaT = item.FirmaT,
+                        
+
+
+                    });
+
+                }
+
+                responseApi.EsCorrecto = true;
+                responseApi.Valor = listaDatosPDF;
+
+            }
+            catch (Exception ex)
+            {
+
+                responseApi.EsCorrecto = false;
+                responseApi.Mensaje = ex.Message;
+
+            }
+            return Ok(responseApi);
+        }
+
+
         [HttpPost]
         [Route("ListaGposEmpaquetados")]
         public async Task<ActionResult> ListaGposEmpaquetados([FromBody] ST_S_GposEmpaquetadosVarDTO sT_S_GposEmpaquetadosVarDTO)

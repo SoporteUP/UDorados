@@ -1,126 +1,190 @@
 ﻿/*----------------------- Contenido Exlusivo para Login ----------------------------*/
 
-.login-wrapper {
+.login-nube-container {
     min-height: 100vh;
-    width: 100vw;
-    background: #f5f8fb; /* blanco suave */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f0f2f8;
+    padding: 1rem;
+}
+
+.login-nube-box {
+    display: flex;
+    width: 980px;
+    background: #fff;
+    border-radius: 2rem;
+    overflow: hidden;
+    position: relative;
+    /* Sombra más grande y extendida */
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.2), 0 15px 30px rgba(0, 0, 0, 0.12);
+}
+
+    .login-nube-box::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 2rem;
+        pointer-events: none;
+        box-shadow: 0 0 60px 10px rgba(255, 215, 0, 0.05);
+    }
+
+/* Lado izquierdo */
+.login-nube-left {
+    flex: 1;
+    padding: 3rem;
+    z-index: 2;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+    .login-nube-left h2 {
+        font-size: 2rem;
+        color: #0a2240;
+        margin-bottom: 0.5rem;
+    }
+
+    .login-nube-left p {
+        color: #444;
+        margin-bottom: 2rem;
+        font-size: 1rem;
+    }
+
+/* Lado derecho con fondo morado */
+.login-nube-right {
+    flex: 1;
+    background: linear-gradient(135deg, #0074D9, #6a00ff);
+    color: white;
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    clip-path: polygon(12% 0, 100% 0, 100% 100%, 12% 100%, 0 70%, 0 30%);
+}
+
+    .login-nube-right h2 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .login-nube-right p {
+        font-size: 1.05rem;
+        line-height: 1.6;
+    }
+
+/* Inputs con sombra e íconos */
+.nube-input {
+    position: relative;
     display: flex;
     align-items: center;
-    justify-content: center;
-    position: relative;
+    background: white;
+    border-radius: 2rem;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.06);
+    padding: 0.8rem 1rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #e1e5f0;
 }
 
-.login-box {
-    background: #fff;
-    border-radius: 1.5rem;
-    box-shadow: 0 6px 38px rgba(30, 56, 140, 0.10), 0 1.5px 3.5px #ffd70025;
-    padding: 2.5rem 2rem 2rem 2rem;
-    min-width: 340px;
-    max-width: 370px;
-    width: 100%;
-    text-align: center;
-    border-top: 6px solid #0074D9;
-    border-bottom: 3.5px solid #FFD700;
-    position: relative;
-}
+    .nube-input .icon {
+        color: #FFA500;
+        margin-right: 0.7rem;
+        font-size: 1.3rem;
+    }
 
-/* Logo */
-.login-logo img {
-    height: 66px;
-    margin-bottom: 1.1rem;
-}
-
-/* Título principal */
-.login-title {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #0074D9;
-    margin-bottom: 0.25rem;
-}
-
-/* Subtítulo */
-.login-desc {
-    font-size: 1.1rem;
-    color: #666;
-    margin-bottom: 1.6rem;
-    font-weight: 400;
-}
-
-.school-highlight {
-    color: #FFD700;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-}
-
-/* Inputs */
-.login-input {
-    border-radius: 0.9rem;
-    border: 1.5px solid #d6e2f3;
-    background: #f7fafd;
-    font-size: 1rem;
-    padding: 0.92rem 1.15rem;
-    margin-bottom: 0.8rem;
-    transition: border 0.2s;
-}
-
-    .login-input:focus {
-        border: 1.6px solid #0074D9;
+    .nube-input input {
+        border: none;
         outline: none;
-        background: #f4faff;
+        background: transparent;
+        font-size: 1rem;
+        width: 100%;
+        color: #333;
     }
 
-/* Botón login azul con hover dorado */
-.btn-primary-custom {
+.nube-options {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    margin-bottom: 1.8rem;
+    color: #555;
+}
+
+    .nube-options a {
+        color: #0074D9;
+        text-decoration: underline;
+    }
+
+/* Botón dorado */
+.nube-btn {
     width: 100%;
-    border-radius: 0.8rem;
-    background: #0074D9;
-    color: #fff;
-    font-weight: 600;
-    padding: 0.9rem 0;
+    padding: 0.9rem;
+    background: #FFD700;
+    color: #0a2240;
     border: none;
-    font-size: 1.1rem;
-    letter-spacing: 0.5px;
-    margin-top: 1rem;
-    margin-bottom: 0.8rem;
-    box-shadow: 0 3px 12px #0074d930;
-    transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+    border-radius: 2rem;
+    font-weight: bold;
+    font-size: 1.05rem;
+    padding: 0.9rem;
+    box-shadow: 0 6px 16px rgba(255, 215, 0, 0.4);
+    transition: all 0.3s ease;
 }
 
-    .btn-primary-custom:hover {
-        background: #FFD700;
+    .nube-btn:hover {
+        background: linear-gradient(to right, #FFEA00, #FFD700); /* Brillo dorado */
         color: #0a2240;
-        box-shadow: 0 8px 24px #ffd70055;
+        box-shadow: 0 10px 24px rgba(255, 215, 0, 0.6);
     }
 
-/* Registro */
-.login-register {
-    margin-top: 0.7rem;
-    font-size: 1.01rem;
-    color: #333;
+.nube-register {
+    margin-top: 1rem;
+    text-align: center;
+    font-size: 0.95rem;
 }
 
-    .login-register a {
-        color: #0074d9;
+    .nube-register a {
+        color: #0074D9;
         font-weight: 600;
         text-decoration: underline;
-        transition: color 0.18s;
     }
 
-        .login-register a:hover {
-            color: #FFD700;
-        }
-
-/* Responsive para móvil */
-@media (max-width: 600px) {
-    .login-box {
-        min-width: 90vw;
-        padding: 1.2rem 0.7rem 1.5rem 0.7rem;
+/* Responsive */
+@media (max-width: 768px) {
+    .login-nube-box {
+        flex-direction: column;
     }
 
-    .login-logo img {
-        height: 48px;
+    .login-nube-right {
+        clip-path: none;
+        border-radius: 0 0 2rem 2rem;
     }
 }
+
+.login-logo {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+    .login-logo img {
+        height: 100px;
+        max-width: 340px;
+        object-fit: contain;
+        filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.1));
+        transition: transform 0.2s ease-in-out;
+    }
+
+        .login-logo img:hover {
+            transform: scale(1.04);
+        }
+
+        .login-logo img:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 10px #eeeeee);
+        }
+
+
+
 
 /* ------------------------ Contenido exclusivo para Registro ----------------- */
 
@@ -282,14 +346,117 @@
     }
 }
 
+/*----------------------- Contenido Exlusivo para EL NAVMENU ----------------------------*/
+.glass-navbar {
+    position: relative;
+    overflow: hidden;
+    background: rgba(255,255,255,0.74) !important; /* Más claro, más escolar */
+    box-shadow: 0 6px 24px 0 rgba(90,100,180,0.09);
+    backdrop-filter: blur(14px) saturate(1.17);
+    -webkit-backdrop-filter: blur(14px) saturate(1.17);
+    border-radius: 0 0 1.2rem 1.2rem;
+    border-top: 6px solid #0074D9;
+    border-bottom: 4px solid #FFD700;
+    border-left: none;
+    border-right: none;
+    padding: 0;
+    border: 1.2px solid rgba(200, 200, 220, 0.15);
+}
 
+    .glass-navbar::before {
+        display: none; /* No uses fondo extra, ya tienes el rayado escolar */
+    }
 
+.navbar-brand {
+    position: relative;
+    z-index: 2;
+    color: #0074D9 !important;
+    font-weight: 800;
+    font-size: 1.28rem;
+    letter-spacing: 0.04em;
+    text-shadow: none;
+}
 
+.menu-list {
+    position: relative;
+    z-index: 2;
+}
+
+.glass-link {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.12rem;
+    font-weight: 600;
+    padding: 0.80rem 1.35rem;
+    border-radius: 1.1rem;
+    position: relative;
+    color: #232c45 !important;
+    background: rgba(255,255,255,0.13);
+    margin: 0 0.07rem;
+    overflow: hidden;
+    border: none;
+    transition: color .17s, background .17s, box-shadow .17s, transform .17s;
+    box-shadow: 0 2px 8px 0 rgba(0,116,217,0.04);
+    letter-spacing: 0.01em;
+}
+
+    .glass-link.active {
+        color: #0074D9 !important;
+        background: rgba(0,116,217,0.08);
+        font-weight: bold;
+    }
+
+        .glass-link.active::after {
+            content: "";
+            display: block;
+            position: absolute;
+            left: 22%;
+            right: 22%;
+            bottom: 0.32rem;
+            height: 3.7px;
+            border-radius: 2.2px;
+            background: linear-gradient(90deg, #0074D9 60%, #FFD700 100%);
+            z-index: 3;
+            box-shadow: 0 0 8px #0074d980;
+            transition: all 0.18s cubic-bezier(.55,.05,.5,.95);
+        }
+
+    .glass-link:not(.active):hover {
+        color: #0074D9 !important;
+        background: rgba(0,116,217,0.10);
+        transform: translateY(-2px) scale(1.03);
+        box-shadow: 0 3px 10px 0 #0074D915;
+    }
+
+    .glass-link:active {
+        background: rgba(0, 116, 217, 0.12);
+    }
+
+@media (max-width: 768px) {
+    .menu-list {
+        flex-direction: column !important;
+        gap: 0.07rem;
+    }
+
+    .glass-link {
+        width: 100%;
+        padding: 1.08rem 0.8rem;
+        font-size: 1.16rem;
+    }
+}
+
+/*body {
+    min-height: 100vh;
+    background: linear-gradient(120deg, #f3f9fe 0%, #e7f1ff 100%);*/
+    /* Líneas verticales sutiles */
+    /*background-image: repeating-linear-gradient(90deg, #e3ecfa 0, #e3ecfa 1px, transparent 1px, transparent 48px);
+}*/
 
 /* ------------------------ Contenido exclusivo para Preinscripciones ----------------- */
 
 
-/* --------------------------------- lista y buscador ---------------------------------*/
+/* -- lista y buscador */
 
 .buscador {
     font-size: 1.1rem !important;
@@ -1011,4 +1178,29 @@ body.modo-oscuro .modal-carreras-exclusivo,
         z-index: 10;
         box-shadow: 0 0 6px 1px #28a74533;
         opacity: 0.94;
+    }
+
+
+.btn-pdf-card {
+    position: absolute;
+    top: 0.6rem;
+    left: 0.7rem;
+    z-index: 20;
+    background: #e03535;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    box-shadow: 0 3px 12px rgba(220,53,69,0.2);
+    transition: background 0.18s, box-shadow 0.15s;
+}
+
+    .btn-pdf-card:hover {
+        background: #b02a37;
+        box-shadow: 0 6px 20px rgba(220,53,69,0.3);
     }
