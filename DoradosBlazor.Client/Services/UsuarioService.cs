@@ -239,6 +239,15 @@ namespace DoradosBlazor.Client.Services
                 throw new Exception(result.Mensaje);
         }
 
+        public async Task<List<ST_S_DatosPDFDTO>> ST_S_DatosPDF(int iTipoConsulta, string iID)
+        {
+            var result = await _http.GetFromJsonAsync<ResponseAPI<List<ST_S_DatosPDFDTO>>>($"api/Usuario/ST_S_DatosPDF/{iTipoConsulta}/{iID}");
+            if (result!.EsCorrecto)
+                return result.Valor!;
+            else
+                throw new Exception(result.Mensaje);
+        }
+
 
     }
 }

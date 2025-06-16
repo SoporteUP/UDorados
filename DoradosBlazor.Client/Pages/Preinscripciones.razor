@@ -86,7 +86,7 @@
                 {
                     <div class="col-12 col-md-6 mb-4">
                         <div class="modern-card tarjeta-alumno tarjeta-completa d-flex flex-column flex-md-row align-items-center gap-3 p-3">
-                            <button class="btn-pdf-card" @* @onclick="() => GenerarPDF(item)" *@>
+                            <button class="btn-pdf-card" @onclick="() => GenerarPDF(item)">
                                 <i class="bi bi-filetype-pdf"></i>
                             </button>
                             <div class="avatar-alumno me-md-3 mb-2 mb-md-0">
@@ -158,7 +158,7 @@
                 {
                     <div class="col-12 col-md-6 mb-4">
                         <div class="modern-card tarjeta-alumno tarjeta-completa d-flex flex-column flex-md-row align-items-center gap-3 p-3">
-                            <button class="btn-pdf-card" @* @onclick="() => GenerarPDF(item)" *@>
+                            <button class="btn-pdf-card" @onclick="() => GenerarPDF(item)">
                                 <i class="bi bi-filetype-pdf"></i>
                             </button>
                             <div class="avatar-alumno me-md-3 mb-2 mb-md-0">
@@ -597,6 +597,7 @@
     private List<ST_S_PREINSCRIPDTO> listaPREINSCRIP = new(); // Lista de resultados
     private List<ST_S_PREINSC_INCOMPDTO> listaPREINSC_INCOMP = new(); // Lista de resultados
     private List<ST_S_CARRERASDTO> listaCARRERAS = new(); // Lista de resultados
+    private List<ST_S_DatosPDFDTO> listaGENERAPDF = new(); // Lista de resultados
 
     private ST_S_CARRERASDTO? carreraSeleccionada;
 
@@ -784,6 +785,12 @@
         mostrarFiltro = !mostrarFiltro;
     }
 
+    private async Task GenerarPDF(ST_S_PREINSCRIPDTO alumPDF)
+    {
+        listaGENERAPDF = await usuarioService.ST_S_DatosPDF(1, Convert.ToString(alumPDF.MatriculaID));
+
+
+    }
 
     private async Task OnFiltroIncompletoChanged(ChangeEventArgs e)
     {
@@ -806,6 +813,7 @@
         }
         StateHasChanged();
     }
+
 
     private async Task OnFiltroCompletasChanged(ChangeEventArgs e)
     {
@@ -930,6 +938,7 @@
         }
 
     }
+
 
     private async Task BtnEditarComp(ST_S_PREINSCRIPDTO completo)
     {
