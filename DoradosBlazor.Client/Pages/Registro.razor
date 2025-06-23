@@ -1,6 +1,4 @@
-﻿@page "/registro"
-
-@layout LoginLayout
+﻿@layout LoginLayout
 @inject HttpClient httpClient
 @using DoradosBlazor.Client.Extensiones
 @using DoradosBlazor.Shared
@@ -10,7 +8,7 @@
 @using DoradosBlazor.Client.Services;
 
 @using CurrieTechnologies.Razor.SweetAlert2;
-
+@using Microsoft.AspNetCore.Components
 @using System;
 @using System.Globalization;
 @using System.Text.RegularExpressions;
@@ -23,69 +21,64 @@
 @inject SweetAlertService Swal;
 @inject IUsuarioService usuarioService;
 
-<div class="register-bg">
-    <div class="register-box animate__animated animate__fadeInDown">
+<div class="modal-overlay">
+    <div class="superwow-register-modal animate__animated animate__fadeInDown">
+        <button class="modal-close" @onclick="Cerrar">×</button>
+
         <div class="register-logo">
             <img src="LogoUDN.png" alt="Logo UD" />
         </div>
         <h2 class="register-title">Registro</h2>
         <p class="register-desc">Crea tu cuenta para acceder a <span class="school-highlight">UD</span></p>
-        
+
         <!-- Matricula -->
         <div class="mb-3 text-start">
             <label>Matricula</label>
-            <div class="input-group">
-                <input class="form-control register-input" @bind="@matr.MatriculaID" placeholder="Tu matrícula">
+            <div class="superwow-input">
+                <i class="bi bi-person-badge-fill"></i>
+                <input @bind="matr.MatriculaID" placeholder="Tu matrícula" />
                 <button type="button" class="btn btn-icon-lg" @onclick="SiExisteMatr" title="Verificar matrícula">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none" viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="11" stroke="#0074D9" stroke-width="2" />
-                        <path d="M17 12l-5 5-5-5" stroke="#FFD700" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
+                    <i class="bi bi-arrow-repeat"></i>
                 </button>
             </div>
         </div>
+
+        <!-- Nombre -->
         <div class="mb-3 text-start">
             <label>Nombre</label>
-            <input class="form-control register-input" @bind="@matr.Nombre" placeholder="Tu nombre completo" />
+            <div class="superwow-input">
+                <i class="bi bi-person-fill"></i>
+                <input @bind="matr.Nombre" placeholder="Tu nombre completo" />
+            </div>
         </div>
+
+        <!-- Correo -->
         <div class="mb-3 text-start">
             <label>Correo</label>
-            <input class="form-control register-input" @bind="correo.Email" placeholder="correo@ejemplo.com" />
+            <div class="superwow-input">
+                <i class="bi bi-envelope-fill"></i>
+                <input @bind="correo.Email" placeholder="correo@ejemplo.com" />
+            </div>
         </div>
+
         <!-- Contraseña -->
         <div class="mb-3 text-start">
             <label>Contraseña</label>
-            <div class="input-group">
-                <input class="form-control register-input"
-                       @bind="passDTO.Password"
-                       placeholder="Crea una contraseña"
-                       type="@passwordInputType" />
-                <button type="button" class="btn btn-icon-lg" tabindex="-1" @onclick="TogglePassword" title="Mostrar/Ocultar contraseña">
-                    @if (showPassword)
-                    {
-                        <!-- OJO ABIERTO -->
-                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none" viewBox="0 0 24 24">
-                            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z" stroke="#0074D9" stroke-width="2" />
-                            <circle cx="12" cy="12" r="3.5" stroke="#FFD700" stroke-width="2" />
-                        </svg>
-                    }
-                    else
-                    {
-                        <!-- OJO CERRADO -->
-                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none" viewBox="0 0 24 24">
-                            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z" stroke="#0074D9" stroke-width="2" />
-                            <circle cx="12" cy="12" r="3.5" stroke="#FFD700" stroke-width="2" />
-                            <line x1="4" y1="20" x2="20" y2="4" stroke="#FFD700" stroke-width="2" />
-                        </svg>
-                    }
+            <div class="superwow-input">
+                <i class="bi bi-lock-fill"></i>
+                <input @bind="passDTO.Password" placeholder="Crea una contraseña" type="@passwordInputType" />
+                <button type="button" class="btn btn-icon-lg" @onclick="TogglePassword" title="Mostrar/Ocultar contraseña">
+                    <i class="bi @(showPassword ? "bi-eye-fill" : "bi-eye-slash-fill")" style="font-size: 1.2rem;"></i>
                 </button>
             </div>
         </div>
-        <button class="btn btn-register" @onclick="SiExisteCorreo" id="btnRegistro">Registrarse</button>        
+
+        <button class="superwow-btn" @onclick="SiExisteCorreo" id="btnRegistro">Registrarse</button>
     </div>
 </div>
 
 @code {
+    [Parameter] public EventCallback OnRegistroCompleto { get; set; }
 
     private MatriculaDTO matr = new MatriculaDTO();
     private CorreoDTO correo = new CorreoDTO();
@@ -95,6 +88,8 @@
     private string passwordInputType => showPassword ? "text" : "password";
 
     int iRolID = 0;
+
+    private void Cerrar() => OnRegistroCompleto.InvokeAsync();
 
     protected override async Task OnInitializedAsync()
     {

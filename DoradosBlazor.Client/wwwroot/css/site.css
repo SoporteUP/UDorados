@@ -191,10 +191,7 @@
         color: #333;
     }
 
-        .superwow-input input:focus {
-            box-shadow: 0 0 0 3px rgba(0,116,217,0.2);
-            transition: box-shadow 0.3s ease;
-        }
+
 
 .superwow-btn {
     width: 100%;
@@ -242,7 +239,7 @@
 }
 
     .superwow-footer a {
-        color: #0074D9;
+        color: #0074D9 !important;
         font-weight: 600;
         text-decoration: none;
     }
@@ -270,44 +267,116 @@
 
 /* ------------------------ Contenido exclusivo para Registro ----------------- */
 
-.register-bg {
+.superwow-register-bg {
     min-height: 100vh;
-    background: #f6f8fa;
+    background: linear-gradient(135deg, #f0f4ff, #ffffff);
+    overflow: hidden;
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-family: 'Segoe UI', sans-serif;
 }
 
-.register-box {
-    background: #fff;
-    border-radius: 1.5rem;
-    box-shadow: 0 8px 38px rgba(0, 90, 180, 0.10), 0 2px 6px #ffd70022;
-    padding: 2.7rem 2.2rem 2.2rem 2.2rem;
-    min-width: 345px;
-    max-width: 390px;
-    width: 100%;
+.superwow-register-card {
+    position: relative;
+    z-index: 2;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(22px);
+    border-radius: 1.8rem;
+    padding: 3rem 2rem;
+    max-width: 430px;
+    width: 90%;
     text-align: center;
     border-top: 5px solid #0074D9;
-    border-bottom: 3.5px solid #FFD700;
-    position: relative;
+    border-bottom: 4px solid #FFD700;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+    animation: fadeIn 1s ease forwards;
 }
 
+    .superwow-register-card h2 {
+        font-size: 1.9rem;
+        color: #0074D9;
+        margin-bottom: 0.5rem;
+    }
+
+    .superwow-register-card p {
+        font-size: 1.05rem;
+        color: #555;
+        margin-bottom: 1.5rem;
+    }
+
+.school-highlight {
+    color: #FFD700;
+    font-weight: bold;
+}
+
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 27, 58, 0.68); /* fondo oscuro azulado */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    backdrop-filter: blur(2.5px);
+    transition: background 0.3s;
+}
+
+.superwow-register-modal {
+    background: rgba(255,255,255,0.95);
+    border-radius: 1.7rem;
+    padding: 2.6rem 2.2rem 2.3rem 2.2rem;
+    width: 95%;
+    max-width: 420px;
+    position: relative;
+    text-align: center;
+    box-shadow: 0 20px 64px 0 rgba(0,0,0,0.24), 0 2px 8px #ffd70033;
+    border-top: 5px solid #0074D9;
+    border-bottom: 4px solid #FFD700;
+    animation: fadeInBounce 0.7s cubic-bezier(.47,1.64,.41,.8);
+}
+
+.modal-close {
+    position: absolute;
+    top: 0.6rem;
+    right: 1.3rem;
+    font-size: 1.8rem;
+    background: none;
+    border: none;
+    color: #0074D9;
+    font-weight: 700;
+    cursor: pointer;
+    z-index: 10;
+    transition: color 0.18s, transform 0.16s;
+}
+
+    .modal-close:hover {
+        color: #FFD700;
+        transform: scale(1.15);
+    }
+
 .register-logo img {
-    height: 60px;
-    margin-bottom: 1.2rem;
+    height: 42px;
+    margin-bottom: 0.9rem;
+    
 }
 
 .register-title {
-    font-size: 1.95rem;
-    font-weight: 800;
+    font-size: 1.6rem;
     color: #0074D9;
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.4rem;
+    font-weight: 800;
 }
 
 .register-desc {
-    font-size: 1.09rem;
-    color: #646464;
-    margin-bottom: 1.5rem;
+    font-size: 1.07rem;
+    color: #444;
+    margin-bottom: 1.1rem;
 }
 
 .school-highlight {
@@ -315,116 +384,17 @@
     font-weight: 700;
     letter-spacing: 1.5px;
 }
-/* Inputs */
-.register-input {
-    border-radius: 0.85rem;
-    border: 1.5px solid #d6e2f3;
-    background: #f7fafd;
-    font-size: 1rem;
-    padding: 0.89rem 1.12rem;
-    margin-bottom: 0.7rem;
-    transition: border 0.18s;
-}
 
-    .register-input:focus {
-        border: 1.7px solid #0074D9;
-        outline: none;
-        background: #f4faff;
-    }
-/* Input group: íconos */
-.input-group {
-    display: flex;
-    align-items: center;
-}
+/* Reutiliza tus estilos .superwow-input, .superwow-btn, etc. */
 
-.btn-icon {
-    border: none;
-    background: none;
-    padding: 0 0.4rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 2.7rem;
-    margin-left: 0.2rem;
-    cursor: pointer;
-    transition: background 0.14s;
-}
-
-    .btn-icon:active,
-    .btn-icon:focus {
-        outline: none;
-        background: #e7f0fd;
-    }
-
-.btn-icon-lg {
-    border: none;
-    background: none;
-    padding: 0 0.25rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 2.7rem;
-    width: 2.8rem;
-    margin-left: 0.2rem;
-    cursor: pointer;
-    border-radius: 0.7rem;
-    font-size: 1.3rem;
-    transition: background 0.12s;
-}
-
-    .btn-icon-lg:hover, .btn-icon-lg:focus {
-        outline: none;
-        background: #f1f9ff;
-    }
-
-.btn-register {
-    width: 100%;
-    border-radius: 0.8rem;
-    background: #0074D9;
-    color: #fff;
-    font-weight: 700;
-    padding: 0.9rem 0;
-    border: none;
-    font-size: 1.12rem;
-    margin-top: 0.5rem;
-    margin-bottom: 0.4rem;
-    box-shadow: 0 3px 12px #0074d928;
-    transition: background 0.15s, color 0.15s;
-}
-
-    .btn-register:hover {
-        background: #FFD700;
-        color: #0a2240;
-        box-shadow: 0 8px 24px #ffd70044;
-    }
-
-.btn-volver {
-    width: 100%;
-    border-radius: 0.8rem;
-    background: #fff;
-    color: #0074D9;
-    font-weight: 700;
-    padding: 0.8rem 0;
-    border: 2px solid #0074D9;
-    font-size: 1.05rem;
-    margin-top: 0.25rem;
-    transition: background 0.13s, color 0.13s, border-color 0.13s;
-}
-
-    .btn-volver:hover {
-        background: #0074D9;
-        color: #fff;
-        border-color: #FFD700;
-    }
-
-@media (max-width: 600px) {
-    .register-box {
-        min-width: 95vw;
-        padding: 1.3rem 0.5rem 1.5rem 0.5rem;
+@media (max-width: 500px) {
+    .superwow-register-modal {
+        padding: 1.5rem 0.7rem;
+        max-width: 91vw;
     }
 
     .register-logo img {
-        height: 42px;
+        height: 32px;
     }
 }
 

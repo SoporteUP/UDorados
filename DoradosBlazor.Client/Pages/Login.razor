@@ -10,8 +10,9 @@
 @inject IJSRuntime JsRuntime
 @using CurrieTechnologies.Razor.SweetAlert2;
 @inject SweetAlertService Swal;
+@using DoradosBlazor.Client.Pages
 
-<div class="superwow-login-bg">
+<div class="@loginBgClass">
     <div class="animated-lines">
         <span class="shooting-star blue" style="top: 12%; animation-delay: 0s; transform: rotate(18deg);"></span>
         <span class="shooting-star gold" style="top: 28%; animation-delay: 1.5s; transform: rotate(12deg);"></span>
@@ -43,14 +44,27 @@
         </form>
 
         <div class="superwow-footer">
-            ¿No tienes cuenta? <a href="/registro">Regístrate</a>
+            ¿No tienes cuenta? 
+            <a role="button" @onclick="() => mostrarModalRegistro = true">Regístrate</a>
         </div>
     </div>
 </div>
 
+@if (mostrarModalRegistro)
+{
+    <Registro OnRegistroCompleto="OnRegistroCerrado" />
+}
+
 @code {
     private LoginDTO login = new LoginDTO();
-  
+    private bool mostrarModalRegistro = false;
+
+    private string loginBgClass => mostrarModalRegistro ? "superwow-login-bg modal-activo" : "superwow-login-bg";
+
+    private void OnRegistroCerrado()
+    {
+        mostrarModalRegistro = false;
+    }
 
     private async Task HandleFormSubmit()
     {
