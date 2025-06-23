@@ -1,4 +1,5 @@
 using DoradosBlazor.Server.Models;
+using DoradosBlazor.Server.Services;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,6 +13,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddTransient<IEmailService, EmailService>();
 
 builder.Services.AddDbContext<DbcrudBlazorContext>(opciones =>
 {

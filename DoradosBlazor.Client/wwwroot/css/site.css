@@ -1,187 +1,269 @@
 ﻿/*----------------------- Contenido Exlusivo para Login ----------------------------*/
 
-.login-nube-container {
+.superwow-login-bg {
     min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #f0f2f8;
-    padding: 1rem;
-}
-
-.login-nube-box {
-    display: flex;
-    width: 980px;
-    background: #fff;
-    border-radius: 2rem;
+    background: linear-gradient(135deg, #f0f4ff, #ffffff);
     overflow: hidden;
     position: relative;
-    /* Sombra más grande y extendida */
-    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.2), 0 15px 30px rgba(0, 0, 0, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Segoe UI', sans-serif;
 }
 
-    .login-nube-box::before {
+    .superwow-login-bg::after {
         content: "";
         position: absolute;
         inset: 0;
-        border-radius: 2rem;
-        pointer-events: none;
-        box-shadow: 0 0 60px 10px rgba(255, 215, 0, 0.05);
+        background-image: radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px);
+        background-size: 40px 40px;
+        animation: gridTwinkle 6s ease-in-out infinite;
+        z-index: 0;
     }
 
-/* Lado izquierdo */
-.login-nube-left {
-    flex: 1;
-    padding: 3rem;
-    z-index: 2;
-    background: white;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+@keyframes gridTwinkle {
+    0%, 100% {
+        opacity: 0.08;
+    }
+
+    50% {
+        opacity: 0.2;
+    }
 }
 
-    .login-nube-left h2 {
-        font-size: 2rem;
-        color: #0a2240;
-        margin-bottom: 0.5rem;
-    }
-
-    .login-nube-left p {
-        color: #444;
-        margin-bottom: 2rem;
-        font-size: 1rem;
-    }
-
-/* Lado derecho con fondo morado */
-.login-nube-right {
-    flex: 1;
-    background: linear-gradient(135deg, #0074D9, #6a00ff);
-    color: white;
-    padding: 3rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    text-align: center;
-    clip-path: polygon(12% 0, 100% 0, 100% 100%, 12% 100%, 0 70%, 0 30%);
+.animated-lines {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
 }
 
-    .login-nube-right h2 {
-        font-size: 2rem;
-        margin-bottom: 1rem;
+.shooting-star {
+    position: absolute;
+    left: -160px;
+    width: 140px;
+    height: 2px;
+    border-radius: 2px;
+    opacity: 0;
+    animation: starFlyDiagonal 5s linear infinite;
+}
+
+    .shooting-star.blue {
+        background: linear-gradient(to right, #00cfff, transparent);
+        box-shadow: 0 0 12px #00cfff;
     }
 
-    .login-nube-right p {
-        font-size: 1.05rem;
-        line-height: 1.6;
+    .shooting-star.gold {
+        background: linear-gradient(to right, #FFD700, transparent);
+        box-shadow: 0 0 12px #FFD700;
     }
 
-/* Inputs con sombra e íconos */
-.nube-input {
+@keyframes starFlyDiagonal {
+    0% {
+        transform: translateX(-160px);
+        opacity: 0;
+    }
+
+    5% {
+        opacity: 0.9;
+    }
+
+    90% {
+        opacity: 0.9;
+    }
+
+    100% {
+        transform: translateX(140vw);
+        opacity: 0;
+    }
+}
+
+.superwow-login-card {
     position: relative;
+    z-index: 2;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(25px);
+    border-radius: 1.8rem;
+    padding: 3rem 2.2rem;
+    max-width: 420px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    text-align: center;
+    animation: fadeInBounce 0.8s ease forwards;
+}
+
+@keyframes fadeInBounce {
+    0% {
+        opacity: 0;
+        transform: scale(0.95) translateY(20px);
+    }
+
+    60% {
+        opacity: 1;
+        transform: scale(1.02) translateY(0);
+    }
+
+    100% {
+        transform: scale(1) translateY(0);
+    }
+}
+
+.superwow-logo {
+    position: relative;
+    z-index: 1;
+    width: 90px;
+    margin-bottom: 1rem;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+    transition: transform 0.3s ease;
+}
+
+    .superwow-logo:hover {
+        transform: scale(1.05);
+    }
+
+    .superwow-logo::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 110px;
+        height: 110px;
+        transform: translate(-50%, -50%);
+        background: radial-gradient(circle, rgba(0, 116, 217, 0.2), transparent 70%);
+        border-radius: 50%;
+        animation: logoPulse 3s ease-in-out infinite;
+        z-index: -1;
+    }
+
+@keyframes logoPulse {
+    0%, 100% {
+        opacity: 0.4;
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    50% {
+        opacity: 0.7;
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+}
+
+.superwow-login-card h2 {
+    font-size: 1.8rem;
+    color: #1a1a1a;
+}
+
+.superwow-login-card p {
+    font-size: 1rem;
+    color: #444;
+    margin-bottom: 2rem;
+}
+
+.superwow-input {
     display: flex;
     align-items: center;
-    background: white;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid #ccc;
     border-radius: 2rem;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.06);
-    padding: 0.8rem 1rem;
-    margin-bottom: 1.5rem;
-    border: 1px solid #e1e5f0;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.2rem;
+    transition: border-color 0.3s ease;
 }
 
-    .nube-input .icon {
-        color: #FFA500;
-        margin-right: 0.7rem;
-        font-size: 1.3rem;
+    .superwow-input:hover {
+        border-color: #0074D9;
     }
 
-    .nube-input input {
+    .superwow-input i {
+        color: #0074D9;
+        margin-right: 0.8rem;
+        font-size: 1.2rem;
+    }
+
+    .superwow-input input {
         border: none;
         outline: none;
+        width: 100%;
         background: transparent;
         font-size: 1rem;
-        width: 100%;
         color: #333;
     }
 
-.nube-options {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.9rem;
-    margin-bottom: 1.8rem;
-    color: #555;
-}
+        .superwow-input input:focus {
+            box-shadow: 0 0 0 3px rgba(0,116,217,0.2);
+            transition: box-shadow 0.3s ease;
+        }
 
-    .nube-options a {
-        color: #0074D9;
-        text-decoration: underline;
-    }
-
-/* Botón dorado */
-.nube-btn {
+.superwow-btn {
     width: 100%;
-    padding: 0.9rem;
-    background: #FFD700;
-    color: #0a2240;
+    background: linear-gradient(270deg, #0074D9, #005BBB, #FFD700, #FFB400);
+    background-size: 600% 600%;
+    color: white;
     border: none;
     border-radius: 2rem;
-    font-weight: bold;
-    font-size: 1.05rem;
     padding: 0.9rem;
-    box-shadow: 0 6px 16px rgba(255, 215, 0, 0.4);
-    transition: all 0.3s ease;
+    font-weight: 600;
+    font-size: 1.05rem;
+    cursor: pointer;
+    animation: gradientBG 3s ease infinite;
+    box-shadow: 0 6px 18px rgba(0, 116, 217, 0.3);
+    transition: transform 0.2s;
 }
 
-    .nube-btn:hover {
-        background: linear-gradient(to right, #FFEA00, #FFD700); /* Brillo dorado */
-        color: #0a2240;
-        box-shadow: 0 10px 24px rgba(255, 215, 0, 0.6);
+    .superwow-btn:hover {
+        transform: scale(1.03);
     }
 
-.nube-register {
-    margin-top: 1rem;
-    text-align: center;
-    font-size: 0.95rem;
+    .superwow-btn:active {
+        transform: scale(0.98);
+        box-shadow: 0 4px 12px rgba(0, 116, 217, 0.2);
+    }
+
+@keyframes gradientBG {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
-    .nube-register a {
+.superwow-footer {
+    margin-top: 2rem;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+    .superwow-footer a {
         color: #0074D9;
         font-weight: 600;
-        text-decoration: underline;
+        text-decoration: none;
     }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .login-nube-box {
-        flex-direction: column;
-    }
-
-    .login-nube-right {
-        clip-path: none;
-        border-radius: 0 0 2rem 2rem;
-    }
-}
-
-.login-logo {
-    text-align: center;
-    margin-bottom: 2.5rem;
-}
-
-    .login-logo img {
-        height: 100px;
-        max-width: 340px;
-        object-fit: contain;
-        filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.1));
-        transition: transform 0.2s ease-in-out;
-    }
-
-        .login-logo img:hover {
-            transform: scale(1.04);
+        .superwow-footer a:hover {
+            text-decoration: underline;
         }
 
-        .login-logo img:hover {
-            transform: scale(1.05);
-            filter: drop-shadow(0 0 10px #eeeeee);
+@media (max-width: 480px) {
+    .superwow-login-card {
+        padding: 2rem 1.5rem;
+    }
+
+        .superwow-login-card h2 {
+            font-size: 1.5rem;
         }
+
+    .superwow-logo {
+        width: 75px;
+    }
+}
 
 
 
@@ -1204,3 +1286,384 @@ body.modo-oscuro .modal-carreras-exclusivo,
         background: #b02a37;
         box-shadow: 0 6px 20px rgba(220,53,69,0.3);
     }
+    
+/*    -----------------opciones de inscripcion*/
+
+.overlay-pdf {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-cerrar-overlay {
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
+    z-index: 10000;
+}
+
+.card-opcion {
+    background: #fff;
+    border-radius: 1.2rem;
+    padding: 1.5rem 2rem;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    width: 220px;
+    transition: transform 0.2s ease;
+}
+
+    .card-opcion:hover {
+        transform: scale(1.05);
+    }
+
+    .card-opcion i {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .card-opcion span {
+        font-weight: 600;
+        font-size: 1rem;
+        color: #333;
+    }
+
+    .card-opcion.whatsapp {
+        box-shadow: 0 0 15px rgba(37, 211, 102, 0.5);
+        color: #25D366;
+    }
+
+    .card-opcion.correo {
+        box-shadow: 0 0 15px rgba(220, 53, 69, 0.4);
+        color: #DC3545;
+    }
+
+    .card-opcion.descargar {
+        box-shadow: 0 0 15px rgba(0, 116, 217, 0.4);
+        color: #0074D9;
+    }
+
+
+
+/* ----------------------------------------- PDF */
+
+.pdf-container-modern {
+    width: 816px;
+    min-height: 1056px;
+    background: #ffffff;
+    color: #1a1a1a;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    padding: 16px;
+    margin: 0 auto;
+    box-shadow: 0 0 14px rgba(0, 0, 0, 0.1);
+    font-size: 0.78rem;
+    line-height: 1.4;
+    border-radius: 8px;
+    text-wrap: pretty;
+}
+
+.fila-horizontal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.2rem;
+    margin-bottom: 10px;
+}
+
+    .fila-horizontal span {
+        min-width: 200px;
+        flex: 1;
+    }
+
+/* Encabezado */
+.pdf-header-modern {
+    background: linear-gradient(90deg, #0074D9 0%, #0056b3 100%);
+    color: white;
+    text-align: center;
+    padding: 10px 12px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+}
+
+.logo-modern {
+    height: 55px;
+    margin-bottom: 3px;
+}
+
+.titulo-modern {
+    font-size: 1.6rem;
+    margin: 0;
+    font-weight: 700;
+}
+
+.subtitulo-modern {
+    font-size: 0.72rem;
+    color: #f1f1f1;
+    margin-top: 1px;
+}
+
+/* Secciones */
+.seccion-modern {
+    background: #f9fafe;
+    padding: 10px 14px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    border: 1px solid #e3e9f7;
+    margin-bottom: 0.5rem;
+}
+
+.titulo-seccion {
+    text-align: center;
+    font-size: 1.00rem;
+    font-weight: 600;
+    color: #222;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    border-bottom: 2px solid #FFD700;
+    padding-bottom: 4px;
+}
+
+/* Layout en tres columnas */
+.datos-dobles {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.3rem 0.8rem;
+}
+
+.seccion-modern p {
+    margin: 2px 0;
+    text-align: left;
+}
+
+    .seccion-modern p strong {
+        font-weight: 600;
+        color: #000;
+    }
+
+/* Pie de página */
+.footer-franja {
+    height: 30px;
+    background: #0056b3;
+    border-radius: 6px;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.footer-text {
+    color: white;
+    font-size: 0.75rem;
+    margin: 0;
+}
+
+/* Animaciones */
+@keyframes fadeSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-content {
+    z-index: 1051;
+    position: relative;
+    animation: fadeSlideIn 0.4s ease-out;
+}
+
+/* Fondo del modal PDF */
+.fondo-modal-pdf {
+    z-index: 1050;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    scrollbar-gutter: stable;
+}
+
+/* Impresión */
+@media print {
+    body {
+        -webkit-print-color-adjust: exact;
+        background: white;
+    }
+
+    .pdf-container-modern {
+        box-shadow: none;
+        margin: 0;
+        width: 100%;
+        padding: 0;
+        border-radius: 0;
+    }
+
+    .modal-header,
+    .modal-footer,
+    .btn,
+    .modal-backdrop {
+        display: none !important;
+    }
+}
+
+/* Leyenda final sin fondo, compacta */
+.leyenda-confirmacion {
+    font-size: 0.76rem;
+    text-align: justify;
+    margin-top: 0.6rem;
+    padding: 4px 6px;
+    line-height: 1.4;
+    color: #111;
+}
+
+    .leyenda-confirmacion p {
+        margin: 0;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+    }
+
+
+/*para MODAL CORREO*/
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(10, 10, 10, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050; /* IMPORTANTE: asegurarse que sea mayor que cualquier otro componente */
+    backdrop-filter: blur(2px); /* opcional: difumina el fondo */
+}
+
+
+.modal-contenido {
+    background: linear-gradient(145deg, #ffffff, #f1f5f9);
+    border-radius: 1.5rem;
+    width: 92%;
+    max-width: 520px;
+    padding: 2rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    position: relative;
+    border-top: 6px solid #0074D9;
+    border-bottom: 3px solid #FFD700;
+}
+
+.modal-title {
+    color: #0074D9;
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: 0.5px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e3eafc;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+}
+
+.modal-body label {
+    font-weight: 600;
+    color: #343a40;
+}
+
+.modal-body input,
+.modal-body textarea {
+    border-radius: 0.7rem;
+    border: 1.3px solid #ced4da;
+    padding: 0.6rem 1rem;
+    font-size: 0.95rem;
+    background-color: #f8f9fa;
+    transition: border-color 0.2s;
+}
+
+    .modal-body input:focus,
+    .modal-body textarea:focus {
+        border-color: #0074D9;
+        outline: none;
+        box-shadow: 0 0 0 0.15rem rgba(0, 116, 217, 0.25);
+    }
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 1rem;
+}
+
+.btn-dorado {
+    background-color: #FFD700;
+    color: #343a40;
+    border: none;
+    padding: 0.6rem 1.3rem;
+    border-radius: 1rem;
+    font-weight: 600;
+    transition: background-color 0.2s ease-in-out;
+}
+
+    .btn-dorado:hover {
+        background-color: #e6c200;
+        color: #1d1d1d;
+    }
+
+.close-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.4rem;
+    color: #dc3545;
+    transition: color 0.2s ease-in-out;
+}
+
+    .close-btn:hover {
+        color: #a71d2a;
+    }
+
+
+@keyframes slideFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-30px) scale(0.98);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-contenido {
+    background: linear-gradient(145deg, #ffffff, #f1f5f9);
+    border-radius: 1.5rem;
+    width: 92%;
+    max-width: 520px;
+    padding: 2rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    position: relative;
+    border-top: 6px solid #0074D9;
+    border-bottom: 3px solid #FFD700;
+    animation: slideFadeIn 0.4s ease-out;
+}

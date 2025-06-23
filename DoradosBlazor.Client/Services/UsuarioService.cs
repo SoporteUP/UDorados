@@ -248,6 +248,15 @@ namespace DoradosBlazor.Client.Services
                 throw new Exception(result.Mensaje);
         }
 
+        public async Task<List<ST_S_CorreosMisCuentasDTO>> ST_S_CorreosMisCuentas(int iTipoConsulta, string sCorreo)
+        {
+            var result = await _http.GetFromJsonAsync<ResponseAPI<List<ST_S_CorreosMisCuentasDTO>>>($"api/Usuario/ST_S_CorreosMisCuentas/{iTipoConsulta}/{sCorreo}");
+            if (result!.EsCorrecto)
+                return result.Valor!;
+            else
+                throw new Exception(result.Mensaje);
+        }
+
 
     }
 }

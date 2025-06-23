@@ -41,25 +41,25 @@
 
     @if (!mostrarFormulario)
     {
-        
+
         <div class="d-flex flex-column align-items-center mb-4">
-             <button class="btn btn-azul mb-3 px-5 py-2 fs-5 rounded-3" @onclick="NuevaPreinscrip">
-                 <i class="bi bi-plus-circle"></i> Nueva
-             </button>
-             <div class="input-group mb-3" style="max-width: 450px;">
-                 <input class="form-control modern-input buscador"
-                        @bind-value="BusquedaAlumno.Nombre"
-                        type="text"
-                        placeholder="Buscar alumno por nombre..."
-                        @oninput="FiltrarPreinscrip"
-                        bind-value="@filtroInscrip" />
-             
-                 <!-- Botón de filtro -->
-                 <button class="btn btn-filtro-dropdown" type="button" @onclick="ToggleFiltro">
-                     <i class="bi bi-funnel"></i>
-                 </button>
-             
-                 <!-- Dropdown de filtro -->
+            <button class="btn btn-azul mb-3 px-5 py-2 fs-5 rounded-3" @onclick="NuevaPreinscrip">
+                <i class="bi bi-plus-circle"></i> Nueva
+            </button>
+            <div class="input-group mb-3" style="max-width: 450px;">
+                <input class="form-control modern-input buscador"
+                       @bind-value="BusquedaAlumno.Nombre"
+                       type="text"
+                       placeholder="Buscar alumno por nombre..."
+                       @oninput="FiltrarPreinscrip"
+                       bind-value="@filtroInscrip" />
+
+                <!-- Botón de filtro -->
+                <button class="btn btn-filtro-dropdown" type="button" @onclick="ToggleFiltro">
+                    <i class="bi bi-funnel"></i>
+                </button>
+
+                <!-- Dropdown de filtro -->
                 <div class="filtro-dropdown" style="@(mostrarFiltro ? "display:block;" : "display:none;")">
                     <label class="checkbox-label mb-2">
                         <input type="checkbox" class="form-check-input me-2"
@@ -74,7 +74,7 @@
                         Completas
                     </label>
                 </div>
-             </div>
+            </div>
         </div>
 
         <div class="row">
@@ -176,8 +176,8 @@
                         </div>
                     </div>
                 }
-            }    
-            
+            }
+
 
 
         </div>
@@ -186,9 +186,9 @@
     {
         <div class="modern-form position-relative">
 
-            
 
-            @if(GuardarFab)
+
+            @if (GuardarFab)
             {
                 <!-- Botón Sticky (desktop) -->
                 <button class="btn btn-azul btn-guardar-sticky d-none d-md-block"
@@ -196,12 +196,12 @@
                     <i class="bi bi-save"></i> Guardar
                 </button>
 
-                 <!-- FAB (móvil, aparece cuando no estás hasta abajo) -->
-                 <button class="btn btn-azul btn-fab-guardar d-md-none"
-                         @onclick="GuardarFormulario"
-                         style="display:none;" id="fabGuardar">
-                     <i class="bi bi-save2-fill"></i>
-                 </button>
+                <!-- FAB (móvil, aparece cuando no estás hasta abajo) -->
+                <button class="btn btn-azul btn-fab-guardar d-md-none"
+                        @onclick="GuardarFormulario"
+                        style="display:none;" id="fabGuardar">
+                    <i class="bi bi-save2-fill"></i>
+                </button>
             }
 
             @if (EditarFab)
@@ -212,14 +212,14 @@
                     <i class="bi bi-pencil-square"></i> Editar
                 </button>
 
-                 <!-- FAB (móvil, aparece cuando no estás hasta abajo) -->
-                <button class="btn btn-dorado btn-fab-editar d-md-none"     
+                <!-- FAB (móvil, aparece cuando no estás hasta abajo) -->
+                <button class="btn btn-dorado btn-fab-editar d-md-none"
                         @onclick="GuardarPreIncompleta"
                         style="display:none;" id="fabEditar">
                     <i class="bi bi-pencil-square"></i>
                 </button>
             }
-           
+
 
             <button class="btn btn-secondary mt-4" @onclick="OcultarFormulario">
                 <i class="bi bi-arrow-left"></i> Volver
@@ -558,9 +558,242 @@
 
 
 
+@if (mostrarOpcionesPdf)
+{
+    <div class="overlay-pdf">
+        <button class="btn-cerrar-overlay" @onclick="() => mostrarOpcionesPdf = false">×</button>
+
+        <h3 class="text-white text-center mb-4">Opciones para el PDF</h3>
+
+        <div class="d-flex flex-wrap justify-content-center gap-3">
+            <div class="card-opcion whatsapp" @onclick="EnviarPorWhatsApp">
+                <i class="bi bi-whatsapp"></i>
+                <span>Enviar por WhatsApp</span>
+            </div>
+            <div class="card-opcion correo" @onclick="MuestraPorCorreo">
+                <i class="bi bi-envelope-fill"></i>
+                <span>Enviar por Correo</span>
+            </div>
+            <div class="card-opcion descargar" @onclick="DescargarPdf">
+                <i class="bi bi-download"></i>
+                <span>Descargar</span>
+            </div>
+        </div>
+    </div>
+}
+
+
+@* ------------------------------PDF---------------------------- *@
+
+@if (mostrarVistaPreviaPDF)
+{
+    <div class="modal fade show d-block fondo-modal-pdf" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content rounded-4 shadow">
+                <div class="modal-header border-bottom border-warning-subtle bg-white rounded-top-4">
+                    <h5 class="modal-title fw-semibold text-dark-emphasis mx-auto text-uppercase" style="letter-spacing: 0.5px;">
+                        Vista Previa de Solicitud de Preinscripción
+                    </h5>
+                    <button type="button" class="btn-close" @onclick="() => mostrarVistaPreviaPDF = false"></button>
+                </div>
+
+                <div class="modal-body p-4" style="overflow-y: auto; max-height: 85vh;">
+                    <div id="pdfContent" class="pdf-container-modern">
+                        <div class="pdf-header-modern">
+                            <img src="LogoUD.png" alt="Logo Dorados" class="logo-modern" />
+                            <h2 class="titulo-modern">Universidad Dorados</h2>
+                            <p class="subtitulo-modern fw-semibold">Solicitud de Preinscripción No. @AlumnoActualPDF?.MatriculaID</p>
+                        </div>
+
+                        <!-- DATOS DEL ALUMNO -->
+                        <div class="seccion-modern">
+                            <h4 class="titulo-seccion">Datos del Alumno</h4>
+                            <div class="fila-horizontal">
+                                <span><strong>Nombre:</strong> @AlumnoActualPDF?.Nombre</span>
+                                <span><strong>Fecha:</strong> @AlumnoActualPDF?.fechadealta</span>
+                                <span><strong>Edad:</strong> @AlumnoActualPDF?.Edad</span>
+                            </div>
+                            <div class="fila-horizontal">
+                                <span><strong>Dirección:</strong> @AlumnoActualPDF?.Direccion</span>
+                                <span><strong>Celular:</strong> @AlumnoActualPDF?.Telefono</span>
+                            </div>
+                            <div class="fila-horizontal">
+                                <span><strong>Colonia:</strong> @AlumnoActualPDF?.Colonia</span>
+                                <span><strong>Municipio:</strong> @AlumnoActualPDF?.Ciudad</span>
+                                <span><strong>CP:</strong> @AlumnoActualPDF?.CodigoPostal</span>
+                            </div>
+                            <div class="fila-horizontal">
+                                <span><strong>Email:</strong> @AlumnoActualPDF?.Email</span>
+                                <span><strong>Escuela de Procedencia:</strong> @AlumnoActualPDF?.EscuelaProcedencia</span>
+                            </div>
+                        </div>
+
+                        <!-- DATOS ADICIONALES -->
+                        <div class="seccion-modern">
+                            <h4 class="titulo-seccion">Datos Adicionales del Alumno</h4>
+                            <div class="fila-horizontal">
+                                <span><strong>Lugar de Nacimiento:</strong> @AlumnoActualPDF?.LugardeNacimiento</span>
+                                <span><strong>Nacionalidad:</strong> @AlumnoActualPDF?.Nacionalidad</span>
+                                <span><strong>Sexo:</strong> @AlumnoActualPDF?.Sexo</span>
+                            </div>
+                            <div class="fila-horizontal">
+                                <span><strong>Fecha de Nacimiento:</strong> @AlumnoActualPDF?.FechaNacimiento</span>
+                                <span><strong>Estado Civil:</strong> @AlumnoActualPDF?.EstadoCivil</span>
+                            </div>
+                            <div class="fila-horizontal">
+                                <span><strong>Ocupación:</strong> @AlumnoActualPDF?.Ocupacion</span>
+                                <span><strong>Sector:</strong> @AlumnoActualPDF?.Sector</span>
+                                <span><strong>Servicio Médico:</strong> @AlumnoActualPDF?.ServicioMedico</span>
+                            </div>
+                            <div class="fila-horizontal">
+                                <span><strong>CURP:</strong> @AlumnoActualPDF?.Curp</span>
+                            </div>
+                        </div>
+
+                        <!-- ÁREA SOLICITADA -->
+                        <div class="seccion-modern">
+                            <h4 class="titulo-seccion">Área Solicitada</h4>
+                            <div class="fila-horizontal">
+                                <span><strong>Licenciatura:</strong> @AlumnoActualPDF?.Carrera</span>
+                                <span><strong>Fecha de Inscripción:</strong> @AlumnoActualPDF?.fechaInsc</span>
+                            </div>
+                            <div class="fila-horizontal">
+                                <span><strong>Atendido Por:</strong> @AlumnoActualPDF?.Atendio</span>
+                                <span><strong>Ciclo Escolar:</strong> @AlumnoActualPDF?.CicloID</span>
+                            </div>
+                            <div class="fila-horizontal">
+                                <span><strong>Medio Entero:</strong> @AlumnoActualPDF?.MedioEntero</span>
+                            </div>
+                        </div>
+
+                        <!-- DATOS DEL PADRE O TUTOR -->
+                        <div class="seccion-modern">
+                            <h4 class="titulo-seccion">Datos del Padre o Tutor</h4>
+                            <div class="fila-horizontal">
+                                <span><strong>Nombre:</strong> @AlumnoActualPDF?.NombreTutor</span>
+                                <span><strong>Ocupación:</strong> @AlumnoActualPDF?.OcupacionTutor</span>
+                            </div>
+                            <div class="fila-horizontal">
+                                <span><strong>Teléfono Casa:</strong> @AlumnoActualPDF?.TelefonoTutor</span>
+                                <span><strong>Email:</strong> @AlumnoActualPDF?.CorreoTutor</span>
+                            </div>
+                            <div class="fila-horizontal">
+                                <span><strong>Dirección:</strong> @AlumnoActualPDF?.DireccionTutor</span>
+                            </div>
+                        </div>
+
+                        <!-- EMERGENCIA -->
+                        <div class="seccion-modern">
+                            <h4 class="titulo-seccion">Contacto de Emergencia</h4>
+                            <div class="fila-horizontal">
+                                <span><strong>Nombre:</strong> @AlumnoActualPDF?.CasoEmergencia</span>
+                                <span><strong>Parentesco:</strong> @AlumnoActualPDF?.Parentesco</span>
+                            </div>
+                            <div class="fila-horizontal">
+                                <span><strong>Teléfono:</strong> @AlumnoActualPDF?.TelEmergencia</span>
+                                <span><strong>Email:</strong> @AlumnoActualPDF?.CorreoEmergencia</span>
+                            </div>
+                        </div>
+
+                        <!-- LEYENDA FINAL (SIN FONDO) -->
+                        <div class="leyenda-confirmacion">
+                            <p>
+                                ASEGURO QUE LOS DATOS ANTES MENCIONADOS SON VERDADEROS Y MANIFIESTO MI CONFORMIDAD AL SER ACEPTADO COMO MIEMBRO DE ESTA INSTITUCIÓN EDUCATIVA Y ACEPTO LOS REGLAMENTOS Y NORMATIVIDAD QUE LA INSTITUCIÓN SEÑALA.
+                            </p>
+                        </div>
+
+                        <!-- PIE -->
+                        <div class="footer-franja">
+                            <p class="footer-text">· Dorados · Universidad Dorados ·</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    @if (mostrarBtnCorreo == true)
+                    {
+                        <button class="btn btn-azul" @onclick="ModalCorreo">
+                            <i class="bi bi-envelope-paper-fill"></i> Enviar PDF
+                        </button>
+                        <button class="btn btn-secondary" @onclick="() => mostrarVistaPreviaPDF = false">Cerrar</button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (mostrarModalCorreo)
+{
+    <div class="modal-overlay">
+        <div class="modal-contenido animate__animated animate__fadeInDown">
+            <div class="modal-header">
+                <h4 class="modal-title">Enviar Correo</h4>
+                <button class="close-btn" @onclick="() => mostrarModalCorreo = false"><i class="bi bi-x-lg"></i></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-group mb-3">
+                    <label>DE:</label>
+                    <input class="form-control" @bind="correoRemitente" placeholder="Correo del remitente" readonly />
+                </div>
+
+                <div class="form-group mb-3">
+                    <label>Contraseña:</label>
+                    <input type="password" class="form-control" @bind="contrasenaCorreo" readonly />
+                </div>
+
+                <div class="form-group mb-3">
+                    <label>PARA:</label>
+                    <input class="form-control" @bind="correoDestinatario" placeholder="Correo del destinatario" />
+                </div>
+
+                <div class="form-group mb-3">
+                    <label>Asunto:</label>
+                    <input class="form-control" @bind="asuntoCorreo" />
+                </div>
+
+                <div class="form-group mb-3">
+                    <label>Mensaje:</label>
+                    <textarea class="form-control" rows="4" @bind="mensajeCorreo"></textarea>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-dorado" @onclick="GenerarYEnviarCorreo">
+                    <i class="bi bi-send-fill"></i> Enviar
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+
+<!-- Modal Cargar-->
+<div class="modal fade" id="modalCarga" data-bs-backdrop="static" tabindex="-1" aria-labelledby="modalCargaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg rounded-xl">
+            <div class="modal-header bg-blue-500 text-white">
+                <h5 class="modal-title" id="modalCargaLabel">Enviar Correo</h5>
+            </div>
+            <div class="modal-body p-4">
+
+
+                <h3>Espera un momento mientras se envia el Correo....</h3>
+
+                <div class="progress">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
+                </div>
 
 
 
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
 
 
 @code {
@@ -571,6 +804,18 @@
 
     private bool mostrarFormulario = false;
     private bool mostrarFiltro = false;
+    private bool mostrarOpcionesPdf = false;
+    private bool mostrarVistaPreviaPDF = false;
+    private bool mostrarModalCorreo = false;
+    private bool mostrarBtnCorreo = false;
+
+    private string correoRemitente = "";
+    private string contrasenaCorreo = "";
+    private string correoDestinatario = "";
+    private string asuntoCorreo = "";
+    private string mensajeCorreo = "";
+    private string smtp = "";
+    private int puerto;
 
     private bool _IsvisibleInscripTodas = true;
     private bool _IsvisibleInscripIncompletas = false;
@@ -598,8 +843,11 @@
     private List<ST_S_PREINSC_INCOMPDTO> listaPREINSC_INCOMP = new(); // Lista de resultados
     private List<ST_S_CARRERASDTO> listaCARRERAS = new(); // Lista de resultados
     private List<ST_S_DatosPDFDTO> listaGENERAPDF = new(); // Lista de resultados
+    private List<ST_S_CorreosMisCuentasDTO> listaCorreoMiCuenta = new(); // Lista de resultados
 
     private ST_S_CARRERASDTO? carreraSeleccionada;
+
+    private ST_S_DatosPDFDTO? AlumnoActualPDF { get; set; }
 
     private ST_S_PREINSCRIPDTO BusquedaAlumno = new ST_S_PREINSCRIPDTO();
 
@@ -618,7 +866,7 @@
     {
         sEmail = mySesionEmail.Email;
 
-        listaPREINSCRIP = await usuarioService.ST_S_PREINSCRIP(3, "-", 0, "-");     
+        listaPREINSCRIP = await usuarioService.ST_S_PREINSCRIP(3, "-", 0, "-");
         listaPREINSC_INCOMP = await usuarioService.ST_S_PREINSC_INCOMP(1, "-");
 
     }
@@ -693,12 +941,12 @@
     private async Task NuevaPreinscrip()
     {
         var resultado = await Swal.FireAsync(new SweetAlertOptions
-        {
-            Title = "Nueva Preinscripción",
-            Text = "Desea hacer una nueva preinscripción?",
-            Icon = SweetAlertIcon.Info,
-            ShowCancelButton = true
-        });
+            {
+                Title = "Nueva Preinscripción",
+                Text = "Desea hacer una nueva preinscripción?",
+                Icon = SweetAlertIcon.Info,
+                ShowCancelButton = true
+            });
 
         if (resultado.IsConfirmed)
         {
@@ -736,7 +984,7 @@
         {
             carreraSeleccionada = carrera; // Guardar el renglón seleccionado
             textoCarreraBuscada = carreraSeleccionada.Carrera;
-        }        
+        }
     }
 
     private async void FiltrarCarreras(ChangeEventArgs e)
@@ -770,11 +1018,11 @@
         else
         {
             var resultado = await Swal.FireAsync(new SweetAlertOptions
-            {
-                Title = "Error",
-                Text = "No ha seleccionado una Carrera",
-                Icon = SweetAlertIcon.Error
-            });
+                {
+                    Title = "Error",
+                    Text = "No ha seleccionado una Carrera",
+                    Icon = SweetAlertIcon.Error
+                });
             return;
         }
 
@@ -789,8 +1037,209 @@
     {
         listaGENERAPDF = await usuarioService.ST_S_DatosPDF(1, Convert.ToString(alumPDF.MatriculaID));
 
+        if (listaGENERAPDF != null && listaGENERAPDF.Any())
+        {
+            AlumnoActualPDF = listaGENERAPDF[0];
+            mostrarOpcionesPdf = true;
+        }
+    }
+
+    private async Task EnviarPorWhatsApp()
+    {
+        mostrarOpcionesPdf = false;
+        mostrarVistaPreviaPDF = true;
+        mostrarBtnCorreo = true;
+
+        await JSRuntime.InvokeVoidAsync("eval", @"
+    const modal = new bootstrap.Modal(document.querySelector('#modalCarga'));
+    modal.show();");
+
+        await Task.Delay(3000); // Simulación de espera
+
+        // 👇 Cambiado para apuntar a sfup.com.mx
+        var apiUrl = navManager.BaseUri.Contains("localhost")
+            ? "http://localhost:5296/"
+            : "https://www.udorados.com/"; // ✅ TU BACKEND REAL
+
+        var nombreSanitizado = LimpiarNombreArchivo(AlumnoActualPDF.Nombre);
+        var nombreArchivo = AlumnoActualPDF.MatriculaID + "_" + nombreSanitizado;
+
+        var urlPDF = await JSRuntime.InvokeAsync<string>(
+            "generarYGuardarPDF",
+            "pdfContent",
+            nombreArchivo,
+            apiUrl
+        );
+
+        if (!string.IsNullOrEmpty(urlPDF))
+        {
+            var mensaje = $"Hola, aquí tienes tu solicitud de preinscripción:\n\n{urlPDF}";
+            var telefono = "7771254213";
+            var urlWhatsapp = $"https://wa.me/{telefono}?text={Uri.EscapeDataString(mensaje)}";
+
+            navManager.NavigateTo(urlWhatsapp, true);
+        }
+        else
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Error al generar y subir el PDF.");
+        }
+
+        await JSRuntime.InvokeVoidAsync("cerrarModal", "#modalCarga");
+        mostrarVistaPreviaPDF = false;
+    }
+
+
+    private string LimpiarNombreArchivo(string texto)
+    {
+        var sinEspacios = texto.Replace(" ", "_");
+        var sinAcentos = new string(sinEspacios
+            .Normalize(NormalizationForm.FormD)
+            .Where(c => CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+            .ToArray());
+
+        return new string(sinAcentos
+            .Where(c => char.IsLetterOrDigit(c) || c == '_')
+            .ToArray());
+    }
+
+    private async Task MuestraPorCorreo()
+    {
+        mostrarOpcionesPdf = false;
+        mostrarVistaPreviaPDF = true;
+        mostrarBtnCorreo = true;
+    }
+
+    private async Task ModalCorreo()
+    {
+        listaCorreoMiCuenta = await usuarioService.ST_S_CorreosMisCuentas(5, "-");
+        correoRemitente = listaCorreoMiCuenta[0].Usuario;
+        contrasenaCorreo = listaCorreoMiCuenta[0].Contraseña;
+        asuntoCorreo = listaCorreoMiCuenta[0].Asunto;
+        mensajeCorreo = listaCorreoMiCuenta[0].Mensaje;
+        smtp = listaCorreoMiCuenta[0].smtp;
+        puerto = listaCorreoMiCuenta[0].Puerto;
+
+        correoDestinatario = AlumnoActualPDF.Email;
+
+        mostrarModalCorreo = true;
+
 
     }
+
+
+    private async Task GenerarYEnviarCorreo()
+    {
+        mostrarModalCorreo = false;
+
+        // Mostrar modal de carga directamente
+        await JSRuntime.InvokeVoidAsync("eval", @"
+        const modal = new bootstrap.Modal(document.querySelector('#modalCarga'));
+        modal.show();");
+
+        await Task.Delay(3000); // Espera visual
+
+        try
+        {
+            var fileBytes = await JSRuntime.InvokeAsync<byte[]>("generatePDFXCorreo", "pdfContent");
+
+            if (fileBytes is null || fileBytes.Length == 0)
+            {
+                Console.WriteLine("Error al generar el PDF");
+                return;
+            }
+
+            // Asegura nombre de archivo válido
+            var matriculaSafe = AlumnoActualPDF.MatriculaID.ToString()
+            .Replace("/", "_")
+            .Replace("\\", "_")
+            .Replace(":", "_");
+            var fileName = $"preinscripcion_{matriculaSafe}.pdf";
+
+            var archivoAdjunto = new MultipartFormDataContent();
+            archivoAdjunto.Add(new ByteArrayContent(fileBytes), "file", fileName);
+
+            // Agrega campos del formulario con claves EXACTAS del modelo
+            archivoAdjunto.Add(new ByteArrayContent(fileBytes), "file", fileName);
+            archivoAdjunto.Add(new StringContent(smtp), "SmtpServidor");
+            archivoAdjunto.Add(new StringContent(puerto.ToString()), "Puerto");
+            archivoAdjunto.Add(new StringContent(correoRemitente), "CorreoRemitente");
+            archivoAdjunto.Add(new StringContent(contrasenaCorreo), "Contraseña");
+            archivoAdjunto.Add(new StringContent(correoDestinatario), "Destinatario");
+            archivoAdjunto.Add(new StringContent(asuntoCorreo), "Asunto");
+            archivoAdjunto.Add(new StringContent(mensajeCorreo), "CuerpoCorreo");
+
+            // Enviar POST al backend
+            var response = await Http.PostAsync("api/correos/enviar", archivoAdjunto);
+
+            if (response.IsSuccessStatusCode)
+            {
+                await Swal.FireAsync(new SweetAlertOptions
+                    {
+                        Title = "Enviado",
+                        Text = "El correo fue enviado correctamente.",
+                        Icon = SweetAlertIcon.Success
+                    });
+
+                // Cierra el modal de carga
+                await JSRuntime.InvokeVoidAsync("eval", @"
+                const modalCarga = bootstrap.Modal.getInstance(document.querySelector('#modalCarga'));
+                if (modalCarga) modalCarga.hide();
+            ");
+
+                mostrarVistaPreviaPDF = false;
+            }
+            else
+            {
+                // Leer el contenido del error
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error backend: {errorContent}");
+
+                await Swal.FireAsync(new SweetAlertOptions
+                    {
+                        Title = "Error",
+                        Text = "No se pudo enviar el correo.\n" + errorContent,
+                        Icon = SweetAlertIcon.Error
+                    });
+
+                await JSRuntime.InvokeVoidAsync("cerrarModal", "#modalCarga");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+            await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Error",
+                    Text = "Ocurrió un error inesperado.",
+                    Icon = SweetAlertIcon.Error
+                });
+
+            await JSRuntime.InvokeVoidAsync("cerrarModal", "#modalCarga");
+        }
+    }
+
+
+    private async Task DescargarPdf()
+    {
+
+        mostrarOpcionesPdf = false;
+        mostrarVistaPreviaPDF = true;
+        mostrarBtnCorreo = false;
+
+
+        // Mostrar modal de carga directamente
+        await JSRuntime.InvokeVoidAsync("eval", @"
+        const modal = new bootstrap.Modal(document.querySelector('#modalCarga'));
+        modal.show();");
+
+        await Task.Delay(3000); // Espera visual
+
+        await JS.InvokeVoidAsync("descargaPDF", AlumnoActualPDF?.Nombre);
+
+        await JSRuntime.InvokeVoidAsync("cerrarModal", "#modalCarga");
+        mostrarVistaPreviaPDF = false;
+    }
+
 
     private async Task OnFiltroIncompletoChanged(ChangeEventArgs e)
     {
@@ -830,7 +1279,7 @@
         }
         else
         {
-            _IsvisibleInscripTodas = true;            
+            _IsvisibleInscripTodas = true;
             _IsvisibleInscripCompletas = false;
         }
         StateHasChanged();
@@ -840,12 +1289,12 @@
     private async Task BtnEditarIncomp(ST_S_PREINSC_INCOMPDTO incompleto)
     {
         var resultado = await Swal.FireAsync(new SweetAlertOptions
-        {
-            Title = "Editar Preinscripción",
-            Text = "Desea editar esta preinscripción?",
-            Icon = SweetAlertIcon.Info,
-            ShowCancelButton = true
-        });
+            {
+                Title = "Editar Preinscripción",
+                Text = "Desea editar esta preinscripción?",
+                Icon = SweetAlertIcon.Info,
+                ShowCancelButton = true
+            });
 
         if (resultado.IsConfirmed)
         {
@@ -888,7 +1337,7 @@
                 textoCelEmergenciaAluI = incompleto.TelEmergencia; // Si no hay guion, guarda todo en telefono
                 textoCelEmergencia = "";
             }
-            ALUMNOSPREINSCDTO.sCorreoEmergencia = incompleto.CorreoEmergencia; 
+            ALUMNOSPREINSCDTO.sCorreoEmergencia = incompleto.CorreoEmergencia;
 
             // Inscrip
 
@@ -943,12 +1392,12 @@
     private async Task BtnEditarComp(ST_S_PREINSCRIPDTO completo)
     {
         var resultado = await Swal.FireAsync(new SweetAlertOptions
-        {
-            Title = "Editar Preinscripción",
-            Text = "Desea editar esta preinscripción?",
-            Icon = SweetAlertIcon.Info,
-            ShowCancelButton = true
-        });
+            {
+                Title = "Editar Preinscripción",
+                Text = "Desea editar esta preinscripción?",
+                Icon = SweetAlertIcon.Info,
+                ShowCancelButton = true
+            });
 
         if (resultado.IsConfirmed)
         {
@@ -995,7 +1444,7 @@
 
             // Inscrip
 
-            CarreraNombre = completo.Carrera;           
+            CarreraNombre = completo.Carrera;
             FechaActual = completo.fechaInsc;
             AtendioText = completo.Atendio;
 
@@ -1226,16 +1675,16 @@
             var loginResponse2 = await httpClient.PostAsJsonAsync<ST_IUD_TUTORPREINSCDTO>($"/api/Usuario/ST_IUD_TUTORPREINSC/", TUTORPREINSCDTO);
             if (loginResponse2.IsSuccessStatusCode)
             {
-                
+
                 var loginResponse3 = await httpClient.PostAsJsonAsync<ST_IUD_PREINSCRIPDTO>($"/api/Usuario/ST_IUD_PREINSCRIP/", PREINSCRIPDTO);
                 if (loginResponse3.IsSuccessStatusCode)
                 {
                     var resultado = await Swal.FireAsync(new SweetAlertOptions
-                    {
-                        Title = "Hecho",
-                        Text = "Se guardo la Preinscripción correctamente",
-                        Icon = SweetAlertIcon.Success
-                    });
+                        {
+                            Title = "Hecho",
+                            Text = "Se guardo la Preinscripción correctamente",
+                            Icon = SweetAlertIcon.Success
+                        });
 
                     ALUMNOSPREINSCDTO = new ST_IUE_ALUMNOSPREINSCDTO();
                     TUTORPREINSCDTO = new ST_IUD_TUTORPREINSCDTO();
@@ -1254,26 +1703,26 @@
                 {
                     var errorContent = await loginResponse3.Content.ReadAsStringAsync();
                     var resultado = await Swal.FireAsync(new SweetAlertOptions
-                    {
-                        Title = "Error al guardar",
-                        Text = $"No se pudo guardar (CRR)",
-                        Icon = SweetAlertIcon.Error,
-                        ShowCancelButton = true
-                    });                    
+                        {
+                            Title = "Error al guardar",
+                            Text = $"No se pudo guardar (CRR)",
+                            Icon = SweetAlertIcon.Error,
+                            ShowCancelButton = true
+                        });
 
-                }               
+                }
 
             }
             else
             {
                 var errorContent = await loginResponse2.Content.ReadAsStringAsync();
                 var resultado = await Swal.FireAsync(new SweetAlertOptions
-                {
-                    Title = "Error al guardar",
-                    Text = $"No se pudo guardar (Tut1)",
-                    Icon = SweetAlertIcon.Error,
-                    ShowCancelButton = true
-                });
+                    {
+                        Title = "Error al guardar",
+                        Text = $"No se pudo guardar (Tut1)",
+                        Icon = SweetAlertIcon.Error,
+                        ShowCancelButton = true
+                    });
             }
 
 
@@ -1283,12 +1732,12 @@
             var errorContent = await loginResponse.Content.ReadAsStringAsync();
 
             var resultado = await Swal.FireAsync(new SweetAlertOptions
-            {
-                Title = "Error al guardar",
-                Text = $"No se pudo guardar (AL1): {errorContent}",
-                Icon = SweetAlertIcon.Error,
-                ShowCancelButton = true
-            });
+                {
+                    Title = "Error al guardar",
+                    Text = $"No se pudo guardar (AL1): {errorContent}",
+                    Icon = SweetAlertIcon.Error,
+                    ShowCancelButton = true
+                });
 
             Console.WriteLine("Error al guardar preinscripción:");
             Console.WriteLine(errorContent);
@@ -1297,6 +1746,7 @@
 
 
     }
+
 
     private async Task GuardarPreIncompleta()
     {

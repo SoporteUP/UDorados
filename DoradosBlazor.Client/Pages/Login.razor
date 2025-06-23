@@ -11,49 +11,46 @@
 @using CurrieTechnologies.Razor.SweetAlert2;
 @inject SweetAlertService Swal;
 
-<div class="login-nube-container">
-    <div class="login-nube-box">
-        <div class="login-nube-left">
+<div class="superwow-login-bg">
+    <div class="animated-lines">
+        <span class="shooting-star blue" style="top: 12%; animation-delay: 0s; transform: rotate(18deg);"></span>
+        <span class="shooting-star gold" style="top: 28%; animation-delay: 1.5s; transform: rotate(12deg);"></span>
+        <span class="shooting-star blue" style="top: 39%; animation-delay: 3s; transform: rotate(24deg);"></span>
+        <span class="shooting-star gold" style="top: 52%; animation-delay: 4.5s; transform: rotate(16deg);"></span>
+        <span class="shooting-star blue" style="top: 64%; animation-delay: 6s; transform: rotate(10deg);"></span>
+        <span class="shooting-star gold" style="top: 75%; animation-delay: 7.5s; transform: rotate(22deg);"></span>
+        <span class="shooting-star blue" style="top: 83%; animation-delay: 9s; transform: rotate(14deg);"></span>
+        <span class="shooting-star gold" style="top: 90%; animation-delay: 10.5s; transform: rotate(20deg);"></span>
+    </div>
 
-            <div class="login-logo">
-                <img src="UDNL.png" alt="Logo UD" />
+    <div class="superwow-login-card">
+        <img src="UDNL.png" class="superwow-logo" alt="Logo" />
+        <h2>¡Bienvenido!</h2>
+        <p>Ingresa tus credenciales para continuar</p>
+
+        <form @onsubmit="HandleFormSubmit">
+            <div class="superwow-input">
+                <i class="bi bi-envelope-fill"></i>
+                <input @bind="login.Correo" placeholder="Correo electrónico" />
             </div>
 
-            <h2>Hola!</h2>
-            <p>Inicia sesión con tu cuenta</p>
-
-            <form @onsubmit="HandleFormSubmit">
-                <div class="nube-input">
-                    <div class="icon"><i class="bi bi-envelope-fill"></i></div>
-                    <input @bind="login.Correo" placeholder="E-mail" />
-                </div>
-                <div class="nube-input">
-                    <div class="icon"><i class="bi bi-lock-fill"></i></div>
-                    <input type="password" @bind="login.Password" placeholder="Password" />
-                </div>
-                <div class="nube-options">
-                    <label><input type="checkbox" /> Remember me</label>
-                    <a href="#">Forgot password?</a>
-                </div>
-                <button type="submit" class="nube-btn">INICIAR SESIÓN</button>
-            </form>
-
-            <div class="nube-register">
-                Don’t have an account? <a href="/registro">Create</a>
+            <div class="superwow-input">
+                <i class="bi bi-lock-fill"></i>
+                <input type="password" @bind="login.Password" placeholder="Contraseña" />
             </div>
-        </div>
 
-        <div class="login-nube-right">
-            <h2>Welcome Back!</h2>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed pharetra magna nisl, at posuere sem dapibus sed.</p>
+            <button type="submit" class="superwow-btn">Ingresar</button>
+        </form>
+
+        <div class="superwow-footer">
+            ¿No tienes cuenta? <a href="/registro">Regístrate</a>
         </div>
     </div>
 </div>
 
-
 @code {
     private LoginDTO login = new LoginDTO();
-
+  
 
     private async Task HandleFormSubmit()
     {
@@ -83,4 +80,5 @@
                 });
         }
     }
+
 }

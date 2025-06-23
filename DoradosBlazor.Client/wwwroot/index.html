@@ -14,7 +14,7 @@
     <link href="DoradosBlazor.Client.styles.css" rel="stylesheet" />
     <link href="css/app.css" rel="stylesheet" /> <!-- Mueve app.css al final -->
     <link href="css/custom.css" rel="stylesheet" /> <!-- Asegúrate de que esté al final -->
-    <link href="css/site.css" rel="stylesheet" /> <!-- Asegúrate de que esté al final -->
+    <link href="css/site.css" rel="stylesheet" /> <!-- Asegúrate de que esté al final -->    
 </head>
 
 <body>
@@ -32,6 +32,25 @@
         <a class="dismiss">🗙</a>
     </div>
 
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            window.addEventListener('popstate', (event) => {
+                const activeElement = document.activeElement;
+
+                if (activeElement && (activeElement.tagName === "INPUT" || activeElement.tagName === "TEXTAREA")) {
+                    // Previene navegación
+                    history.pushState(null, null, location.href);
+                    // Cierra teclado
+                    activeElement.blur();
+                }
+            });
+
+            // Necesario para "atrapar" el primer popstate
+            history.pushState(null, null, location.href);
+        });
+    </script>
+
     <!-- Scripts -->
     <script>
         window.downloadFileFromStream = async (fileName, contentStreamReference) => {
@@ -46,6 +65,141 @@
             URL.revokeObjectURL(url);
         }
     </script>
+
+
+    <script>
+        window.generarYGuardarPDF = async (divId, nombreArchivo, baseUrl) => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF("p", "mm", "a4");
+            const element = document.getElementById(divId);
+
+            if (!element) return null;
+
+            const images = element.querySelectorAll("img");
+            await Promise.all(Array.from(images).map(img =>
+                new Promise((res, rej) => {
+                    img.complete ? res() : (img.onload = res, img.onerror = rej);
+                })
+            ));
+
+            const canvas = await html2canvas(element, { scale: 2, useCORS: true });
+            const imgData = canvas.toDataURL("image/jpeg", 0.92);
+
+            const pdfWidth = doc.internal.pageSize.getWidth();
+            const imgProps = doc.getImageProperties(imgData);
+            const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+            let position = 0;
+
+            while (position < imgHeight) {
+                doc.addImage(imgData, "JPEG", 0, -position, pdfWidth, imgHeight);
+                position += doc.internal.pageSize.getHeight();
+                if (position < imgHeight) doc.addPage();
+            }
+
+            const pdfBlob = doc.output("blob");
+            const pdfFile = new File([pdfBlob], `${nombreArchivo}.pdf`, { type: "application/pdf" });
+
+            const formData = new FormData();
+            formData.append("archivo", pdfFile);
+
+            try {
+                const respuesta = await fetch(baseUrl + "api/pdf/subir", {
+                    method: "POST",
+                    body: formData
+                });
+
+                if (respuesta.ok) {
+                    const resultado = await respuesta.json();
+                    return resultado.ruta;
+                } else {
+                    const error = await respuesta.text();
+                    console.error("Error al subir el PDF:", error);
+                    return null;
+                }
+            } catch (error) {
+                console.error("Error en la petición:", error);
+                return null;
+            }
+        };
+    </script>
+
+
+    <script>
+        window.generatePDFXCorreo = async (divId) => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF("p", "mm", "a4");
+            const element = document.getElementById(divId);
+
+            if (!element) return null;
+
+            const images = element.querySelectorAll("img");
+            await Promise.all(Array.from(images).map(img => {
+                return new Promise((res, rej) => {
+                    img.complete ? res() : (img.onload = res, img.onerror = rej);
+                });
+            }));
+
+            const canvas = await html2canvas(element, { scale: 2, useCORS: true });
+            const imgData = canvas.toDataURL("image/jpeg", 0.92);
+
+            const pdfWidth = doc.internal.pageSize.getWidth();
+            const imgProps = doc.getImageProperties(imgData);
+            const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+            let position = 0;
+
+            while (position < imgHeight) {
+                doc.addImage(imgData, "JPEG", 0, -position, pdfWidth, imgHeight);
+                position += doc.internal.pageSize.getHeight();
+                if (position < imgHeight) doc.addPage();
+            }
+
+            const pdfBlob = doc.output("blob");
+            const arrayBuffer = await pdfBlob.arrayBuffer();
+            return new Uint8Array(arrayBuffer);
+        };
+    </script>
+
+
+
+    <script>
+        window.descargaPDF = async (matricula) => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF("p", "mm", "a4");
+            const element = document.getElementById("pdfContent");
+
+            if (!element) {
+                console.error("No se encontró el div pdfContent.");
+                return;
+            }
+
+            const images = element.querySelectorAll("img");
+            await Promise.all(Array.from(images).map(img => {
+                return new Promise((res, rej) => {
+                    img.complete ? res() : (img.onload = res, img.onerror = rej);
+                });
+            }));
+
+            const canvas = await html2canvas(element, { scale: 2, useCORS: true });
+            const imgData = canvas.toDataURL("image/jpeg", 0.92);
+
+            const pdfWidth = doc.internal.pageSize.getWidth();
+            const imgProps = doc.getImageProperties(imgData);
+            const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+            let position = 0;
+
+            while (position < imgHeight) {
+                doc.addImage(imgData, "JPEG", 0, -position, pdfWidth, imgHeight);
+                position += doc.internal.pageSize.getHeight();
+                if (position < imgHeight) doc.addPage();
+            }
+
+            // Nombre del archivo con matrícula
+            const nombreArchivo = `preinscripcion_${matricula || "sin_matricula"}.pdf`;
+            doc.save(nombreArchivo);
+        };
+    </script>
+
+
 
     <script>
         window.mostrarModal = (modalId) => {
