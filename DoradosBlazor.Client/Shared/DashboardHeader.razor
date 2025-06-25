@@ -1,0 +1,36 @@
+﻿<header class="dashboard-header @(IsSidebarCollapsed ? "sidebar-collapsed" : "")">
+    <div class="mobile-branding">
+        @* <img src="LogoUDN.png" alt="Logo" class="mobile-logo" /> *@
+        @* <span class="mobile-title">Universidad Dorados</span> *@
+    </div>
+    @* <input type="text" class="search-bar" placeholder="Buscar..." />
+    <div class="dashboard-stats">
+        <div class="stat">
+            <i class="bi bi-eye"></i>
+            <span>1,504</span>
+            <small>Vistas</small>
+        </div>
+        <div class="stat active">
+            <i class="bi bi-cart"></i>
+            <span>80</span>
+            <small>Ventas</small>
+        </div>
+        <div class="stat">
+            <i class="bi bi-chat"></i>
+            <span>284</span>
+            <small>Comentarios</small>
+        </div>
+        <div class="stat">
+            <i class="bi bi-cash-stack"></i>
+            <span>$7,842</span>
+            <small>Ganancias</small>
+        </div>
+    </div>
+    <div class="avatar">
+        <img src="avatar.png" alt="Avatar" />
+    </div> *@
+</header>
+
+@code {
+    [Parameter] public bool IsSidebarCollapsed { get; set; }
+}

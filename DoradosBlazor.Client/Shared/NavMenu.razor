@@ -2,7 +2,6 @@
 @using DoradosBlazor.Shared;
 @using DoradosBlazor.Client.Services;
 @using System.Security.Claims;
-@inject AuthenticationStateProvider autenticacionProvider
 @using DoradosBlazor.Client.Extensiones;
 
 @inject AuthenticationStateProvider autenticacionProvider
@@ -13,73 +12,232 @@
 @inject NavigationManager navegacion;
 
 
-<nav class="navbar glass-navbar navbar-expand-md">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="/index">
-            <img src="LogoUDN.png" alt="Logo UD" style="height: 38px; margin-right: 0.7rem;" />
-            Dorados App
-        </a>
-        <button class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse @(collapseNavMenu ? "" : "show")">
-            <ul class="navbar-nav w-100 justify-content-center align-items-center gap-1 menu-list">
-                <li class="nav-item">
-                    <NavLink class="nav-link glass-link" href="/index" Match="NavLinkMatch.All">Home</NavLink>
+<!-- Botón hamburguesa (solo móvil) -->
+<button class="sidebar-hamburger" @onclick="OpenDrawer" aria-label="Abrir menú">
+    <i class="bi bi-list"></i>
+</button>
+
+<!-- Sidebar mini (solo iconos, siempre visible en escritorio) -->
+<aside class="sidebar-mini">
+    <ul>
+        <li>
+            <button title="Expandir/Colapsar menú"
+                    style="background: none; border: none; cursor: pointer;"
+                    @onclick="() => ToggleSidebar.InvokeAsync()">
+                <i class="bi @(IsSidebarCollapsed ? "bi-chevron-right" : "bi-chevron-left")"
+                   style="font-size:1.22rem; color:#FFD700"></i>
+            </button>
+        </li>
+        <li>
+            <NavLink href="/index" class="sidebar-icon" Match="NavLinkMatch.All">
+                <i class="bi bi-house-door"></i>
+            </NavLink>
+        </li>
+        <AuthorizeView Roles="Administrador">
+            <Authorized>
+                <li>
+                    <NavLink href="/usuarios" class="sidebar-icon">
+                        <i class="bi bi-people-fill"></i>
+                    </NavLink>
                 </li>
-                <AuthorizeView Roles="Administrador">
-                    <Authorized>
-                        <li class="nav-item">
-                            <NavLink class="nav-link glass-link" href="/usuarios">Usuarios</NavLink>
-                        </li>
-                    </Authorized>
-                </AuthorizeView>
-                <AuthorizeView Roles="Alumno">
-                    <Authorized>
-                        <li class="nav-item">
-                            <NavLink class="nav-link glass-link" href="AdeudosAlumno">Adeudos</NavLink>
-                        </li>
-                    </Authorized>
-                </AuthorizeView>
-                <AuthorizeView Roles="Alumno">
-                    <Authorized>
-                        <li class="nav-item">
-                            <NavLink class="nav-link glass-link" href="Calificaciones">Boletas</NavLink>
-                        </li>
-                    </Authorized>
-                </AuthorizeView>
-                <AuthorizeView Roles="Profesor">
-                    <Authorized>
-                        <li class="nav-item">
-                            <NavLink class="nav-link glass-link" href="MateriasProfesores">MateriasProfesores</NavLink>
-                        </li>
-                    </Authorized>
-                </AuthorizeView>
-                <AuthorizeView Roles="Reclutador">
-                    <Authorized>
-                        <li class="nav-item">
-                            <NavLink class="nav-link glass-link" href="preinscripciones">Pre-inscripciones</NavLink>
-                        </li>
-                    </Authorized>
-                </AuthorizeView>
-                <li class="nav-item">
-                    <a class="nav-link glass-link" href="#" @onclick="CerrarSesion">Salir</a>
+            </Authorized>
+        </AuthorizeView>
+        <AuthorizeView Roles="Alumno">
+            <Authorized>
+                <li>
+                    <NavLink href="/AdeudosAlumno" class="sidebar-icon">
+                        <i class="bi bi-cash-coin"></i>
+                    </NavLink>
                 </li>
-            </ul>
-        </div>
+                <li>
+                    <NavLink href="/Calificaciones" class="sidebar-icon">
+                        <i class="bi bi-award"></i>
+                    </NavLink>
+                </li>
+            </Authorized>
+        </AuthorizeView>
+        <AuthorizeView Roles="Profesor">
+            <Authorized>
+                <li>
+                    <NavLink href="/MateriasProfesores" class="sidebar-icon">
+                        <i class="bi bi-journal-bookmark-fill"></i>
+                    </NavLink>
+                </li>
+            </Authorized>
+        </AuthorizeView>
+        <AuthorizeView Roles="Reclutador">
+            <Authorized>
+                <li>
+                    <NavLink href="/preinscripciones" class="sidebar-icon">
+                        <i class="bi bi-person-plus-fill"></i>
+                    </NavLink>
+                </li>
+            </Authorized>
+        </AuthorizeView>
+        <li>
+            <a href="#" class="sidebar-icon" @onclick="() => CerrarSesion.InvokeAsync()">
+                <i class="bi bi-box-arrow-right"></i>
+            </a>
+        </li>
+    </ul>
+</aside>
+
+<!-- Sidebar principal (colapsable) -->
+<nav class="sidebar-main @(IsSidebarCollapsed ? "collapsed" : "")">
+    <div class="brand-name">
+        <img src="LogoUDN.png" alt="Logo" class="brand-logo" />
+        <span>Universidad Dorados</span>
     </div>
+    <ul>
+        <li>
+            <NavLink href="/index" class="sidebar-link" Match="NavLinkMatch.All">
+                <i class="bi bi-house-door"></i>
+                <span>Inicio</span>
+            </NavLink>
+        </li>
+        <!-- ...Tus AuthorizeView para roles igual que antes... -->
+        <AuthorizeView Roles="Administrador">
+            <Authorized>
+                <li>
+                    <NavLink href="/usuarios" class="sidebar-link">
+                        <i class="bi bi-people-fill"></i>
+                        <span>Usuarios</span>
+                    </NavLink>
+                </li>
+            </Authorized>
+        </AuthorizeView>
+        <AuthorizeView Roles="Alumno">
+            <Authorized>
+                <li>
+                    <NavLink href="/AdeudosAlumno" class="sidebar-link">
+                        <i class="bi bi-cash-coin"></i>
+                        <span>Adeudos</span>
+                    </NavLink>
+                </li>
+                <li>
+                    <NavLink href="/Calificaciones" class="sidebar-link">
+                        <i class="bi bi-award"></i>
+                        <span>Boletas</span>
+                    </NavLink>
+                </li>
+            </Authorized>
+        </AuthorizeView>
+        <AuthorizeView Roles="Profesor">
+            <Authorized>
+                <li>
+                    <NavLink href="/MateriasProfesores" class="sidebar-link">
+                        <i class="bi bi-journal-bookmark-fill"></i>
+                        <span>Materias</span>
+                    </NavLink>
+                </li>
+            </Authorized>
+        </AuthorizeView>
+        <AuthorizeView Roles="Reclutador">
+            <Authorized>
+                <li>
+                    <NavLink href="/preinscripciones" class="sidebar-link">
+                        <i class="bi bi-person-plus-fill"></i>
+                        <span>Preinscripciones</span>
+                    </NavLink>
+                </li>
+            </Authorized>
+        </AuthorizeView>
+        <li>
+            <a href="#" class="sidebar-link" @onclick="() => CerrarSesion.InvokeAsync()">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>Salir</span>
+            </a>
+        </li>
+    </ul>
 </nav>
 
+<!-- Drawer móvil -->
+@if (isDrawerOpen)
+{
+    <div class="sidebar-backdrop" @onclick="CloseDrawer"></div>
+    <aside class="sidebar-drawer">
+        <div class="drawer-header">
+            <button class="sidebar-drawer-close" @onclick="CloseDrawer" aria-label="Cerrar menú">
+                <i class="bi bi-x"></i>
+            </button>
+        </div>
+        <div class="drawer-branding">
+            <img src="LogoUDN.png" alt="Logo" class="drawer-logo" />
+            <span class="drawer-title">Universidad Dorados</span>
+        </div>
+        <ul>
+            <li>
+                <NavLink href="/index" class="sidebar-link" Match="NavLinkMatch.All" @onclick="CloseDrawer">
+                    <i class="bi bi-house-door"></i>
+                    <span>Inicio</span>
+                </NavLink>
+            </li>
+            <!-- ...igual que arriba para los roles y salir... -->
+            <AuthorizeView Roles="Administrador">
+                <Authorized>
+                    <li>
+                        <NavLink href="/usuarios" class="sidebar-link" @onclick="CloseDrawer">
+                            <i class="bi bi-people-fill"></i>
+                            <span>Usuarios</span>
+                        </NavLink>
+                    </li>
+                </Authorized>
+            </AuthorizeView>
+            <AuthorizeView Roles="Alumno">
+                <Authorized>
+                    <li>
+                        <NavLink href="/AdeudosAlumno" class="sidebar-link" @onclick="CloseDrawer">
+                            <i class="bi bi-cash-coin"></i>
+                            <span>Adeudos</span>
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink href="/Calificaciones" class="sidebar-link" @onclick="CloseDrawer">
+                            <i class="bi bi-award"></i>
+                            <span>Boletas</span>
+                        </NavLink>
+                    </li>
+                </Authorized>
+            </AuthorizeView>
+            <AuthorizeView Roles="Profesor">
+                <Authorized>
+                    <li>
+                        <NavLink href="/MateriasProfesores" class="sidebar-link" @onclick="CloseDrawer">
+                            <i class="bi bi-journal-bookmark-fill"></i>
+                            <span>Materias</span>
+                        </NavLink>
+                    </li>
+                </Authorized>
+            </AuthorizeView>
+            <AuthorizeView Roles="Reclutador">
+                <Authorized>
+                    <li>
+                        <NavLink href="/preinscripciones" class="sidebar-link" @onclick="CloseDrawer">
+                            <i class="bi bi-person-plus-fill"></i>
+                            <span>Preinscripciones</span>
+                        </NavLink>
+                    </li>
+                </Authorized>
+            </AuthorizeView>
+            <a href="#" class="sidebar-link" @onclick="@(async () => { await CerrarSesion.InvokeAsync(); CloseDrawer(); })">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>Salir</span>
+            </a>
+        </ul>
+    </aside>
+}
+
 @code {
-    private bool collapseNavMenu = true;
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
-    private async Task CerrarSesion()
-    {
-        var autenticacionExt = (AutenticacionExtension)autenticacionProvider;
-        await autenticacionExt.ActualizarEstadoAutenticacion(null);
-        navManager.NavigateTo("/", true);
-    }
+
+    [Parameter] public bool IsSidebarCollapsed { get; set; }
+    [Parameter] public EventCallback ToggleSidebar { get; set; }
+    [Parameter] public EventCallback CerrarSesion { get; set; }
+
+    private bool isDrawerOpen = false;
+
+    private void OpenDrawer() => isDrawerOpen = true;
+    private void CloseDrawer() => isDrawerOpen = false;
+   
+
+   
 }

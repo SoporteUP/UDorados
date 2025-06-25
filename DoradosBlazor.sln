@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35013.160
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DoradosBlazor.Server", "DoradosBlazor.Server\DoradosBlazor.Server.csproj", "{F3918C39-A78C-424A-85C3-825F7352FA7A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DoradosBlazor.Server", "DoradosBlazor.Server\DoradosBlazor.Server.csproj", "{F3918C39-A78C-424A-85C3-825F7352FA7A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DoradosBlazor.Shared", "DoradosBlazor.Shared\DoradosBlazor.Shared.csproj", "{981E4F8C-DFFD-4691-BC4B-5ABD26EFB86C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DoradosBlazor.Shared", "DoradosBlazor.Shared\DoradosBlazor.Shared.csproj", "{981E4F8C-DFFD-4691-BC4B-5ABD26EFB86C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DoradosBlazor.Client", "DoradosBlazor.Client\DoradosBlazor.Client.csproj", "{3AB82B95-5CD7-4E12-B7C4-990B8DABE418}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DoradosBlazor.Client", "DoradosBlazor.Client\DoradosBlazor.Client.csproj", "{3AB82B95-5CD7-4E12-B7C4-990B8DABE418}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

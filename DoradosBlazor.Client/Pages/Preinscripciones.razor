@@ -468,13 +468,13 @@
             </div>
 
             <!-- Botón guardar al final (solo móvil) -->
-            <div class="d-md-none text-center mt-4" id="footerBtnGuardar" style="display:none;">
+            <div class="d-md-none text-center mt-4 footer-btn-fixed" id="footerBtnGuardar" style="display:none;">
                 <button class="btn btn-azul btn-block" @onclick="GuardarFormulario">
                     <i class="bi bi-save"></i> Guardar
                 </button>
             </div>
 
-            <div class="d-md-none text-center mt-4" id="footerBtnEditar" style="display:none;">
+            <div class="d-md-none text-center mt-4 footer-btn-fixed" id="footerBtnEditar" style="display:none;">
                 <button class="btn btn-dorado btn-block" @onclick="GuardarPreIncompleta">
                     <i class="bi bi-pencil-square"></i> Editar
                 </button>
@@ -566,7 +566,7 @@
         <h3 class="text-white text-center mb-4">Opciones para el PDF</h3>
 
         <div class="d-flex flex-wrap justify-content-center gap-3">
-            <div class="card-opcion whatsapp" @onclick="EnviarPorWhatsApp">
+            <div class="card-opcion whatsapp" @onclick="MuestraPorWhatsApp">
                 <i class="bi bi-whatsapp"></i>
                 <span>Enviar por WhatsApp</span>
             </div>
@@ -718,7 +718,51 @@
                         </button>
                         <button class="btn btn-secondary" @onclick="() => mostrarVistaPreviaPDF = false">Cerrar</button>
                     }
+                    @if (mostrarBtnWhatsapp == true)
+                    {
+                        <button class="btn btn-azul" @onclick="ModalWhatsapp">
+                            <i class="bi bi-envelope-paper-fill"></i> Enviar PDF
+                        </button>
+                        <button class="btn btn-secondary" @onclick="() => mostrarVistaPreviaPDF = false">Cerrar</button>
+                    }
                 </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+
+@if (mostrarModalWhatsapp)
+{
+    <div class="modal-overlay">
+        <div class="modal-contenido animate__animated animate__fadeInDown">
+            <div class="modal-header">
+                <h4 class="modal-title">Enviar Whatsapp</h4>
+                <button class="close-btn" @onclick="() => mostrarModalWhatsapp = false"><i class="bi bi-x-lg"></i></button>
+            </div>
+
+            <div class="modal-body">  
+                <div class="form-group mb-3">
+                    <label>PARA:</label>
+                    <input class="form-control" @bind="NombreWhatsapp" placeholder="Correo del destinatario" readonly />
+                </div>
+
+                <div class="form-group mb-3">
+                    <label>Num.Celular</label>
+                    <input class="form-control" @bind="NumWhatsapp" />
+                </div>
+
+                <div class="form-group mb-3">
+                    <label>Mensaje:</label>
+                    <textarea class="form-control" rows="4" @bind="mensajeWhatsapp"></textarea>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-dorado" @onclick="GenerarYEnviarWhatsapp">
+                    <i class="bi bi-send-fill"></i> Enviar Whatsapp
+                </button>
             </div>
         </div>
     </div>
@@ -806,8 +850,14 @@
     private bool mostrarFiltro = false;
     private bool mostrarOpcionesPdf = false;
     private bool mostrarVistaPreviaPDF = false;
+    private bool mostrarModalWhatsapp = false;
     private bool mostrarModalCorreo = false;
     private bool mostrarBtnCorreo = false;
+    private bool mostrarBtnWhatsapp = false;
+
+    private string NombreWhatsapp = "";
+    private string NumWhatsapp = "";
+    private string mensajeWhatsapp = "";
 
     private string correoRemitente = "";
     private string contrasenaCorreo = "";
@@ -1044,15 +1094,46 @@
         }
     }
 
-    private async Task EnviarPorWhatsApp()
+    private async Task MuestraPorWhatsApp()
     {
         mostrarOpcionesPdf = false;
         mostrarVistaPreviaPDF = true;
-        mostrarBtnCorreo = true;
+        mostrarBtnCorreo = false;
+        mostrarBtnWhatsapp = true;
+
+    }
+
+
+    private string LimpiarNombreArchivo(string texto)
+    {
+        var sinEspacios = texto.Replace(" ", "_");
+        var sinAcentos = new string(sinEspacios
+            .Normalize(NormalizationForm.FormD)
+            .Where(c => CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+            .ToArray());
+
+        return new string(sinAcentos
+            .Where(c => char.IsLetterOrDigit(c) || c == '_')
+            .ToArray());
+    }
+
+    private async Task ModalWhatsapp()
+    {
+        NombreWhatsapp = AlumnoActualPDF.Nombre;
+        NumWhatsapp = AlumnoActualPDF.Telefono;
+        mensajeWhatsapp = "Hola, aquí tienes tu solicitud de preinscripción:";
+
+        mostrarModalWhatsapp = true;
+
+    }
+
+    private async Task GenerarYEnviarWhatsapp()
+    {
+        mostrarModalWhatsapp = false;
 
         await JSRuntime.InvokeVoidAsync("eval", @"
-    const modal = new bootstrap.Modal(document.querySelector('#modalCarga'));
-    modal.show();");
+        const modal = new bootstrap.Modal(document.querySelector('#modalCarga'));
+        modal.show();");
 
         await Task.Delay(3000); // Simulación de espera
 
@@ -1073,11 +1154,11 @@
 
         if (!string.IsNullOrEmpty(urlPDF))
         {
-            var mensaje = $"Hola, aquí tienes tu solicitud de preinscripción:\n\n{urlPDF}";
-            var telefono = "7771254213";
+            var mensaje = mensajeWhatsapp + $"\n\n{urlPDF}";
+            var telefono = NumWhatsapp;
             var urlWhatsapp = $"https://wa.me/{telefono}?text={Uri.EscapeDataString(mensaje)}";
 
-            navManager.NavigateTo(urlWhatsapp, true);
+            await JSRuntime.InvokeVoidAsync("abrirEnNuevaPestana", urlWhatsapp);
         }
         else
         {
@@ -1086,25 +1167,16 @@
 
         await JSRuntime.InvokeVoidAsync("cerrarModal", "#modalCarga");
         mostrarVistaPreviaPDF = false;
+
+
+       
     }
 
-
-    private string LimpiarNombreArchivo(string texto)
-    {
-        var sinEspacios = texto.Replace(" ", "_");
-        var sinAcentos = new string(sinEspacios
-            .Normalize(NormalizationForm.FormD)
-            .Where(c => CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
-            .ToArray());
-
-        return new string(sinAcentos
-            .Where(c => char.IsLetterOrDigit(c) || c == '_')
-            .ToArray());
-    }
 
     private async Task MuestraPorCorreo()
     {
         mostrarOpcionesPdf = false;
+        mostrarBtnWhatsapp = false;
         mostrarVistaPreviaPDF = true;
         mostrarBtnCorreo = true;
     }

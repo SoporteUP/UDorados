@@ -25,3 +25,13 @@ window.forzarRecargaActualizacion = async () => {
     sessionStorage.clear();
     location.reload(true);
 };
+
+window.limpiarCache = async () => {
+    if ("caches" in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map(k => caches.delete(k)));
+    }
+    localStorage.clear();
+    sessionStorage.clear();
+    location.reload(true);
+};

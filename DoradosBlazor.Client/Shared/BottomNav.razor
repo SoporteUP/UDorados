@@ -1,0 +1,53 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+
+<div class="bottom-nav">
+    <NavLink href="/index" class="bottom-nav-link" Match="NavLinkMatch.All">
+        <i class="bi bi-house-door"></i>
+        <span>Inicio</span>
+    </NavLink>
+    <AuthorizeView Roles="Administrador">
+        <Authorized>
+            <NavLink href="/usuarios" class="bottom-nav-link">
+                <i class="bi bi-people-fill"></i>
+                <span>Usuarios</span>
+            </NavLink>
+        </Authorized>
+    </AuthorizeView>
+    <AuthorizeView Roles="Alumno">
+        <Authorized>
+            <NavLink href="/AdeudosAlumno" class="bottom-nav-link">
+                <i class="bi bi-cash-coin"></i>
+                <span>Adeudos</span>
+            </NavLink>
+            <NavLink href="/Calificaciones" class="bottom-nav-link">
+                <i class="bi bi-award"></i>
+                <span>Boletas</span>
+            </NavLink>
+        </Authorized>
+    </AuthorizeView>
+    <AuthorizeView Roles="Profesor">
+        <Authorized>
+            <NavLink href="/MateriasProfesores" class="bottom-nav-link">
+                <i class="bi bi-journal-bookmark-fill"></i>
+                <span>Materias</span>
+            </NavLink>
+        </Authorized>
+    </AuthorizeView>
+    <AuthorizeView Roles="Reclutador">
+        <Authorized>
+            <NavLink href="/preinscripciones" class="bottom-nav-link">
+                <i class="bi bi-person-plus-fill"></i>
+                <span>Preinscripciones</span>
+            </NavLink>
+        </Authorized>
+    </AuthorizeView>
+    <a href="#" class="bottom-nav-link" @onclick="CerrarSesion">
+        <i class="bi bi-box-arrow-right"></i>
+        <span>Salir</span>
+    </a>
+</div>
+
+@code {
+    [CascadingParameter] public Task<AuthenticationState> AuthStateTask { get; set; }
+    [Parameter] public EventCallback CerrarSesion { get; set; }
+}

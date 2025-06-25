@@ -13,6 +13,13 @@
 @using DoradosBlazor.Client.Pages
 
 <div class="@loginBgClass">
+
+    <!-- FAB Soporte -->
+    <button class="btn-fab-soporte" id="btnFabSoporte" @onclick="AbrirSoporteBlazor">
+        <i class="bi bi-headset"></i>
+        <span>Soporte</span>
+    </button>
+
     <div class="animated-lines">
         <span class="shooting-star blue" style="top: 12%; animation-delay: 0s; transform: rotate(18deg);"></span>
         <span class="shooting-star gold" style="top: 28%; animation-delay: 1.5s; transform: rotate(12deg);"></span>
@@ -50,6 +57,38 @@
     </div>
 </div>
 
+
+<!-- Offcanvas Soporte -->
+<div id="offcanvasSoporteCuaderno" class="offcanvas-cuaderno-custom">
+    <div class="offcanvas-header">
+        <h5 class="cuaderno-title">Soporte técnico</h5>
+        <button type="button" class="btn-closecuaderno" onclick="cerrarSoporteCuaderno()" aria-label="Cerrar">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="offcanvas-body cuaderno-support-section">
+        <p class="mb-4 fw-semibold" style="color:#0056b3;">¿Tienes un problema o necesitas ayuda? Estamos para apoyarte.</p>
+        <div class="mb-3">
+            <h6>Oficina</h6>
+            <p>📞 Tel: 777 244 0513</p>
+        </div>
+        <div class="mb-3">
+            <h6>Isaí López (Soporte)</h6>
+            <p>💬 WhatsApp: <a href="https://wa.me/527771254213" target="_blank">777 125 4213</a></p>
+        </div>
+        <div class="mb-3">
+            <h6>Damaris Calvillo (Soporte)</h6>
+            <p>💬 WhatsApp: <a href="https://wa.me/527771955801" target="_blank">777 195 5801</a></p>
+        </div>
+        <hr />
+        <p class="mb-4">¿La app no carga bien? Prueba reiniciar y limpiar caché:</p>
+        <button class="btn btn-outline-primary w-100" onclick="limpiarCache()">
+            🔄 Actualizar y limpiar cache
+        </button>
+    </div>
+</div>
+<div id="offcanvasSoporteBackdrop" class="offcanvas-cuaderno-backdrop" onclick="cerrarSoporteCuaderno()"></div>
+
 @if (mostrarModalRegistro)
 {
     <Registro OnRegistroCompleto="OnRegistroCerrado" />
@@ -64,6 +103,11 @@
     private void OnRegistroCerrado()
     {
         mostrarModalRegistro = false;
+    }
+
+    private void AbrirSoporteBlazor()
+    {
+        JsRuntime.InvokeVoidAsync("abrirSoporteCuaderno");
     }
 
     private async Task HandleFormSubmit()

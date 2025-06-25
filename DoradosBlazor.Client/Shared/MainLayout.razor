@@ -8,13 +8,24 @@
 @inject IJSRuntime JS
 
 
-<NavMenu />
-<div class="main">
-    @Body
+<div>
+    <NavMenu IsSidebarCollapsed="isSidebarCollapsed" ToggleSidebar="ToggleSidebar" CerrarSesion="CerrarSesion" />
+    <DashboardHeader IsSidebarCollapsed="isSidebarCollapsed" />
+    <main class="dashboard-main @(isSidebarCollapsed ? "sidebar-collapsed" : "")">
+        @Body
+    </main>
+    <BottomNav CerrarSesion="CerrarSesion" />
 </div>
 
 
 @code {
+
+    private bool isSidebarCollapsed = false;
+
+    public void ToggleSidebar()
+    {
+        isSidebarCollapsed = !isSidebarCollapsed;
+    }
 
     private async Task CerrarSesion()
     {
@@ -22,4 +33,5 @@
         await autenticacionExt.ActualizarEstadoAutenticacion(null);
         navManager.NavigateTo("/", true);
     }
+
 }

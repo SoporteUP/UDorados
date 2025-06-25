@@ -42,3 +42,6 @@ window.setupOfflineHandler = () => {
     window.addEventListener("offline", updateStatus);
     updateStatus();
 };
+
+    
+
