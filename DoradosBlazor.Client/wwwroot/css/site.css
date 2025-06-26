@@ -398,6 +398,150 @@
     }
 }
 
+/*----------------------- Contenido Exlusivo para Dashboard cartas ----------------------------*/
+.dashboard-cards-container {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 2.2rem;
+    scrollbar-width: thin;
+    scrollbar-color: #6fa4fb #eee;
+}
+
+    .dashboard-cards-container::-webkit-scrollbar {
+        height: 6px;
+        background: #eee;
+    }
+
+    .dashboard-cards-container::-webkit-scrollbar-thumb {
+        background: #6fa4fb;
+        border-radius: 6px;
+    }
+
+.dashboard-card {
+    min-width: 230px;
+    flex: 1 1 210px;
+    max-width: 330px;
+    border-radius: 1.1rem;
+    color: #fff;
+    padding: 1.3rem 1.5rem 1.1rem 1.5rem;
+    box-shadow: 0 2px 14px #0002;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.14s;
+}
+
+    .dashboard-card:hover {
+        transform: translateY(-4px) scale(1.03);
+    }
+
+.card-header {
+    font-weight: 600;
+    font-size: 1.08rem;
+    opacity: 0.93;
+    letter-spacing: 0.04em;
+}
+
+.card-main {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.card-amount {
+    font-size: 2.1rem;
+    font-weight: bold;
+    letter-spacing: -1px;
+}
+
+.card-icon {
+    font-size: 2.5rem;
+    opacity: 0.14;
+    margin-left: auto;
+}
+
+.card-details {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.99rem;
+    opacity: 0.93;
+    gap: 2rem;
+}
+
+    .card-details b {
+        font-size: 1.08em;
+        font-weight: 600;
+        display: block;
+        margin-top: 0.05rem;
+    }
+
+.card-blue {
+    background: linear-gradient(90deg, #3a8dde 75%, #45c6fc 100%);
+}
+
+.card-purple {
+    background: linear-gradient(90deg, #9c42e8 75%, #7e6df9 100%);
+}
+
+.card-darkblue {
+    background: linear-gradient(90deg, #2749a8 60%, #7036e8 100%);
+}
+
+.card-green {
+    background: linear-gradient(90deg, #2abfa5 60%, #33cdd2 100%);
+}
+
+.dashboard-card::after {
+    content: "";
+    position: absolute;
+    top: -30px;
+    right: -40px;
+    width: 100px;
+    height: 100px;
+    background: #fff3;
+    border-radius: 50%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* --- RESPONSIVO PARA MÓVIL (scroll horizontal tipo carousel) --- */
+@media (max-width: 700px) {
+    .dashboard-cards-container {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 1rem;
+        width: 100%;
+        box-sizing: border-box;
+        padding-left: 1rem; /* Espacio al inicio */
+        padding-right: 1rem; /* Espacio al final */
+        scroll-snap-type: x mandatory;
+        scroll-padding-left: 1rem; /* CLAVE para snap correcto */
+        scroll-padding-right: 1rem;
+        -webkit-overflow-scrolling: touch;
+        margin-top: 2.2rem;
+    }
+
+    .dashboard-card {
+        min-width: 160px;
+        max-width: 180px;
+        flex: 0 0 160px;
+        scroll-snap-align: start;
+        padding: 1rem 0.7rem 0.8rem 0.7rem;
+        font-size: 0.99rem;
+        margin-bottom: 0.4rem;
+        box-shadow: 0 2px 8px #0001;
+    }
+}
+
+
+
 /*----------------------- Contenido Exlusivo para EL NAVMENU y Dashboard----------------------------*/
 
 :root {
@@ -2220,6 +2364,12 @@ body.modo-oscuro .modal-carreras-exclusivo,
 #modalCarga .modal-dialog,
 #modalCarga .modal-content {
     z-index: 4050 !important;
+}
+
+#modalCargaWhatsapp,
+#modalCargaWhatsapp .modal-dialog,
+#modalCargaWhatsapp .modal-content {
+    z-index: 4051 !important;
 }
 
 

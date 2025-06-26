@@ -254,10 +254,15 @@
     </script>
 
     <script>
+        window.esDispositivoMovil = function () {
+            // Retorna true si es móvil, false si no lo es
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        };
         window.abrirEnNuevaPestana = function (url) {
             window.open(url, '_blank');
-        }
+        };
     </script>
+
     
 
     <script src="_framework/blazor.webassembly.js"></script>

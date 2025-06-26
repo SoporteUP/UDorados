@@ -814,7 +814,7 @@
 }
 
 
-<!-- Modal Cargar-->
+<!-- Modals Cargar-->
 <div class="modal fade" id="modalCarga" data-bs-backdrop="static" tabindex="-1" aria-labelledby="modalCargaLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content shadow-lg rounded-xl">
@@ -839,6 +839,30 @@
     </div>
 </div>
 
+<!-- Modal Cargar-->
+<div class="modal fade" id="modalCargaWhatsapp" data-bs-backdrop="static" tabindex="-1" aria-labelledby="modalCargaWhatsappLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg rounded-xl">
+            <div class="modal-header bg-blue-500 text-white">
+                <h5 class="modal-title" id="modalCargaWhatsappLabel">Enviar Whatsapp</h5>
+            </div>
+            <div class="modal-body p-4">
+
+
+                <h3>Espera un momento mientras se envia el Whatsapp....</h3>
+
+                <div class="progress">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
+                </div>
+
+
+
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
 
 @code {
 
@@ -1132,7 +1156,7 @@
         mostrarModalWhatsapp = false;
 
         await JSRuntime.InvokeVoidAsync("eval", @"
-        const modal = new bootstrap.Modal(document.querySelector('#modalCarga'));
+        const modal = new bootstrap.Modal(document.querySelector('#modalCargaWhatsapp'));
         modal.show();");
 
         await Task.Delay(3000); // Simulación de espera
@@ -1158,14 +1182,25 @@
             var telefono = NumWhatsapp;
             var urlWhatsapp = $"https://wa.me/{telefono}?text={Uri.EscapeDataString(mensaje)}";
 
-            await JSRuntime.InvokeVoidAsync("abrirEnNuevaPestana", urlWhatsapp);
+            // Detectar si es móvil
+            var esMovil = await JS.InvokeAsync<bool>("esDispositivoMovil");
+            if (esMovil)
+            {
+                // Móvil: abrir en la misma pestaña (redirección directa)
+                navManager.NavigateTo(urlWhatsapp, true);
+            }
+            else
+            {
+                // Desktop: abrir en nueva pestaña
+                await JS.InvokeVoidAsync("abrirEnNuevaPestana", urlWhatsapp);
+            }
         }
         else
         {
             await JSRuntime.InvokeVoidAsync("alert", "Error al generar y subir el PDF.");
         }
 
-        await JSRuntime.InvokeVoidAsync("cerrarModal", "#modalCarga");
+        await JSRuntime.InvokeVoidAsync("cerrarModal", "#modalCargaWhatsapp");
         mostrarVistaPreviaPDF = false;
 
 
