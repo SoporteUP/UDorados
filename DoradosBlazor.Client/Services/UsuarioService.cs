@@ -219,6 +219,14 @@ namespace DoradosBlazor.Client.Services
             else
                 throw new Exception(result.Mensaje);
         }
+        public async Task<List<ST_S_PREINSCRIPCOUNTDTO>> ST_S_PREINSCRIPCOUNT(int iTipoConsulta, string sUsuario, int iMatriculaID, string sNombre)
+        {
+            var result = await _http.GetFromJsonAsync<ResponseAPI<List<ST_S_PREINSCRIPCOUNTDTO>>>($"api/Usuario/ST_S_PREINSCRIPCOUNT/{iTipoConsulta}/{sUsuario}/{iMatriculaID}/{sNombre}");
+            if (result!.EsCorrecto)
+                return result.Valor!;
+            else
+                throw new Exception(result.Mensaje);
+        }
 
         public async Task<List<ST_S_CARRERASDTO>> ST_S_CARRERAS(int iTipoConsulta, string sCarrera)
         {

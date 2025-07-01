@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using DoradosBlazor.Server.Models;
+using DoradosBlazor.Shared;
 using Microsoft.EntityFrameworkCore;
 
 namespace DoradosBlazor.Server.Models;
@@ -41,6 +42,7 @@ public partial class DbcrudBlazorContext : DbContext
 
     public virtual DbSet<CalificacionMateriaApp> calificacionMateriaApp { get; set; }
     public virtual DbSet<ST_S_PREINSCRIP> sT_S_PREINSCRIP { get; set; }
+    public virtual DbSet<ST_S_PREINSCRIPCOUNT> sT_S_PREINSCRIPCOUNT { get; set; }
     public virtual DbSet<ST_S_CARRERAS> sT_S_CARRERAS { get; set; }
     public virtual DbSet<ST_S_PREINSC_INCOMP> sT_S_PREINSC_INCOMP { get; set; }
     public virtual DbSet<ST_S_DatosPDF> sT_S_DatosPDF { get; set; }

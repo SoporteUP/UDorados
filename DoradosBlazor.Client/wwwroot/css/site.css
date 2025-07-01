@@ -398,7 +398,7 @@
     }
 }
 
-/*----------------------- Contenido Exlusivo para Dashboard cartas ----------------------------*/
+/* ===== Dashboard Cards General (desktop/tablet) ===== */
 .dashboard-cards-container {
     display: flex;
     gap: 1.5rem;
@@ -510,8 +510,10 @@
     pointer-events: none;
 }
 
-/* --- RESPONSIVO PARA MÓVIL (scroll horizontal tipo carousel) --- */
-@media (max-width: 700px) {
+
+
+/* ===== Responsive Carousel para móvil ===== */
+@media (max-width: 750px) {
     .dashboard-cards-container {
         display: flex;
         flex-wrap: nowrap;
@@ -519,26 +521,28 @@
         gap: 1rem;
         width: 100%;
         box-sizing: border-box;
-        padding-left: 1rem; /* Espacio al inicio */
-        padding-right: 1rem; /* Espacio al final */
+        padding-left: 1rem;
+        padding-right: 1rem;
         scroll-snap-type: x mandatory;
-        scroll-padding-left: 1rem; /* CLAVE para snap correcto */
+        scroll-padding-left: 1rem;
         scroll-padding-right: 1rem;
         -webkit-overflow-scrolling: touch;
         margin-top: 2.2rem;
+        justify-content: flex-start;
     }
 
     .dashboard-card {
-        min-width: 160px;
-        max-width: 180px;
+        min-width: 179px;
+        max-width: 189px;
         flex: 0 0 160px;
         scroll-snap-align: start;
         padding: 1rem 0.7rem 0.8rem 0.7rem;
-        font-size: 0.99rem;
+        font-size: 0.92rem;
         margin-bottom: 0.4rem;
         box-shadow: 0 2px 8px #0001;
     }
 }
+
 
 
 

@@ -1,21 +1,67 @@
 ﻿@page "/Index"
 
-@using Microsoft.AspNetCore.Authorization;
-@using Microsoft.AspNetCore.Components.Authorization;
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
 @attribute [Authorize]
-@using Blazored.SessionStorage;
-@using DoradosBlazor.Shared;
-@using System.Security.Claims;
-@using DoradosBlazor.Client.Services;
+@using Blazored.SessionStorage
+@using DoradosBlazor.Shared
+@using System.Security.Claims
+@using DoradosBlazor.Client.Services
 
-@inject IUsuarioService usuarioService;
-@inject IRolesService rolesService;
-@inject NavigationManager navegacion;
+@inject IUsuarioService usuarioService
+@inject IRolesService rolesService
+@inject NavigationManager navegacion
 @inject AuthenticationStateProvider AuthenticationStateProvider
-@inject SweetAlertService Swal;
-
+@inject SweetAlertService Swal
+@inject SesionEmail mySesionEmail;
 
 <PageTitle>Index</PageTitle>
+
+<!-- Carousel de tarjetas visible para todos los usuarios -->
+<div class="dashboard-cards-container">
+    <div class="dashboard-card card-green">
+        <div class="card-header">PreInscripciones</div>
+        <div class="card-main">
+            <div class="card-amount">@PreinscNum</div>
+            <i class="bi bi-receipt card-icon"></i>
+        </div>
+        <div class="card-details">
+            <span><br /><b>Completas</b></span>
+        </div>
+    </div>
+    <div class="dashboard-card card-blue">
+        <div class="card-header">Total bill</div>
+        <div class="card-main">
+            <div class="card-amount">$3000</div>
+            <i class="bi bi-bar-chart-line card-icon"></i>
+        </div>
+        <div class="card-details">
+            <span>Collected<br /><b>$3000</b></span>
+            <span>Pending bill<br /><b>$1500</b></span>
+        </div>
+    </div>
+    <div class="dashboard-card card-purple">
+        <div class="card-header">Total User</div>
+        <div class="card-main">
+            <div class="card-amount">$2100</div>
+            <i class="bi bi-patch-check card-icon"></i>
+        </div>
+        <div class="card-details">
+            <span>Active<br /><b>1100</b></span>
+            <span>Deactive<br /><b>560</b></span>
+        </div>
+    </div>
+    <div class="dashboard-card card-darkblue">
+        <div class="card-header">User Paid</div>
+        <div class="card-main">
+            <div class="card-amount">2110</div>
+            <i class="bi bi-receipt card-icon"></i>
+        </div>
+        <div class="card-details">
+            <span>User Unpaid<br /><b>380</b></span>
+        </div>
+    </div>    
+</div>
 
 <h1 class="text-center">Universidad Dorados</h1>
 
@@ -23,68 +69,28 @@
     <Authorized>
         <h3 class="text-center"> Bienvenido: @context.User.Identity!.Name</h3>
         <h5 class="text-center"> @context.User.FindFirst(ClaimTypes.Email).Value</h5>
-
     </Authorized>
 </AuthorizeView>
 
-<AuthorizeView Roles="Reclutador">
-    <Authorized>
+@code{
 
-        <!-- Puedes dejarlo justo después del PageTitle y antes del h1 principal -->
-        <div class="dashboard-cards-container">
-            <div class="dashboard-card card-blue">
-                <div class="card-header">Total bill</div>
-                <div class="card-main">
-                    <div class="card-amount">$3000</div>
-                    <i class="bi bi-bar-chart-line card-icon"></i>
-                </div>
-                <div class="card-details">
-                    <span>Collected<br /><b>$3000</b></span>
-                    <span>Pending bill<br /><b>$1500</b></span>
-                </div>
-            </div>
-            <div class="dashboard-card card-purple">
-                <div class="card-header">Total User</div>
-                <div class="card-main">
-                    <div class="card-amount">$2100</div>
-                    <i class="bi bi-patch-check card-icon"></i>
-                </div>
-                <div class="card-details">
-                    <span>Active<br /><b>1100</b></span>
-                    <span>Deactive<br /><b>560</b></span>
-                </div>
-            </div>
-            <div class="dashboard-card card-darkblue">
-                <div class="card-header">User Paid</div>
-                <div class="card-main">
-                    <div class="card-amount">2110</div>
-                    <i class="bi bi-receipt card-icon"></i>
-                </div>
-                <div class="card-details">
-                    <span>User Unpaid<br /><b>380</b></span>
-                </div>
-            </div>
-            <div class="dashboard-card card-green">
-                <div class="card-header">New User</div>
-                <div class="card-main">
-                    <div class="card-amount">670</div>
-                    <i class="bi bi-receipt card-icon"></i>
-                </div>
-                <div class="card-details">
-                    <span>Old User<br /><b>1150</b></span>
-                </div>
-            </div>
-        </div>
+    [Parameter]
+    public string sEmail { get; set; } = "";
 
+    private int PreinscNum;
 
-    </Authorized>
-</AuthorizeView>
+    private List<ST_S_PREINSCRIPCOUNTDTO> listaPREINSCRIPCOUNT = new(); // Lista de resultados
 
+    protected override async Task OnInitializedAsync()
+    {
 
+        sEmail = mySesionEmail.Email;
 
-
-@code
-{
-
-   
+        listaPREINSCRIPCOUNT = await usuarioService.ST_S_PREINSCRIPCOUNT(3, sEmail, 0, "-");
+        if (listaPREINSCRIPCOUNT != null && listaPREINSCRIPCOUNT.Any())
+        {
+            PreinscNum = listaPREINSCRIPCOUNT[0].TotalPreins;
+        }
+        
+    }
 }

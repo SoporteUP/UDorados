@@ -279,6 +279,43 @@ namespace DoradosBlazorCrud.Server.Controllers
             return Ok(responseApi);
         }
 
+
+        //ST_S_PREINSCRIPCOUNT Get
+        [HttpGet]
+        [Route("ST_S_PREINSCRIPCOUNT/{iTipoConsulta}/{sUsuario}/{iMatriculaID}/{sNombre}")]
+        public async Task<IActionResult> ST_S_PREINSCRIPCOUNT(int iTipoConsulta, string sUsuario, int iMatriculaID, string sNombre)
+        {
+            var responseApi = new ResponseAPI<List<ST_S_PREINSCRIPCOUNTDTO>>();
+            var listaPREINSCRIPDTO = new List<ST_S_PREINSCRIPCOUNTDTO>();
+
+            var Result = _dbContext.sT_S_PREINSCRIPCOUNT.FromSql($"ST_S_PREINSCRIPCOUNT {iTipoConsulta},{sUsuario},{iMatriculaID},{sNombre}").ToList();
+
+            try
+            {
+                foreach (var item in Result)
+                {
+                    listaPREINSCRIPDTO.Add(new ST_S_PREINSCRIPCOUNTDTO
+                    {
+                        TotalPreins = item.TotalPreins, 
+
+                    });
+
+                }
+
+                responseApi.EsCorrecto = true;
+                responseApi.Valor = listaPREINSCRIPDTO;
+
+            }
+            catch (Exception ex)
+            {
+
+                responseApi.EsCorrecto = false;
+                responseApi.Mensaje = ex.Message;
+
+            }
+            return Ok(responseApi);
+        }
+
         //ST_S_CARRERAS Get
         [HttpGet]
         [Route("ST_S_CARRERAS/{iTipoConsulta}/{sCarrera}")]

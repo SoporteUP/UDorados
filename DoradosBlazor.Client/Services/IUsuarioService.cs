@@ -20,6 +20,7 @@ namespace DoradosBlazor.Client.Services
         Task<List<ST_S_GposEmpaquetadosDTO>> ListaGposEmpaquetados(ST_S_GposEmpaquetadosVarDTO sT_S_GposEmpaquetadosVarDTO);
         Task<List<ST_S_GposEmpaquetadosListosDTO>> ListaGposEmpaquetadosListos(ST_S_GposEmpaquetadosVarDTO sT_S_GposEmpaquetadosVarDTO);
         Task<List<ST_S_PREINSCRIPDTO>> ST_S_PREINSCRIP(int iTipoConsulta, string sUsuario, int iMatriculaID, string sNombre);
+        Task<List<ST_S_PREINSCRIPCOUNTDTO>> ST_S_PREINSCRIPCOUNT(int iTipoConsulta, string sUsuario, int iMatriculaID, string sNombre);
         Task<List<ST_S_CARRERASDTO>> ST_S_CARRERAS(int iTipoConsulta, string sCarrera);
         Task<List<ST_S_PREINSC_INCOMPDTO>> ST_S_PREINSC_INCOMP(int iTipoConsulta, string sNombre);
         Task<List<ST_S_DatosPDFDTO>> ST_S_DatosPDF(int iTipoConsulta, string iID);

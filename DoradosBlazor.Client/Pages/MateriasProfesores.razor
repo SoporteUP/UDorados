@@ -32,12 +32,13 @@
             </thead>
             <tbody>
 
-                @if (listaMateriasProfesores == null)
+                @if (listaMateriasProfesores == null || listaMateriasProfesores.Count == 0)
                 {
 
                     <tr>
-                        <td colspan="5" align="center">
-                            <img style="width:50px" src="https://media.tenor.com/On7kvXhzml4AAAAj/loading-gif.gif" />
+                        <td colspan="7" align="center">
+                            <i class="bi bi-journal-x"></i>
+                            <div>No se encontraron materias.</div>
                         </td>
                     </tr>
                 }
