@@ -47,6 +47,7 @@ public partial class DbcrudBlazorContext : DbContext
     public virtual DbSet<ST_S_PREINSC_INCOMP> sT_S_PREINSC_INCOMP { get; set; }
     public virtual DbSet<ST_S_DatosPDF> sT_S_DatosPDF { get; set; }
     public virtual DbSet<ST_S_CorreosMisCuentas> sT_S_CorreosMisCuentas { get; set; }
+    public virtual DbSet<ST_S_ProspecFiltros> sT_S_ProspecFiltros { get; set; }
 
 
     public virtual DbSet<Respuesta> respuesta { get; set; }

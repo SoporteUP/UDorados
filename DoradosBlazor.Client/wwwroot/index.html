@@ -209,20 +209,15 @@
                 console.error("No se encontró el modal:", modalId);
                 return;
             }
-
             const modal = new bootstrap.Modal(modalElement);
             modal.show();
         };
-    </script>
-
-    <script>
         window.cerrarModal = (modalId) => {
             const modalElement = document.querySelector(modalId);
             if (!modalElement) {
                 console.error("No se encontró el modal:", modalId);
                 return;
             }
-
             const modal = bootstrap.Modal.getInstance(modalElement);
             if (modal) {
                 modal.hide();
@@ -231,6 +226,7 @@
             }
         };
     </script>
+   
 
     <script>
         window.abrirSoporteCuaderno = function () {
@@ -263,7 +259,7 @@
         };
     </script>
 
-    
+
 
     <script src="_framework/blazor.webassembly.js"></script>
     <script src="js/utils.js"></script>

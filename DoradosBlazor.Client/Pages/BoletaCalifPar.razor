@@ -84,12 +84,19 @@
             </thead>
             <tbody>
 
-                @if (listaCalifPar == null)
+                @if (cargando)
                 {
-
                     <tr>
-                        <td colspan="5" align="center">
+                        <td colspan="9" align="center">
                             <img style="width:50px" src="https://media.tenor.com/On7kvXhzml4AAAAj/loading-gif.gif" />
+                        </td>
+                    </tr>
+                }
+                else if (listaCalifPar == null || listaCalifPar.Count == 0)
+                {
+                    <tr>
+                        <td colspan="9" align="center">
+                            <span>@mensaje</span>
                         </td>
                     </tr>
                 }
@@ -99,9 +106,9 @@
                     {
                         <tr>
                             <td>@item.Materia</td>
-                            <td>@item.Parcial1</td>                           
-                            <td>@item.Parcial2</td>                           
-                            <td>@item.Parcial3</td>                          
+                            <td>@item.Parcial1</td>
+                            <td>@item.Parcial2</td>
+                            <td>@item.Parcial3</td>
                             <td>@item.PromediodeParciales</td>
                             <td>@item.ExamenFinal</td>
                             <td>@item.CalificacionFinal</td>
@@ -131,32 +138,49 @@
     [Parameter]
     public string cicloID { get; set; } = "";
 
-      public string MatID { get; set; } = "";
+    public string MatID { get; set; } = "";
 
-      public string Grupo { get; set; } = "";
+    public string Grupo { get; set; } = "";
 
-      public string Alumno { get; set; } = "";
+    public string Alumno { get; set; } = "";
 
     List<CaliParcDTO>? listaCalifPar = null;
 
-    private CalifVarDTO califVar = new CalifVarDTO();       
+    private CalifVarDTO califVar = new CalifVarDTO();  
+    
+    bool cargando = true;
+    string mensaje = "";
 
     protected override async Task OnInitializedAsync()
     {
-        califVar.iTipoConsulta = 1;
-        califVar.sMatriculaID = matriculaID;
-        califVar.iCarreraID = carreraID;
-        califVar.sCiclo = cicloID;
+        try
+        {
+            cargando = true;
+            califVar.iTipoConsulta = 1;
+            califVar.sMatriculaID = matriculaID;
+            califVar.iCarreraID = carreraID;
+            califVar.sCiclo = cicloID;
 
-        listaCalifPar =   await usuarioService.ListaCaliParc(califVar);
-
-
-        MatID = listaCalifPar[0].MatriculaID.ToString();  
-        Grupo = listaCalifPar[0].GrupoID.ToString();  
-        Alumno = listaCalifPar[0].Alumno.ToString();  
-
-      
- 
+            listaCalifPar = await usuarioService.ListaCaliParc(califVar);
+            if (listaCalifPar != null && listaCalifPar.Count > 0)
+            {
+                MatID = listaCalifPar[0].MatriculaID.ToString();
+                Grupo = listaCalifPar[0].GrupoID.ToString();
+                Alumno = listaCalifPar[0].Alumno.ToString();
+            }
+            else
+            {
+                mensaje = "No se encontraron calificaciones para este alumno.";
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = $"Error al consultar las calificaciones: {ex.Message}";
+        }
+        finally
+        {
+            cargando = false;
+        }
     }
 
 }

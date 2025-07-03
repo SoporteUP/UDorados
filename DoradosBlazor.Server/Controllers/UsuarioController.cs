@@ -557,6 +557,64 @@ namespace DoradosBlazorCrud.Server.Controllers
             return Ok(responseApi);
         }
 
+
+        //ST_S_ProspecFiltros Get
+        [HttpGet]
+        [Route("ST_S_ProspecFiltros/{cCampo}/{cBusqueda}/{cCampo2}/{cBusqueda2}")]
+        public async Task<IActionResult> ST_S_ProspecFiltros(string cCampo, string cBusqueda, string cCampo2, string cBusqueda2)
+        {
+            var responseApi = new ResponseAPI<List<ST_S_ProspecFiltrosDTO>>();
+            var listaProspecFiltros = new List<ST_S_ProspecFiltrosDTO>();
+
+            var Result = _dbContext.sT_S_ProspecFiltros.FromSql($"ST_S_ProspecFiltros {cCampo},{cBusqueda},{cCampo2},{cBusqueda2}").ToList();
+
+            try
+            {
+                foreach (var item in Result)
+                {
+                    listaProspecFiltros.Add(new ST_S_ProspecFiltrosDTO
+                    {
+                        ProspectoID = item.ProspectoID,
+                        EjecutivoID = item.EjecutivoID,
+                        Nombre = item.Nombre,
+                        Telefono = item.Telefono,
+                        Celular = item.Celular,
+                        Correo = item.Correo,
+                        Localidad = item.Localidad,
+                        AreaInteres = item.AreaInteres,
+                        EscuelaProcedencia = item.EscuelaProcedencia,
+                        CicloEscolar = item.CicloEscolar,
+                        Edad = item.Edad,
+                        MedioseEntero = item.MedioseEntero,
+                        QuienAtendio = item.QuienAtendio,
+                        Estatus = item.Estatus,
+                        Llamo = item.Llamo,
+                        Ubicacion = item.Ubicacion,
+                        Facebook = item.Facebook,
+                        Niv_AcademicoInteres = item.Niv_AcademicoInteres,
+                        Base = item.Base,
+                        Turno = item.Turno,
+                        Institu_Evento = item.Institu_Evento,
+
+                    });
+
+                }
+
+                responseApi.EsCorrecto = true;
+                responseApi.Valor = listaProspecFiltros;
+
+            }
+            catch (Exception ex)
+            {
+
+                responseApi.EsCorrecto = false;
+                responseApi.Mensaje = ex.Message;
+
+            }
+            return Ok(responseApi);
+        }
+
+
         [HttpPost]
         [Route("ListaGposEmpaquetados")]
         public async Task<ActionResult> ListaGposEmpaquetados([FromBody] ST_S_GposEmpaquetadosVarDTO sT_S_GposEmpaquetadosVarDTO)
