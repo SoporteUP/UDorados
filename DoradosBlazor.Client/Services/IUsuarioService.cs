@@ -25,6 +25,7 @@ namespace DoradosBlazor.Client.Services
         Task<List<ST_S_PREINSC_INCOMPDTO>> ST_S_PREINSC_INCOMP(int iTipoConsulta, string sNombre);
         Task<List<ST_S_DatosPDFDTO>> ST_S_DatosPDF(int iTipoConsulta, string iID);
         Task<List<ST_S_CorreosMisCuentasDTO>> ST_S_CorreosMisCuentas(int iTipoConsulta, string sCorreo);
+        Task<List<ST_S_ProspecFiltrosDTO>> ST_S_ProspecFiltros(string cCampo, string cBusqueda, string cCampo2, string cBusqueda2);
         Task<UsuarioDTO>Buscar(int id); 
 
         Task<int>Guardar(UsuarioDTO usuario);

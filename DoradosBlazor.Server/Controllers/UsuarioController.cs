@@ -1349,6 +1349,19 @@ namespace DoradosBlazorCrud.Server.Controllers
         }
 
         [HttpPost]
+        [Route("ST_IUD_Prospectos")]
+        public async Task<ActionResult> ST_IUD_Prospectos([FromBody] ST_IUD_ProspectosDTO prospec)
+        {
+
+            var Result1 = new List<Respuesta>();
+
+            Result1 = _dbContext.respuesta.FromSql($"ST_IUD_Prospectos {prospec.iTipoOperacion},{prospec.iProspectoID},{prospec.iEjecutivoID},{prospec.sNombre},{prospec.sTelefono}, {prospec.sCelular}, {prospec.sCorreo}, {prospec.sLocalidad}, {prospec.sAreaInteres},{prospec.sEscuelaProcedencia},{prospec.sCicloEscolar},{prospec.iEdad},{prospec.sMedioseEntero},{prospec.sQuienAtendio},{prospec.sEstatus},{prospec.sLlamo},{prospec.sUbicacion},{prospec.sFacebook},{prospec.sNiv_AcademicoInteres},{prospec.sBase},{prospec.sTurno},{prospec.sInstitu_Evento}").ToList();
+
+            return StatusCode(StatusCodes.Status200OK, Result1);
+
+        }
+
+        [HttpPost]
         [Route("ST_IUE_ALUMNOSPREINSC")]
         public async Task<ActionResult> ST_IUE_ALUMNOSPREINSC([FromBody] ST_IUE_ALUMNOSPREINSCDTO alumnosp)
         {

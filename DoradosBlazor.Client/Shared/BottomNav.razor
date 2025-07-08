@@ -41,6 +41,14 @@
             </NavLink>
         </Authorized>
     </AuthorizeView>
+    <AuthorizeView Roles="Reclutador">
+        <Authorized>
+            <NavLink href="/prospectos" class="bottom-nav-link">
+                <i class="bi bi-person-arms-up"></i>
+                <span>Prospectos</span>
+            </NavLink>
+        </Authorized>
+    </AuthorizeView>
     <a href="#" class="bottom-nav-link" @onclick="CerrarSesion">
         <i class="bi bi-box-arrow-right"></i>
         <span>Salir</span>

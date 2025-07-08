@@ -1285,17 +1285,14 @@ select.modern-input {
 }
 
 /* Responsividad perfecta con Bootstrap y modern-card */
-@media (max-width: 992px) {
-    .modern-card {
-        min-height: unset;
-        padding: 1.1rem .7rem 1rem .7rem;
-    }
-}
-
 @media (max-width: 576px) {
     .modern-card {
-        padding: .8rem;
-        margin-bottom: 1.1rem;
+        padding: 1rem;
+        margin: 1.1rem auto 1.5rem auto;
+        width: 95vw;
+        max-width: 95vw;
+        border-radius: 1rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
 
     .container-preinscripciones {
@@ -2491,3 +2488,396 @@ body.modo-oscuro .modal-carreras-exclusivo,
 .swal2-container {
     z-index: 4100 !important;
 }
+
+
+/*----------------------- Contenido Exlusivo para Prospectos ----------------------------*/
+/* === Prospectos Modernos (Juvenil + Increíble) === */
+
+:root {
+    --fondo-claro: #eef4f8;
+    --gris-oscuro: #2f3542;
+    --azul-info: #17A2B8;
+    --azul-vital: #0074D9;
+    --verde-salud: #28A745;
+    --naranja-ia: #FF851B;
+    --rojo-aviso: #DC3545;
+    --gris-suave: #f8f9fa;
+    --amarillo-suave: #FFC107;
+    --borde-suave: #dee2e6;
+}
+
+.prospectos-kanban-bg {
+    padding: 2rem;
+    background: linear-gradient(135deg, var(--fondo-claro), #ffffff);
+    min-height: 100vh;
+    padding-bottom: 9rem;
+}
+
+.prospectos-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+    gap: 1rem;
+    background: white;
+    padding: 1rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.prospectos-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--azul-vital);
+    margin: 0;
+}
+
+.prospectos-title-sub {
+    font-size: 1rem;
+    color: var(--naranja-ia);
+    margin-left: 0.5rem;
+    font-weight: 600;
+}
+
+.prospectos-filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.prospectos-buscador,
+.prospectos-select {
+    border-radius: 0.75rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.95rem;
+    border: 1px solid var(--borde-suave);
+    min-width: 180px;
+    transition: all 0.3s ease;
+    background-color: #fff;
+}
+
+    .prospectos-buscador:focus,
+    .prospectos-select:focus {
+        border-color: var(--azul-vital);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(0, 116, 217, 0.1);
+    }
+
+.prospectos-btn-limpiar {
+    background-color: transparent;
+    border: none;
+    color: var(--rojo-aviso);
+    font-size: 1.25rem;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+    .prospectos-btn-limpiar:hover {
+        transform: scale(1.1);
+    }
+
+.prospectos-btn-nuevo {
+    background: linear-gradient(145deg, var(--azul-vital), #005bb5);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    font-size: 1rem;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0, 116, 217, 0.4);
+}
+
+    .prospectos-btn-nuevo:hover {
+        transform: translateY(-2px);
+        background: var(--azul-info);
+    }
+
+@media (max-width: 768px) {
+    .prospectos-btn-nuevo {
+        position: fixed;
+        bottom: 110px;
+        right: 1.25rem;
+        width: 56px;
+        height: 56px;
+        padding: 0;
+        justify-content: center;
+        border-radius: 50%;
+        font-size: 1.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        animation: pulse 1.5s infinite ease-in-out;
+    }
+
+        .prospectos-btn-nuevo span {
+            display: none;
+        }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(0, 116, 217, 0.4);
+    }
+
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 8px rgba(0, 116, 217, 0);
+    }
+}
+
+.prospectos-kanban {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    margin-top: 1rem;
+}
+
+.prospectos-columna {
+    background-color: white;
+    border-radius: 1rem;
+    padding: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    min-height: 300px;
+    transition: background 0.3s ease;
+    border-top: 4px solid var(--azul-info);
+    position: relative;
+}
+
+.prospectos-columna-header {
+    font-weight: 700;
+    font-size: 1.1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--azul-vital);
+    margin-bottom: 0.75rem;
+}
+
+.prospectos-columna-count {
+    background-color: var(--naranja-ia);
+    color: white;
+    border-radius: 1rem;
+    padding: 0.1rem 0.6rem;
+    font-size: 0.85rem;
+}
+
+.prospectos-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.prospectos-card {
+    background-color: #ffffff;
+    border-radius: 1rem;
+    padding: 0.75rem 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    cursor: grab;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-left: 5px solid var(--azul-vital);
+    position: relative;
+}
+
+    .prospectos-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+    }
+
+.prospectos-card-title {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--gris-oscuro);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.prospectos-card-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+}
+
+.prospectos-card-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.btn-kanban-accion {
+    background-color: transparent;
+    border: none;
+    color: var(--azul-vital);
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+    .btn-kanban-accion:hover {
+        color: var(--naranja-ia);
+    }
+
+.prospectos-alert {
+    text-align: center;
+    color: var(--gris-oscuro);
+    font-style: italic;
+    font-size: 0.95rem;
+    opacity: 0.7;
+}
+
+.prospecto-formulario-bg {
+    background-color: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(4px);
+    position: fixed;
+    inset: 0;
+    z-index: 3030;
+    display: flex;
+    justify-content: center;
+    align-items: start;
+    padding-top: 3rem;
+    padding-bottom: 6rem;
+    overflow-y: auto;
+}
+
+.btn-cerrar-form {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 10;
+    background-color: transparent;
+    border: none;
+    font-size: 1.25rem;
+    color: #999;
+    transition: color 0.3s ease;
+}
+
+    .btn-cerrar-form:hover {
+        color: #000;
+    }
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background-color: var(--gris-suave);
+    border-radius: 1rem;
+    padding: 0.25rem 0.6rem;
+    font-weight: 500;
+}
+
+.chip-azul {
+    background-color: var(--azul-info);
+    color: white;
+}
+
+.chip-localidad {
+    background-color: var(--verde-salud);
+    color: white;
+}
+
+.chip-cel {
+    background-color: var(--naranja-ia);
+    color: white;
+}
+
+.chip-facebook {
+    background-color: #3b5998;
+    color: white;
+}
+
+.badge-rojo,
+.badge-verde,
+.badge-amarillo,
+.badge-azul {
+    border-radius: 1rem;
+    padding: 0.2rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.badge-rojo {
+    background-color: var(--rojo-aviso);
+    color: white;
+}
+
+.badge-verde {
+    background-color: var(--verde-salud);
+    color: white;
+}
+
+.badge-amarillo {
+    background-color: var(--amarillo-suave);
+    color: #333;
+}
+
+.badge-azul {
+    background-color: var(--azul-info);
+    color: white;
+}
+
+
+/* === Estilo Moderno para Select en Prospectos === */
+.prospectos-select {
+    border-radius: 0.7rem !important;
+    border: 1.2px solid #d1d7e6 !important;
+    font-size: 1rem !important;
+    padding: 0.75rem 1rem !important;
+    background: #f8f9fa !important;
+    transition: border-color 0.17s, background 0.17s;
+    box-shadow: none !important;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg fill='gray' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1rem;
+}
+
+
+.prospectos-paginacion {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.btn-paginacion {
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn-paginacion-atras {
+    background-color: var(--azul-info);
+    color: white;
+}
+
+.btn-paginacion-mas {
+    background-color: var(--naranja-ia);
+    color: white;
+}
+
+.btn-paginacion:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+
