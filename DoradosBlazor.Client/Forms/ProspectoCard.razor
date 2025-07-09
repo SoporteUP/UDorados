@@ -1,0 +1,59 @@
+﻿@using DoradosBlazor.Shared
+@using DoradosBlazor.Client.Pages
+
+@inject IJSRuntime JS
+
+<div class="prospectos-card"
+     draggable="true"
+     @ondragstart="(e) => OnDragStart(e)">
+
+    <div class="prospectos-card-title">
+        @Prospecto.Nombre
+        @if (!string.IsNullOrWhiteSpace(Prospecto.Estatus))
+        {
+            <span class="badge badge-@Prospecto.Estatus.ToLower().Replace(" ", "")">
+                @Prospecto.Estatus
+            </span>
+        }
+    </div>
+
+    <div class="prospectos-card-chips">
+        <span class="chip chip-azul">
+            <i class="bi bi-mortarboard"></i> @Prospecto.AreaInteres
+        </span>
+        <span class="chip chip-localidad">
+            <i class="bi bi-geo-alt"></i> @Prospecto.Localidad
+        </span>
+        <span class="chip chip-cel">
+            <i class="bi bi-telephone"></i> @Prospecto.Telefono
+        </span>
+        @if (!string.IsNullOrWhiteSpace(Prospecto.Facebook))
+        {
+            <span class="chip chip-facebook" title="Facebook">
+                <i class="bi bi-facebook"></i> @Prospecto.Facebook
+            </span>
+        }
+    </div>
+
+    <div class="prospectos-card-footer">
+        <button class="btn-kanban-accion" title="Editar" @onclick="OnEditar">
+            <i class="bi bi-pencil"></i>
+        </button>
+        <button class="btn-kanban-accion" title="Agendar cita">
+            <i class="bi bi-calendar-event"></i>
+        </button>
+        <button class="btn-kanban-accion" title="Ver detalles">
+            <i class="bi bi-eye"></i>
+        </button>
+    </div>
+</div>
+
+@code {
+    [Parameter] public ST_S_ProspecFiltrosDTO Prospecto { get; set; } = new();
+    [Parameter] public EventCallback OnEditar { get; set; }
+
+    private async Task OnDragStart(DragEventArgs e)
+    {
+        await JS.InvokeVoidAsync("setDragData", Prospecto.ProspectoID);
+    }
+}

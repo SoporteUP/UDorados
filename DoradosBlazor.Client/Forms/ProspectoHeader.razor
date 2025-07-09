@@ -1,0 +1,53 @@
+﻿@using DoradosBlazor.Shared
+@using DoradosBlazor.Client.Pages
+
+<div class="prospectos-header">
+    <div>
+        <h2 class="prospectos-title">
+            Prospectos <span class="prospectos-title-sub">/ CRM visual</span>
+        </h2>
+        <div class="prospectos-filtros">
+            <input class="prospectos-buscador"
+                   type="text"
+                   placeholder="Buscar nombre, correo, tel..."
+                   @bind="Filtro"
+                   @oninput="Buscar" />
+
+            <select class="prospectos-select" @bind="CampoFiltro">
+                <option value="">Filtro por:</option>
+                @foreach (var campo in ListaCampos)
+                {
+                    <option value="@campo">@campo</option>
+                }
+            </select>
+
+            <button class="prospectos-btn-limpiar" @onclick="OnLimpiar">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+    </div>
+    <button class="prospectos-btn-nuevo" @onclick="OnNuevo">
+        <i class="bi bi-plus-circle"></i> <span>Nuevo</span>
+    </button>
+</div>
+
+@code {
+    [Parameter] public string Filtro { get; set; } = string.Empty;
+    [Parameter] public EventCallback<string> FiltroChanged { get; set; }
+    [Parameter] public string CampoFiltro { get; set; } = string.Empty;
+    [Parameter] public EventCallback<string> CampoFiltroChanged { get; set; }
+    [Parameter] public EventCallback OnLimpiar { get; set; }
+    [Parameter] public EventCallback OnNuevo { get; set; }
+
+    private List<string> ListaCampos = new() {
+        "Nombre", "Telefono", "Estatus", "Celular", "Correo", "Localidad",
+        "AreaInteres", "EscuelaProcedencia", "CicloEscolar", "Edad",
+        "MedioseEntero", "Facebook", "Niv_AcademicoInteres", "Base",
+        "Turno", "Institu_Evento"
+    };
+
+    private async Task Buscar(ChangeEventArgs e)
+    {
+        await FiltroChanged.InvokeAsync(Filtro);
+    }
+}

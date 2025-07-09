@@ -2672,13 +2672,24 @@ body.modo-oscuro .modal-carreras-exclusivo,
     gap: 0.75rem;
 }
 
+.prospecto-moviendo {
+    transform: translateX(100px);
+    opacity: 0;
+}
+
+.prospecto-slide-out {
+    transform: translateX(100px);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
 .prospectos-card {
     background-color: #ffffff;
     border-radius: 1rem;
     padding: 0.75rem 1rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     cursor: grab;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
     border-left: 5px solid var(--azul-vital);
     position: relative;
 }
@@ -2878,6 +2889,10 @@ body.modo-oscuro .modal-carreras-exclusivo,
 .btn-paginacion:hover {
     transform: translateY(-2px);
     opacity: 0.9;
+}
+
+#modal-carga-kanban {
+    z-index: 3100 !important; /* Más alto que modales comunes */
 }
 
 

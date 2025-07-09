@@ -4,6 +4,7 @@
 
 @using DoradosBlazor.Shared
 @using DoradosBlazor.Client.Services
+@using DoradosBlazor.Client.Forms
 @inject IUsuarioService usuarioService
 @inject IJSRuntime JSRuntime
 @inject HttpClient httpClient
@@ -176,7 +177,7 @@
                         }
                         @foreach (var prospecto in columna.Prospectos)
                         {
-                            <div class="prospectos-card"
+                            <div class="prospectos-card prospecto-id-@prospecto.ProspectoID @(prospectosMoviendose.Contains(prospecto.ProspectoID) ? "prospecto-moviendo" : "")"
                                  draggable="true"
                                  @ondragstart="(e) => OnCardDragStart(e, prospecto.ProspectoID)">
                                 <div class="prospectos-card-title">
@@ -234,37 +235,15 @@
 </div>
 
 
-<!-- Modals Cargar-->
-<div class="modal fade" id="modalCarga" data-bs-backdrop="static" tabindex="-1" aria-labelledby="modalCargaLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content shadow-lg rounded-xl">
-            <div class="modal-header bg-blue-500 text-white">
-                <h5 class="modal-title" id="modalCargaLabel">Enviar Correo</h5>
-            </div>
-            <div class="modal-body p-4">
-
-
-                <h3>Espera un momento mientras se envia el Correo....</h3>
-
-                <div class="progress">
-                    <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
-                </div>
-
-
-
-            </div>
-            <div class="modal-footer">
-            </div>
-        </div>
-    </div>
-</div>
+<!-- Modal de carga reutilizable -->
+<LoadingModal Mostrar="cargando" Mensaje="'Cargando...'" />
 
 @code {
     string filtroBusqueda = "";
     string filtroEstatus = "";
     string Txtfiltro = "";
     string filtroArea = "";
-
+    bool cargando = false;
     int? idArrastrando = null;
 
     List<ColumnaKanban> ColumnasKanban = new();
@@ -278,10 +257,10 @@
     List<string> listaEstatus = new() { "Nuevo", "Contactado", "En seguimiento", "Inscrito", "No interesado" };
     List<string> listaAreas = new();
 
-    const int PAGE_SIZE = 10;
+    const int PAGE_SIZE = 7;
     Dictionary<string, int> PaginaActualPorEstatus = new();
 
-    
+    HashSet<int> prospectosMoviendose = new();
 
     class ColumnaKanban
     {
@@ -289,15 +268,22 @@
         public List<ST_S_ProspecFiltrosDTO> Prospectos { get; set; } = new();
     }
 
-   
-
     private ST_IUD_ProspectosDTO PROSPECTODTO = new ST_IUD_ProspectosDTO();
 
     protected override async Task OnInitializedAsync()
     {
+        await CargarProspectos();
+    }
+
+    async Task CargarProspectos()
+    {
+        cargando = true;
+        StateHasChanged();
         todosLosProspectos = await usuarioService.ST_S_ProspecFiltros("Nombre", "-", "Nombre", "-");
         listaAreas = todosLosProspectos.Select(x => x.AreaInteres).Distinct().Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
         ConstruirKanban();
+        cargando = false;
+        StateHasChanged();
     }
 
     void NuevoProspecto()
@@ -313,195 +299,155 @@
         PROSPECTODTO.iTipoOperacion = 1;
         PROSPECTODTO.iProspectoID = 0;
         PROSPECTODTO.iEjecutivoID = 1;
-        PROSPECTODTO.sNombre = PROSPECTODTO.sNombre;
-        PROSPECTODTO.sTelefono = PROSPECTODTO.sTelefono;
-        PROSPECTODTO.sCelular = PROSPECTODTO.sCelular;
-        PROSPECTODTO.sCorreo = PROSPECTODTO.sCorreo;
-        PROSPECTODTO.sLocalidad = PROSPECTODTO.sLocalidad;
-        PROSPECTODTO.sAreaInteres = PROSPECTODTO.sAreaInteres;
-        PROSPECTODTO.sEscuelaProcedencia = PROSPECTODTO.sEscuelaProcedencia;
-        PROSPECTODTO.sCicloEscolar = PROSPECTODTO.sCicloEscolar;
-        PROSPECTODTO.iEdad = PROSPECTODTO.iEdad;
-        PROSPECTODTO.sMedioseEntero = PROSPECTODTO.sMedioseEntero;
-        PROSPECTODTO.sQuienAtendio = PROSPECTODTO.sQuienAtendio;
-        PROSPECTODTO.sEstatus = PROSPECTODTO.sEstatus;
-        PROSPECTODTO.sLlamo = PROSPECTODTO.sLlamo;
-        PROSPECTODTO.sUbicacion = PROSPECTODTO.sUbicacion;
-        PROSPECTODTO.sFacebook = PROSPECTODTO.sFacebook;
-        PROSPECTODTO.sNiv_AcademicoInteres = PROSPECTODTO.sNiv_AcademicoInteres;
-        PROSPECTODTO.sBase = PROSPECTODTO.sBase;
-        PROSPECTODTO.sTurno = PROSPECTODTO.sTurno;
-        PROSPECTODTO.sInstitu_Evento = PROSPECTODTO.sInstitu_Evento;
 
-        var loginResponse = await httpClient.PostAsJsonAsync<ST_IUD_ProspectosDTO>($"/api/Usuario/ST_IUD_Prospectos/", PROSPECTODTO);
+        var loginResponse = await httpClient.PostAsJsonAsync("/api/Usuario/ST_IUD_Prospectos/", PROSPECTODTO);
         if (loginResponse.IsSuccessStatusCode)
         {
-            var resultado = await Swal.FireAsync(new SweetAlertOptions
-            {
-                Title = "Hecho",
-                Text = "Se guardo el prospecto correctamente",
-                Icon = SweetAlertIcon.Success
-            });
+            await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Hecho",
+                    Text = "Se guardó el prospecto correctamente",
+                    Icon = SweetAlertIcon.Success
+                });
 
-            todosLosProspectos = await usuarioService.ST_S_ProspecFiltros("Nombre", "-", "Nombre", "-");
-            ConstruirKanban();
+            await CargarProspectos();
             mostrarFormulario = false;
-
         }
-
-
     }
 
-    void EditarProspecto(ST_S_ProspecFiltrosDTO prospecto)
+    void EditarProspecto(ST_S_ProspecFiltrosDTO p)
     {
         mostrarFormulario = true;
         mostrarBtnModalA = true;
         mostrarBtnModalG = false;
-        PROSPECTODTO.iProspectoID = prospecto.ProspectoID;
-        PROSPECTODTO.iEjecutivoID = prospecto.EjecutivoID;
-        PROSPECTODTO.sNombre = prospecto.Nombre;
-        PROSPECTODTO.sTelefono = prospecto.Telefono;
-        PROSPECTODTO.sCelular = prospecto.Celular;
-        PROSPECTODTO.sCorreo = prospecto.Correo;
-        PROSPECTODTO.sLocalidad = prospecto.Localidad;
-        PROSPECTODTO.sAreaInteres = prospecto.AreaInteres;
-        PROSPECTODTO.sEscuelaProcedencia = prospecto.EscuelaProcedencia;
-        PROSPECTODTO.sCicloEscolar = prospecto.CicloEscolar;
-        PROSPECTODTO.iEdad = prospecto.Edad;
-        PROSPECTODTO.sMedioseEntero = prospecto.MedioseEntero;
-        PROSPECTODTO.sQuienAtendio = prospecto.QuienAtendio;
-        PROSPECTODTO.sEstatus = prospecto.Estatus;
-        PROSPECTODTO.sLlamo = prospecto.Llamo;
-        PROSPECTODTO.sUbicacion = prospecto.Ubicacion;
-        PROSPECTODTO.sFacebook = prospecto.Facebook;
-        PROSPECTODTO.sNiv_AcademicoInteres = prospecto.Niv_AcademicoInteres;
-        PROSPECTODTO.sBase = prospecto.Base;
-        PROSPECTODTO.sTurno = prospecto.Turno;
-        PROSPECTODTO.sInstitu_Evento = prospecto.Institu_Evento;
+        PROSPECTODTO = new ST_IUD_ProspectosDTO
+            {
+                iProspectoID = p.ProspectoID,
+                iEjecutivoID = p.EjecutivoID,
+                sNombre = p.Nombre,
+                sTelefono = p.Telefono,
+                sCelular = p.Celular,
+                sCorreo = p.Correo,
+                sLocalidad = p.Localidad,
+                sAreaInteres = p.AreaInteres,
+                sEscuelaProcedencia = p.EscuelaProcedencia,
+                sCicloEscolar = p.CicloEscolar,
+                iEdad = p.Edad,
+                sMedioseEntero = p.MedioseEntero,
+                sQuienAtendio = p.QuienAtendio,
+                sEstatus = p.Estatus,
+                sLlamo = p.Llamo,
+                sUbicacion = p.Ubicacion,
+                sFacebook = p.Facebook,
+                sNiv_AcademicoInteres = p.Niv_AcademicoInteres,
+                sBase = p.Base,
+                sTurno = p.Turno,
+                sInstitu_Evento = p.Institu_Evento
+            };
     }
 
     private async Task GuardarProspectoEditado()
     {
-        PROSPECTODTO.iTipoOperacion = 2;
-        PROSPECTODTO.iProspectoID = PROSPECTODTO.iProspectoID;
-        PROSPECTODTO.iEjecutivoID = PROSPECTODTO.iEjecutivoID;
-        PROSPECTODTO.sNombre = PROSPECTODTO.sNombre;
-        PROSPECTODTO.sTelefono = PROSPECTODTO.sTelefono;
-        PROSPECTODTO.sCelular = PROSPECTODTO.sCelular;
-        PROSPECTODTO.sCorreo = PROSPECTODTO.sCorreo;
-        PROSPECTODTO.sLocalidad = PROSPECTODTO.sLocalidad;
-        PROSPECTODTO.sAreaInteres = PROSPECTODTO.sAreaInteres;
-        PROSPECTODTO.sEscuelaProcedencia = PROSPECTODTO.sEscuelaProcedencia;
-        PROSPECTODTO.sCicloEscolar = PROSPECTODTO.sCicloEscolar;
-        PROSPECTODTO.iEdad = PROSPECTODTO.iEdad;
-        PROSPECTODTO.sMedioseEntero = PROSPECTODTO.sMedioseEntero;
-        PROSPECTODTO.sQuienAtendio = PROSPECTODTO.sQuienAtendio;
-        PROSPECTODTO.sEstatus = PROSPECTODTO.sEstatus;
-        PROSPECTODTO.sLlamo = PROSPECTODTO.sLlamo;
-        PROSPECTODTO.sUbicacion = PROSPECTODTO.sUbicacion;
-        PROSPECTODTO.sFacebook = PROSPECTODTO.sFacebook;
-        PROSPECTODTO.sNiv_AcademicoInteres = PROSPECTODTO.sNiv_AcademicoInteres;
-        PROSPECTODTO.sBase = PROSPECTODTO.sBase;
-        PROSPECTODTO.sTurno = PROSPECTODTO.sTurno;
-        PROSPECTODTO.sInstitu_Evento = PROSPECTODTO.sInstitu_Evento;
+        cargando = true;
+        StateHasChanged();
 
-        var loginResponse = await httpClient.PostAsJsonAsync<ST_IUD_ProspectosDTO>($"/api/Usuario/ST_IUD_Prospectos/", PROSPECTODTO);
-        if (loginResponse.IsSuccessStatusCode)
+        PROSPECTODTO.iTipoOperacion = 2;
+        var response = await httpClient.PostAsJsonAsync("/api/Usuario/ST_IUD_Prospectos/", PROSPECTODTO);
+        cargando = false;
+
+        if (response.IsSuccessStatusCode)
         {
-            var resultado = await Swal.FireAsync(new SweetAlertOptions
+            await Swal.FireAsync(new SweetAlertOptions
                 {
                     Title = "Hecho",
-                    Text = "Se Actualizo el Prospecto",
+                    Text = "Se actualizó el prospecto",
                     Icon = SweetAlertIcon.Success
                 });
-
-            todosLosProspectos = await usuarioService.ST_S_ProspecFiltros("Nombre", "-", "Nombre", "-");
-            ConstruirKanban();
             mostrarFormulario = false;
-            StateHasChanged();
-
+            await CargarProspectos();
         }
         else
         {
-            var resultado = await Swal.FireAsync(new SweetAlertOptions
+            await Swal.FireAsync(new SweetAlertOptions
                 {
                     Title = "Error",
-                    Text = "NO se pudo",
+                    Text = "No se pudo actualizar",
                     Icon = SweetAlertIcon.Error
                 });
         }
-
-
     }
-
 
     void CerrarFormulario() => mostrarFormulario = false;
 
-
-
-
-    // ------------------------------------------------------- FUNCIONALIDAD CUANDO SE MUEVE EL PROS -----------------------------------------
-
-    void OnCardDragStart(DragEventArgs e, int idProspecto) => idArrastrando = idProspecto;
+    void OnCardDragStart(DragEventArgs e, int id) => idArrastrando = id;
     void OnColumnaDragOver(DragEventArgs e) { }
 
     private async Task OnColumnaDrop(DragEventArgs e, string nuevoEstatus)
     {
-        if (idArrastrando != null)
+        if (idArrastrando == null) return;
+
+        var p = todosLosProspectos.FirstOrDefault(x => x.ProspectoID == idArrastrando);
+        if (p != null && p.Estatus != nuevoEstatus)
         {
-            
-            var prospecto = todosLosProspectos.FirstOrDefault(p => p.ProspectoID == idArrastrando);
-            if (prospecto != null && prospecto.Estatus != nuevoEstatus)
+            prospectosMoviendose.Add(p.ProspectoID);
+            var estatusAnterior = p.Estatus;
+
+            // Paso visual con slide
+            await JSRuntime.InvokeVoidAsync("slideOutCard", p.ProspectoID);
+            await Task.Delay(300); // espera que se vea la animación
+
+            // Actualiza localmente para que el usuario vea el cambio inmediato
+            p.Estatus = nuevoEstatus;
+            ConstruirKanban();
+
+            // Crea DTO para guardar
+            PROSPECTODTO = new ST_IUD_ProspectosDTO
+                {
+                    iTipoOperacion = 2,
+                    iProspectoID = p.ProspectoID,
+                    iEjecutivoID = p.EjecutivoID,
+                    sNombre = p.Nombre,
+                    sTelefono = p.Telefono,
+                    sCelular = p.Celular,
+                    sCorreo = p.Correo,
+                    sLocalidad = p.Localidad,
+                    sAreaInteres = p.AreaInteres,
+                    sEscuelaProcedencia = p.EscuelaProcedencia,
+                    sCicloEscolar = p.CicloEscolar,
+                    iEdad = p.Edad,
+                    sMedioseEntero = p.MedioseEntero,
+                    sQuienAtendio = p.QuienAtendio,
+                    sEstatus = p.Estatus,
+                    sLlamo = p.Llamo,
+                    sUbicacion = p.Ubicacion,
+                    sFacebook = p.Facebook,
+                    sNiv_AcademicoInteres = p.Niv_AcademicoInteres,
+                    sBase = p.Base,
+                    sTurno = p.Turno,
+                    sInstitu_Evento = p.Institu_Evento
+                };
+
+            var r = await httpClient.PostAsJsonAsync("/api/Usuario/ST_IUD_Prospectos/", PROSPECTODTO);
+
+            if (!r.IsSuccessStatusCode)
             {
-                prospecto.Estatus = nuevoEstatus;
+                // Revertimos visualmente si falla
+                p.Estatus = estatusAnterior;
+                ConstruirKanban();
 
-                PROSPECTODTO.iTipoOperacion = 2;
-                PROSPECTODTO.iProspectoID = prospecto.ProspectoID;
-                PROSPECTODTO.iEjecutivoID = prospecto.EjecutivoID;
-                PROSPECTODTO.sNombre = prospecto.Nombre;
-                PROSPECTODTO.sTelefono = prospecto.Telefono;
-                PROSPECTODTO.sCelular = prospecto.Celular;
-                PROSPECTODTO.sCorreo = prospecto.Correo;
-                PROSPECTODTO.sLocalidad = prospecto.Localidad;
-                PROSPECTODTO.sAreaInteres = prospecto.AreaInteres;
-                PROSPECTODTO.sEscuelaProcedencia = prospecto.EscuelaProcedencia;
-                PROSPECTODTO.sCicloEscolar = prospecto.CicloEscolar;
-                PROSPECTODTO.iEdad = prospecto.Edad;
-                PROSPECTODTO.sMedioseEntero = prospecto.MedioseEntero;
-                PROSPECTODTO.sQuienAtendio = prospecto.QuienAtendio;
-                PROSPECTODTO.sEstatus = prospecto.Estatus;
-                PROSPECTODTO.sLlamo = prospecto.Llamo;
-                PROSPECTODTO.sUbicacion = prospecto.Ubicacion;
-                PROSPECTODTO.sFacebook = prospecto.Facebook;
-                PROSPECTODTO.sNiv_AcademicoInteres = prospecto.Niv_AcademicoInteres;
-                PROSPECTODTO.sBase = prospecto.Base;
-                PROSPECTODTO.sTurno = prospecto.Turno;
-                PROSPECTODTO.sInstitu_Evento = prospecto.Institu_Evento;
-
-                var loginResponse = await httpClient.PostAsJsonAsync<ST_IUD_ProspectosDTO>($"/api/Usuario/ST_IUD_Prospectos/", PROSPECTODTO);
-                if (loginResponse.IsSuccessStatusCode)
-                {
-                   
-
-                }
-                else
-                {
-                  
-                    var resultado = await Swal.FireAsync(new SweetAlertOptions
-                        {
-                            Title = "Error",
-                            Text = "NO se pudo arrastrar",
-                            Icon = SweetAlertIcon.Error
-                        });
-                }
-
-
+                await Swal.FireAsync(new SweetAlertOptions
+                    {
+                        Title = "Error",
+                        Text = "No se pudo actualizar el estatus",
+                        Icon = SweetAlertIcon.Error
+                    });
             }
 
-            idArrastrando = null;          
-            ConstruirKanban();
+            prospectosMoviendose.Remove(p.ProspectoID);
             StateHasChanged();
         }
+
+        idArrastrando = null;
     }
 
     void ConstruirKanban()
@@ -513,44 +459,48 @@
             }).ToList();
     }
 
-    List<ST_S_ProspecFiltrosDTO> FiltrarProspectosPorColumna(string estatus)
-    {
-        var q = todosLosProspectos.Where(p => p.Estatus == estatus);
-
-        if (!string.IsNullOrWhiteSpace(filtroArea))
-            q = q.Where(p => p.AreaInteres == filtroArea);
-
-        if (!string.IsNullOrWhiteSpace(filtroEstatus) && filtroEstatus != estatus)
-            return new List<ST_S_ProspecFiltrosDTO>();
-
-        return q.ToList();
-    }
-
-
     private async Task FiltrarProspecto(ChangeEventArgs e)
     {
         filtroBusqueda = e.Value?.ToString() ?? "";
 
-        if (!string.IsNullOrWhiteSpace(Txtfiltro) && !string.IsNullOrWhiteSpace(filtroBusqueda))
+        // Reiniciar paginación
+        foreach (var estatus in listaEstatus)
         {
-            todosLosProspectos = await usuarioService.ST_S_ProspecFiltros(Txtfiltro, filtroBusqueda, "Nombre", "-");
+            PaginaActualPorEstatus[estatus] = 0;
         }
-        else
+
+        var campoFiltro = string.IsNullOrWhiteSpace(Txtfiltro) ? "Nombre" : Txtfiltro;
+        var valorFiltro = filtroBusqueda?.Trim();
+
+        // Si no hay campo o valor, cargamos todos
+        if (string.IsNullOrWhiteSpace(valorFiltro))
         {
-            todosLosProspectos = await usuarioService.ST_S_ProspecFiltros("Nombre", "-", "Nombre", "-");
+            await CargarProspectos();
+            return;
         }
+
+        // Buscar con campo y valor
+        todosLosProspectos = await usuarioService.ST_S_ProspecFiltros(
+            campoFiltro,
+            valorFiltro,
+            "Nombre",
+            "-"
+        );
 
         ConstruirKanban();
-
     }
 
-    void LimpiarFiltros()
+    private async Task LimpiarFiltros()
     {
-        filtroBusqueda = "";
-        filtroArea = "";
-        filtroEstatus = "";
-        Txtfiltro = "";
-        ConstruirKanban();
+        filtroBusqueda = filtroArea = filtroEstatus = Txtfiltro = "";
+
+        // Reiniciar paginación
+        foreach (var estatus in listaEstatus)
+        {
+            PaginaActualPorEstatus[estatus] = 0;
+        }
+
+        await CargarProspectos();
     }
 
     protected override void OnParametersSet()
@@ -562,31 +512,23 @@
     {
         if (!PaginaActualPorEstatus.ContainsKey(estatus))
             PaginaActualPorEstatus[estatus] = 0;
-
-        PaginaActualPorEstatus[estatus] += cambio;
-        if (PaginaActualPorEstatus[estatus] < 0)
-            PaginaActualPorEstatus[estatus] = 0;
-
+        PaginaActualPorEstatus[estatus] = Math.Max(0, PaginaActualPorEstatus[estatus] + cambio);
         ConstruirKanban();
     }
 
     List<ST_S_ProspecFiltrosDTO> PaginarProspectos(string estatus)
     {
         var q = todosLosProspectos.Where(p => p.Estatus == estatus);
-
         if (!string.IsNullOrWhiteSpace(filtroArea))
             q = q.Where(p => p.AreaInteres == filtroArea);
-
         if (!string.IsNullOrWhiteSpace(filtroEstatus) && filtroEstatus != estatus)
-            return new List<ST_S_ProspecFiltrosDTO>();
-
-        int pagina = PaginaActualPorEstatus.ContainsKey(estatus) ? PaginaActualPorEstatus[estatus] : 0;
+            return new();
+        int pagina = PaginaActualPorEstatus.GetValueOrDefault(estatus, 0);
         return q.Skip(pagina * PAGE_SIZE).Take(PAGE_SIZE).ToList();
     }
 
-    int ObtenerCantidadProspectos(string estatus)
-    {
-        return todosLosProspectos.Count(p => p.Estatus == estatus);
-    }
+    int ObtenerCantidadProspectos(string estatus) =>
+        todosLosProspectos.Count(p => p.Estatus == estatus);
 }
+
 

@@ -1,0 +1,65 @@
+﻿@using DoradosBlazor.Shared
+@using DoradosBlazor.Client.Pages
+@using DoradosBlazor.Client.Forms
+@inject IJSRuntime JS
+
+<div class="prospectos-columna"
+     @ondragover:preventDefault
+     @ondrop="(e) => DropCard(e)">
+
+    <div class="prospectos-columna-header">
+        @Column.Nombre
+        <span class="prospectos-columna-count">@Column.Prospectos.Count</span>
+    </div>
+
+    <div class="prospectos-cards">
+        @if (Column.Prospectos.Count == 0)
+        {
+            <div class="prospectos-alert">No hay prospectos en esta etapa.</div>
+        }
+        @foreach (var prospecto in Column.Prospectos)
+        {
+            <ProspectoCard Prospecto="prospecto" OnEditar="() => Editar(prospecto)" />
+        }
+    </div>
+
+    <div class="prospectos-paginacion">
+        @if (PaginaActual > 0)
+        {
+            <button class="btn-paginacion btn-paginacion-atras" @onclick="() => OnPaginar.InvokeAsync((Column.Nombre, -1))">
+                <i class="bi bi-arrow-left-circle"></i> Atrás
+            </button>
+        }
+        @if (Total > (PaginaActual + 1) * 7)
+        {
+            <button class="btn-paginacion btn-paginacion-mas" @onclick="() => OnPaginar.InvokeAsync((Column.Nombre, 1))">
+                Más <i class="bi bi-arrow-right-circle"></i>
+            </button>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public ColumnaKanban Column { get; set; } = new();
+    [Parameter] public int PaginaActual { get; set; }
+    [Parameter] public int Total { get; set; }
+    [Parameter] public EventCallback<(string columna, int cambio)> OnPaginar { get; set; }
+    [Parameter] public EventCallback<(int, string)> OnDrop { get; set; }
+    [Parameter] public EventCallback<ST_S_ProspecFiltrosDTO> OnEditarProspecto { get; set; }
+
+    private async void DropCard(DragEventArgs e)
+    {
+        if (e.DataTransfer != null)
+        {
+            var result = await JS.InvokeAsync<string>("getDragData");
+            if (int.TryParse(result, out int id))
+            {
+                await OnDrop.InvokeAsync((id, Column.Nombre));
+            }
+        }
+    }
+
+    private Task Editar(ST_S_ProspecFiltrosDTO prospecto) => OnEditarProspecto.InvokeAsync(prospecto);
+
+  
+}
