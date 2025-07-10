@@ -188,6 +188,14 @@
                                             @prospecto.Estatus
                                         </span>
                                     }
+                                    @if (actividadesPorProspecto.ContainsKey(prospecto.ProspectoID) &&
+                                   actividadesPorProspecto[prospecto.ProspectoID].Any(a => !a.Realizado))
+                                    {
+                                        <span class="badge bg-warning text-dark ms-2" title="Actividades pendientes">
+                                            <i class="bi bi-exclamation-circle"></i>
+                                            @actividadesPorProspecto[prospecto.ProspectoID].Count(a => !a.Realizado)
+                                        </span>
+                                    }
                                 </div>
                                 <div class="prospectos-card-chips">
                                     <span class="chip chip-azul"><i class="bi bi-mortarboard"></i> @prospecto.AreaInteres</span>
@@ -205,9 +213,9 @@
                                         <i class="bi bi-pencil"></i>
                                     </button>
                                     <button class="btn-kanban-accion" title="Agendar cita" @onclick="() => AbrirModalAgendar(prospecto)">
-                                        <i class="bi bi-calendar-event"></i>
+                                        <i class="bi bi-calendar-plus-fill"></i>
                                     </button>
-                                    <button class="btn-kanban-accion" title="Ver detalles">
+                                    <button class="btn-kanban-accion" title="Ver detalles" @onclick="() => VerDetalles(prospecto)">
                                         <i class="bi bi-eye"></i>
                                     </button>
                                 </div>
@@ -239,7 +247,9 @@
     <div class="modal-backdrop">
         @* podría usar clases de Bootstrap si ya están incluidas *@
         <div class="modern-card sombra-azul prospecto-actividad-form">
-            <button class="btn-close" @onclick="() => mostrarModalAgendar=false"></button>
+            <button class="btn-closepros" @onclick="() => mostrarModalAgendar=false">
+                <i class="bi bi-x"></i>
+            </button>
             <div class="modern-card-title mb-3">
                 <i class="bi bi-calendar-event"></i> Agendar actividad para @nombreProspectoSeleccionado
             </div>
@@ -271,6 +281,70 @@
     </div>
 }
 
+@if (mostrarDetalles)
+{
+    <div class="modal-backdrop">
+        <div class="modern-card sombra-azul prospecto-detalle">
+            <button class="btn-closepros" @onclick="() => mostrarDetalles=false">
+                <i class="bi bi-x"></i>
+             </button>
+            <div class="modern-card-title mb-3">
+                <i class="bi bi-eye"></i> Detalles de @nombreProspectoSeleccionado
+            </div>
+            <!-- Información del prospecto -->
+            <div class="mb-3">
+                <strong>Correo:</strong> @prospectoSeleccionado.Correo <br />
+                <strong>Teléfono:</strong> <a href="tel:@prospectoSeleccionado.Telefono">@prospectoSeleccionado.Telefono</a> <br />
+                <strong>Localidad:</strong> @prospectoSeleccionado.Localidad <br />
+                <strong>Estatus:</strong> @prospectoSeleccionado.Estatus <br />
+                <!-- ... otros campos relevantes ... -->
+            </div>
+            <!-- Lista de actividades -->
+            <h5>Actividades programadas</h5>
+            @if (actividadesProspecto.Any())
+            {
+                <ul class="list-group mb-3">
+                    @foreach(var act in actividadesProspecto.Where(a => !a.Realizado))
+                    {
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>
+                                <i class="bi @(act.Tipo == "Llamada" ? "bi-telephone" : act.Tipo == "Correo" ? "bi-envelope" : act.Tipo == "Visita" ? "bi-geo" : "bi-alarm")"></i>
+                                <strong>@act.Tipo:</strong> @act.Descripcion 
+                                (<small>@act.FechaProgramada.ToString("g")</small>)
+                            </span>
+                            <button class="btn btn-success btn-sm" title="Marcar como realizado" @onclick="() => MarcarRealizado(act.ActividadID)">
+                                ✔️
+                            </button>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <div class="mb-3"><em>Sin actividades programadas.</em></div>
+            }
+            <h5>Historial de actividades realizadas</h5>
+            @if (actividadesProspecto.Any(a => a.Realizado))
+            {
+                <ul class="list-group">
+                    @foreach(var act in actividadesProspecto.Where(a => a.Realizado))
+                    {
+                        <li class="list-group-item">
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                            <strong>@act.Tipo realizada:</strong> @act.Descripcion 
+                            – <small>Realizado el @act.FechaProgramada.ToString("g")</small>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <div><em>Aún no hay actividades realizadas.</em></div>
+            }
+        </div>
+    </div>
+}
+
 
 <!-- Modal de carga reutilizable -->
 <LoadingModal Mostrar="cargando" Mensaje="'Cargando...'" />
@@ -290,6 +364,7 @@
     private bool mostrarBtnModalG = false;
     private bool mostrarBtnModalA = false;
     private bool mostrarModalAgendar = false;
+    private bool mostrarDetalles = false;
 
     private string nombreProspectoSeleccionado = "";
     private int ProspectoSeleccionadoID = 0;
@@ -312,12 +387,21 @@
     private ST_IUD_ProspectosDTO PROSPECTODTO = new ST_IUD_ProspectosDTO();
     private ST_IUD_ProspectoActividadDTO ACTIVIDADDTO = new ST_IUD_ProspectoActividadDTO();
 
-    private ST_S_ProspectoActividadesDTO[] actividadesProspecto = Array.Empty<ST_S_ProspectoActividadesDTO>();
+    private List<ST_S_ProspectoActividadesDTO> actividadesProspecto = new List<ST_S_ProspectoActividadesDTO>();
+    private ST_S_ProspecFiltrosDTO prospectoSeleccionado = new();
 
+    Dictionary<int, List<ST_S_ProspectoActividadesDTO>> actividadesPorProspecto = new();
 
     protected override async Task OnInitializedAsync()
     {
         await CargarProspectos();
+
+        var todasLasActividades = await usuarioService.ST_S_ProspectoActividadesAll();
+        actividadesPorProspecto = todasLasActividades
+            .GroupBy(a => a.ProspectoID)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
+        ConstruirKanban();
     }
 
     async Task CargarProspectos()
@@ -552,14 +636,21 @@
         nombreProspectoSeleccionado = prospecto.Nombre ?? "";
         mostrarModalAgendar = true;
 
-        // ProspectoSeleccionadoID = prospecto.ProspectoID;
+        ProspectoSeleccionadoID = prospecto.ProspectoID;
 
-        // // Opcional: cargar actividades existentes de este prospecto para mostrar
-        // actividadesProspecto = await usuarioService.ST_S_ProspectoActividades(ProspectoSeleccionadoID);
+        // Opcional: cargar actividades existentes de este prospecto para mostrar
+        actividadesProspecto = await usuarioService.ST_S_ProspectoActividades(ProspectoSeleccionadoID);
     }
 
     private async Task GuardarActividad()
     {
+
+        if (string.IsNullOrWhiteSpace(ACTIVIDADDTO.sTipo) || ACTIVIDADDTO.dFechaProgramada < DateTime.Now)
+        {
+            await Swal.FireAsync("Validación", "Por favor selecciona un tipo de actividad válido y una fecha futura.", SweetAlertIcon.Warning);
+            return;
+        }
+
         ACTIVIDADDTO.iTipoOperacion = 1; // Asegurar que indica inserción (por si reutilizamos para editar en futuro)
                                          // Llamar API REST para guardar la actividad
         var response = await httpClient.PostAsJsonAsync("/api/Usuario/ST_IUD_ProspectoActividad", ACTIVIDADDTO);
@@ -573,11 +664,59 @@
                     Text = "Se ha agendado la " + ACTIVIDADDTO.sTipo.ToLower() + " correctamente.",
                     Icon = SweetAlertIcon.Success
                 });
-            // (Opcional) Recargar la lista de actividades del prospecto o refrescar la vista general si es necesario
+
+            // ✅ Recargar actividades del prospecto y actualizar el diccionario
+            var nuevasActividades = await usuarioService.ST_S_ProspectoActividades(ProspectoSeleccionadoID);
+            actividadesPorProspecto[ProspectoSeleccionadoID] = nuevasActividades;
+
+            // También actualizar la lista local del modal, si está abierta
+            actividadesProspecto = nuevasActividades;
         }
         else
         {
             await Swal.FireAsync("Error", "No se pudo guardar la actividad", SweetAlertIcon.Error);
+        }
+    }
+
+    private async Task VerDetalles(ST_S_ProspecFiltrosDTO prospecto)
+    {
+        prospectoSeleccionado = prospecto;
+        nombreProspectoSeleccionado = prospecto.Nombre ?? "";
+        ProspectoSeleccionadoID = prospecto.ProspectoID;
+        mostrarDetalles = true;
+
+        actividadesProspecto = await usuarioService.ST_S_ProspectoActividades(ProspectoSeleccionadoID);
+    }
+
+    private async Task MarcarRealizado(int actividadID)
+    {
+        // Buscar la actividad y marcarla
+        var act = actividadesProspecto.FirstOrDefault(a => a.ActividadID == actividadID);
+        if (act != null)
+        {
+            var updateDto = new ST_IUD_ProspectoActividadDTO
+                {
+                    iTipoOperacion = 2,
+                    iActividadID = actividadID,
+                    iProspectoID = act.ProspectoID,
+                    iEjecutivoID = 1, // o ID real
+                    sTipo = act.Tipo,
+                    sDescripcion = act.Descripcion,
+                    dFechaProgramada = act.FechaProgramada,
+                    bRealizado = true
+                };
+            var resp = await httpClient.PostAsJsonAsync("/api/Usuario/ST_IUD_ProspectoActividad", updateDto);
+            if (resp.IsSuccessStatusCode)
+            {
+                act.Realizado = true;
+                // Refrescar la lista del diccionario
+                var nuevasActividades = await usuarioService.ST_S_ProspectoActividades(ProspectoSeleccionadoID);
+                actividadesPorProspecto[ProspectoSeleccionadoID] = nuevasActividades;
+
+                actividadesProspecto = nuevasActividades;
+
+                StateHasChanged();
+            }
         }
     }
 

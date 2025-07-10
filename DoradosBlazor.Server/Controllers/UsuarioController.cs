@@ -656,6 +656,45 @@ namespace DoradosBlazorCrud.Server.Controllers
             return Ok(responseApi);
         }
 
+        [HttpGet]
+        [Route("ST_S_ProspectoActividadesAll")]
+        public async Task<IActionResult> ST_S_ProspectoActividadesAll()
+        {
+            var responseApi = new ResponseAPI<List<ST_S_ProspectoActividadesDTO>>();
+            var listaProspectoAct = new List<ST_S_ProspectoActividadesDTO>();
+
+            try
+            {
+                var Result = _dbContext.sT_S_ProspectoActividades
+                    .FromSqlRaw("SELECT * FROM ProspectoActividades") // tabla o vista
+                    .ToList();
+
+                foreach (var item in Result)
+                {
+                    listaProspectoAct.Add(new ST_S_ProspectoActividadesDTO
+                    {
+                        ActividadID = item.ActividadID,
+                        ProspectoID = item.ProspectoID,
+                        EjecutivoID = item.EjecutivoID,
+                        Tipo = item.Tipo,
+                        Descripcion = item.Descripcion,
+                        FechaProgramada = item.FechaProgramada,
+                        Realizado = item.Realizado,
+                    });
+                }
+
+                responseApi.EsCorrecto = true;
+                responseApi.Valor = listaProspectoAct;
+            }
+            catch (Exception ex)
+            {
+                responseApi.EsCorrecto = false;
+                responseApi.Mensaje = ex.Message;
+            }
+
+            return Ok(responseApi);
+        }
+
 
         [HttpPost]
         [Route("ListaGposEmpaquetados")]

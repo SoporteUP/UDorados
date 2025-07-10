@@ -27,6 +27,7 @@ namespace DoradosBlazor.Client.Services
         Task<List<ST_S_CorreosMisCuentasDTO>> ST_S_CorreosMisCuentas(int iTipoConsulta, string sCorreo);
         Task<List<ST_S_ProspecFiltrosDTO>> ST_S_ProspecFiltros(string cCampo, string cBusqueda, string cCampo2, string cBusqueda2);
         Task<List<ST_S_ProspectoActividadesDTO>> ST_S_ProspectoActividades(int ProspectoID);
+        Task<List<ST_S_ProspectoActividadesDTO>> ST_S_ProspectoActividadesAll();
         Task<UsuarioDTO>Buscar(int id); 
 
         Task<int>Guardar(UsuarioDTO usuario);

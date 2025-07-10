@@ -2896,3 +2896,90 @@ body.modo-oscuro .modal-carreras-exclusivo,
 }
 
 
+/*-------------------------modal pros -------------------------*/
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(3px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050;
+    padding: 1rem;
+}
+
+.prospecto-actividad-form,
+.prospecto-detalle {
+    background-color: white;
+    border-radius: 1.5rem;
+    max-width: 500px;
+    width: 100%;
+    padding: 2rem;
+    position: relative;
+    box-shadow: 0 0 30px rgba(0, 116, 217, 0.3);
+    animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.prospecto-detalle {
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.btn-closepros {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: transparent;
+    border: none;
+    font-size: 1.25rem;
+    color: #000; /* ← Color negro */
+    cursor: pointer;
+}
+
+    .btn-closepros:hover {
+        color: #dc3545; /* Rojo al pasar el mouse (opcional, se ve elegante) */
+    }
+
+.modern-card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #0074D9;
+}
+
+.list-group-item {
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+    background-color: #f8f9fa;
+}
+
+@media (max-width: 480px) {
+    .prospecto-actividad-form,
+    .prospecto-detalle {
+        padding: 1rem;
+        border-radius: 1rem;
+    }
+
+    .modern-card-title {
+        font-size: 1rem;
+    }
+
+    .btn {
+        font-size: 0.9rem;
+    }
+}
