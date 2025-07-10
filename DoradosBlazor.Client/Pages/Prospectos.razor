@@ -204,7 +204,7 @@
                                     <button class="btn-kanban-accion" title="Editar" @onclick="() => EditarProspecto(prospecto)">
                                         <i class="bi bi-pencil"></i>
                                     </button>
-                                    <button class="btn-kanban-accion" title="Agendar cita">
+                                    <button class="btn-kanban-accion" title="Agendar cita" @onclick="() => AbrirModalAgendar(prospecto)">
                                         <i class="bi bi-calendar-event"></i>
                                     </button>
                                     <button class="btn-kanban-accion" title="Ver detalles">
@@ -234,6 +234,43 @@
     }
 </div>
 
+@if (mostrarModalAgendar)
+{
+    <div class="modal-backdrop">
+        @* podría usar clases de Bootstrap si ya están incluidas *@
+        <div class="modern-card sombra-azul prospecto-actividad-form">
+            <button class="btn-close" @onclick="() => mostrarModalAgendar=false"></button>
+            <div class="modern-card-title mb-3">
+                <i class="bi bi-calendar-event"></i> Agendar actividad para @nombreProspectoSeleccionado
+            </div>
+            <div class="mb-2">
+                <label class="modern-label">Tipo de actividad</label>
+                <select class="form-select modern-input" @bind="ACTIVIDADDTO.sTipo">
+                    <option>Llamada</option>
+                    <option>Correo</option>
+                    <option>Visita</option>
+                    <option>Recordatorio</option>
+                </select>
+            </div>
+            <div class="mb-2">
+                <label class="modern-label">Fecha y hora</label>
+                <input type="datetime-local" class="form-control modern-input"
+                       @bind="ACTIVIDADDTO.dFechaProgramada" />
+            </div>
+            <div class="mb-3">
+                <label class="modern-label">Descripción o notas</label>
+                <textarea class="form-control modern-input" @bind="ACTIVIDADDTO.sDescripcion" rows="3"
+                          placeholder="Notas de la tarea (opcional)"></textarea>
+            </div>
+            <div class="text-end">
+                <button class="btn btn-azul px-4 py-2 rounded-pill" @onclick="GuardarActividad">
+                    <i class="bi bi-save"></i> Guardar
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
 
 <!-- Modal de carga reutilizable -->
 <LoadingModal Mostrar="cargando" Mensaje="'Cargando...'" />
@@ -252,6 +289,10 @@
     private bool mostrarFormulario = false;
     private bool mostrarBtnModalG = false;
     private bool mostrarBtnModalA = false;
+    private bool mostrarModalAgendar = false;
+
+    private string nombreProspectoSeleccionado = "";
+    private int ProspectoSeleccionadoID = 0;
 
     List<string> listaFiltroX = new() { "Nombre", "Telefono", "Estatus", "Celular", "Correo", "Localidad", "AreaInteres", "EscuelaProcedencia", "CicloEscolar", "Edad", "MedioseEntero", "Facebook", "CicloEscolar", "Niv_AcademicoInteres", "Base", "Turno", "Institu_Evento" };
     List<string> listaEstatus = new() { "Nuevo", "Contactado", "En seguimiento", "Inscrito", "No interesado" };
@@ -269,6 +310,10 @@
     }
 
     private ST_IUD_ProspectosDTO PROSPECTODTO = new ST_IUD_ProspectosDTO();
+    private ST_IUD_ProspectoActividadDTO ACTIVIDADDTO = new ST_IUD_ProspectoActividadDTO();
+
+    private ST_S_ProspectoActividadesDTO[] actividadesProspecto = Array.Empty<ST_S_ProspectoActividadesDTO>();
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -488,6 +533,52 @@
         );
 
         ConstruirKanban();
+    }
+
+    private async Task AbrirModalAgendar(ST_S_ProspecFiltrosDTO prospecto)
+    {
+        // Preparar nueva actividad con valores por defecto
+        ACTIVIDADDTO = new ST_IUD_ProspectoActividadDTO
+            {
+                iTipoOperacion = 1,              // 1 = insertar nueva
+                iActividadID = 0,
+                iProspectoID = prospecto.ProspectoID,
+                iEjecutivoID = 1,                // TODO: reemplazar con ID del usuario actual logueado
+                sTipo = "Llamada",               // valor inicial por defecto
+                sDescripcion = "",
+                dFechaProgramada = DateTime.Now.AddDays(1), // ejemplo: mañana por defecto
+                bRealizado = false
+            };
+        nombreProspectoSeleccionado = prospecto.Nombre ?? "";
+        mostrarModalAgendar = true;
+
+        // ProspectoSeleccionadoID = prospecto.ProspectoID;
+
+        // // Opcional: cargar actividades existentes de este prospecto para mostrar
+        // actividadesProspecto = await usuarioService.ST_S_ProspectoActividades(ProspectoSeleccionadoID);
+    }
+
+    private async Task GuardarActividad()
+    {
+        ACTIVIDADDTO.iTipoOperacion = 1; // Asegurar que indica inserción (por si reutilizamos para editar en futuro)
+                                         // Llamar API REST para guardar la actividad
+        var response = await httpClient.PostAsJsonAsync("/api/Usuario/ST_IUD_ProspectoActividad", ACTIVIDADDTO);
+        if (response.IsSuccessStatusCode)
+        {
+            // Cerrar modal y notificar éxito
+            mostrarModalAgendar = false;
+            await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Actividad programada",
+                    Text = "Se ha agendado la " + ACTIVIDADDTO.sTipo.ToLower() + " correctamente.",
+                    Icon = SweetAlertIcon.Success
+                });
+            // (Opcional) Recargar la lista de actividades del prospecto o refrescar la vista general si es necesario
+        }
+        else
+        {
+            await Swal.FireAsync("Error", "No se pudo guardar la actividad", SweetAlertIcon.Error);
+        }
     }
 
     private async Task LimpiarFiltros()

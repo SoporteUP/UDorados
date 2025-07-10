@@ -615,6 +615,48 @@ namespace DoradosBlazorCrud.Server.Controllers
         }
 
 
+        //ST_S_ProspectoActividades Get
+        [HttpGet]
+        [Route("ST_S_ProspectoActividades/{ProspectoID}")]
+        public async Task<IActionResult> ST_S_ProspectoActividades(int ProspectoID)
+        {
+            var responseApi = new ResponseAPI<List<ST_S_ProspectoActividadesDTO>>();
+            var listaProspectoAct = new List<ST_S_ProspectoActividadesDTO>();
+
+            var Result = _dbContext.sT_S_ProspectoActividades.FromSql($"ST_S_ProspectoActividades {ProspectoID}").ToList();
+
+            try
+            {
+                foreach (var item in Result)
+                {
+                    listaProspectoAct.Add(new ST_S_ProspectoActividadesDTO
+                    {
+                        ActividadID = item.ActividadID,
+                        ProspectoID = item.ProspectoID,
+                        EjecutivoID = item.EjecutivoID,
+                        Tipo = item.Tipo,
+                        Descripcion = item.Descripcion,
+                        FechaProgramada = item.FechaProgramada,
+                        Realizado = item.Realizado,
+                    });
+
+                }
+
+                responseApi.EsCorrecto = true;
+                responseApi.Valor = listaProspectoAct;
+
+            }
+            catch (Exception ex)
+            {
+
+                responseApi.EsCorrecto = false;
+                responseApi.Mensaje = ex.Message;
+
+            }
+            return Ok(responseApi);
+        }
+
+
         [HttpPost]
         [Route("ListaGposEmpaquetados")]
         public async Task<ActionResult> ListaGposEmpaquetados([FromBody] ST_S_GposEmpaquetadosVarDTO sT_S_GposEmpaquetadosVarDTO)
@@ -1356,6 +1398,19 @@ namespace DoradosBlazorCrud.Server.Controllers
             var Result1 = new List<Respuesta>();
 
             Result1 = _dbContext.respuesta.FromSql($"ST_IUD_Prospectos {prospec.iTipoOperacion},{prospec.iProspectoID},{prospec.iEjecutivoID},{prospec.sNombre},{prospec.sTelefono}, {prospec.sCelular}, {prospec.sCorreo}, {prospec.sLocalidad}, {prospec.sAreaInteres},{prospec.sEscuelaProcedencia},{prospec.sCicloEscolar},{prospec.iEdad},{prospec.sMedioseEntero},{prospec.sQuienAtendio},{prospec.sEstatus},{prospec.sLlamo},{prospec.sUbicacion},{prospec.sFacebook},{prospec.sNiv_AcademicoInteres},{prospec.sBase},{prospec.sTurno},{prospec.sInstitu_Evento}").ToList();
+
+            return StatusCode(StatusCodes.Status200OK, Result1);
+
+        }
+
+        [HttpPost]
+        [Route("ST_IUD_ProspectoActividad")]
+        public async Task<ActionResult> ST_IUD_ProspectoActividad([FromBody] ST_IUD_ProspectoActividadDTO prospec)
+        {
+
+            var Result1 = new List<Respuesta>();
+
+            Result1 = _dbContext.respuesta.FromSql($"ST_IUD_ProspectoActividad {prospec.iTipoOperacion},{prospec.iActividadID},{prospec.iProspectoID},{prospec.iEjecutivoID},{prospec.sTipo}, {prospec.sDescripcion}, {prospec.dFechaProgramada}, {prospec.bRealizado}").ToList();
 
             return StatusCode(StatusCodes.Status200OK, Result1);
 

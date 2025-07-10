@@ -273,6 +273,20 @@ namespace DoradosBlazor.Client.Services
             else
                 throw new Exception(result.Mensaje);
         }
+
+
+        public async Task<List<ST_S_ProspectoActividadesDTO>> ST_S_ProspectoActividades(int ProspectoID)
+        {
+            var result = await _http.GetFromJsonAsync<ResponseAPI<List<ST_S_ProspectoActividadesDTO>>>($"api/Usuario/ST_S_ProspectoActividades/{ProspectoID}");
+            if (result!.EsCorrecto)
+                return result.Valor!;
+            else
+                throw new Exception(result.Mensaje);
+        }
+
+
+
+
     }
 }
 
