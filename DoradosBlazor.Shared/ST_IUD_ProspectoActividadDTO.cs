@@ -16,5 +16,6 @@ namespace DoradosBlazor.Shared
         public string? sDescripcion { get; set; }  // Detalles de la tarea (opcional, p.ej. "Llamar para seguimiento de inscripción")
         public DateTime dFechaProgramada { get; set; } // Fecha y hora programada para la actividad
         public bool bRealizado { get; set; }       // Marcar true si ya se realizó (para históricos)
+        public string? sNombreProspecto { get; set; }       // Nombre del prospecto
     }
 }

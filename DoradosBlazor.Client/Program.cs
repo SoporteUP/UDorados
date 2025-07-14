@@ -8,6 +8,8 @@ using CurrieTechnologies.Razor.SweetAlert2;
 using Blazored.SessionStorage;
 using Microsoft.JSInterop;
 
+using Radzen;
+
 using Microsoft.AspNetCore.Components.Authorization;
 using DoradosBlazor.Client.Extensiones;
 
@@ -20,6 +22,8 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
+builder.Services.AddScoped<DialogService>();
+
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://localhost:5296/") });
 
 builder.Services.AddBlazoredSessionStorage();
@@ -29,6 +33,7 @@ builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<IRolesService, RolesService>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<SesionEmail>();
+builder.Services.AddScoped<SesionUsuario>();
 builder.Services.AddScoped<QRService>();
 
 builder.Services.AddBlazorBootstrap();

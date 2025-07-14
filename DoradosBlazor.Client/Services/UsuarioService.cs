@@ -275,9 +275,9 @@ namespace DoradosBlazor.Client.Services
         }
 
 
-        public async Task<List<ST_S_ProspectoActividadesDTO>> ST_S_ProspectoActividades(int ProspectoID)
+        public async Task<List<ST_S_ProspectoActividadesDTO>> ST_S_ProspectoActividades(int iTipoOperacion, int iProspectoID, int iEjecutivoID)
         {
-            var result = await _http.GetFromJsonAsync<ResponseAPI<List<ST_S_ProspectoActividadesDTO>>>($"api/Usuario/ST_S_ProspectoActividades/{ProspectoID}");
+            var result = await _http.GetFromJsonAsync<ResponseAPI<List<ST_S_ProspectoActividadesDTO>>>($"api/Usuario/ST_S_ProspectoActividades/{iTipoOperacion}/{iProspectoID}/{iEjecutivoID}");
             if (result!.EsCorrecto)
                 return result.Valor!;
             else

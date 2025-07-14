@@ -12,5 +12,6 @@ namespace DoradosBlazor.Server.Models
         public string? Descripcion { get; set; }
         public DateTime FechaProgramada { get; set; }
         public bool Realizado { get; set; }
+        public string? NombreProspecto { get; set; }
     }
 }

@@ -1,0 +1,214 @@
+﻿@page "/prospectos/calendario/{ProspectoID:int}"
+@using DoradosBlazor.Shared
+@using Radzen
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering
+@using DoradosBlazor.Client.Services
+@inject IUsuarioService usuarioService
+@inject SesionUsuario mySesion
+@inject IJSRuntime JS
+
+<div class="row prospectos-calendar">
+    <div class="col-md-8">
+        <RadzenScheduler TItem="CitaProspecto" @ref="schedulerRef"
+                         Data="@citas"
+                         StartProperty="Inicio" EndProperty="Fin" TextProperty="Titulo"
+                         AppointmentSelect="@OnAppointmentSelect"
+                         SlotSelect="@OnSlotSelect"
+                         AppointmentRender="@OnAppointmentRender"
+                         Style="height: 600px;">
+            <RadzenDayView />
+            <RadzenWeekView />
+            <RadzenMonthView />
+        </RadzenScheduler>
+    </div>
+
+    <div class="col-md-4 detalles-panel @TipoClase(citaSeleccionada?.Tipo)">
+        @if (citaSeleccionada is not null)
+        {
+            <h4>Detalles de la actividad</h4>
+            <p><strong>Asunto:</strong> @citaSeleccionada.Titulo</p>
+            <p><strong>Tipo:</strong> @citaSeleccionada.Tipo</p>
+            <p><strong>Descripción:</strong> @citaSeleccionada.Descripcion</p>
+            <p><strong>Inicio:</strong> @citaSeleccionada.Inicio.ToString("g")</p>
+            <p><strong>Fin:</strong> @citaSeleccionada.Fin.ToString("g")</p>
+            <p><strong>Estatus:</strong> @citaSeleccionada.Estatus</p>
+            @if (citaSeleccionada.Id == 0)
+            {
+                <button class="btn btn-success btn-sm" @onclick="GuardarNuevaCita">
+                    <i class="bi bi-plus-circle-fill"></i> Guardar nueva cita
+                </button>
+            }
+            else
+            {
+                <button class="btn btn-primary btn-sm" @onclick="EditarCita">
+                    <i class="bi bi-pencil-square"></i> Editar
+                </button>
+                <button class="btn btn-danger btn-sm" @onclick="EliminarCita">
+                    <i class="bi bi-trash-fill"></i> Eliminar
+                </button>
+            }
+        }
+        else
+        {
+            <p><em>Selecciona una cita para ver los detalles.</em></p>
+        }
+    </div>
+
+    @if (mostrarModalCitasDia)
+    {
+        <div id="prospectos-calendar-modal-citas-overlay" class="prospectos-calendar-modal-overlay">
+            <div id="prospectos-calendar-modal-citas" class="prospectos-calendar-modal-contenido">
+                <button class="prospectos-calendar-modal-cerrar" @onclick="CerrarModalCitasDia" title="Cerrar">×</button>
+                <h5 class="prospectos-calendar-modal-titulo">Citas del @fechaSeleccionada?.ToString("dd/MM/yyyy")</h5>
+                @if (citasDelDia.Any())
+                {
+                    <ul class="prospectos-calendar-lista-citas mt-3">
+                        @foreach (var cita in citasDelDia)
+                        {
+                            <li class="prospectos-calendar-item-cita @TipoClase(cita.Tipo)">
+                                <div>
+                                    <span class="prospectos-calendar-item-titulo"><strong>@cita.Titulo</strong></span>
+                                    <span class="prospectos-calendar-item-hora">@cita.Tipo - @cita.Inicio.ToString("t")</span>
+                                </div>
+                                <div class="prospectos-calendar-item-desc text-muted">@cita.Descripcion</div>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="prospectos-calendar-modal-vacio">No hay citas para este día.</p>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<HeadContent>
+    <link rel="stylesheet" href="_content/Radzen.Blazor/css/material.css" />
+</HeadContent>
+
+@code {
+    [Parameter] public int ProspectoID { get; set; }
+    [Parameter] public string iUsuarioID { get; set; } = "";
+
+    private bool mostrarModalCitasDia = false;
+    private DateTime? fechaSeleccionada;
+    private List<CitaProspecto> citas = new();
+    private List<CitaProspecto> citasDelDia = new();
+    private CitaProspecto? citaSeleccionada;
+    private RadzenScheduler<CitaProspecto>? schedulerRef;
+
+    protected override async Task OnInitializedAsync()
+    {
+        iUsuarioID = mySesion.UsuarioID;
+        await CargarCitasDesdeBackend();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("calendarUtils.setupMoreClick", DotNetObjectReference.Create(this));
+        }
+    }
+
+    private async Task CargarCitasDesdeBackend()
+    {
+        var modo = ProspectoID != 0 ? 1 : 2;
+        var resultado = await usuarioService.ST_S_ProspectoActividades(modo, ProspectoID, Convert.ToInt32(iUsuarioID));
+        citas = resultado.Select(x => new CitaProspecto
+            {
+                Id = x.ActividadID,
+                Titulo = $"{x.Tipo} con {x.NombreProspecto}",
+                Tipo = x.Tipo,
+                Descripcion = x.Descripcion,
+                Estatus = x.Realizado ? "COMPLETADA" : "PENDIENTE",
+                Inicio = x.FechaProgramada,
+                Fin = x.FechaProgramada.AddMinutes(30)
+            }).ToList();
+    }
+
+    private void OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<CitaProspecto> args)
+    {
+        citaSeleccionada = args.Data;
+    }
+
+    private void OnSlotSelect(SchedulerSlotSelectEventArgs args)
+    {
+        citaSeleccionada = new CitaProspecto
+            {
+                Id = 0,
+                Titulo = "(Nuevo)",
+                Tipo = "Llamada",
+                Estatus = "PENDIENTE",
+                Inicio = args.Start,
+                Fin = args.End
+            };
+        citas.Add(citaSeleccionada);
+    }
+
+    private void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<CitaProspecto> args)
+    {
+        var clases = $"rz-scheduler-appointment {args.Data.Tipo?.ToLower()}";
+        if (args.Data.Estatus == "COMPLETADA")
+        {
+            clases += " evento-completado";
+        }
+        args.Attributes["class"] = clases;
+    }
+
+    private void CerrarModalCitasDia() => mostrarModalCitasDia = false;
+
+    [JSInvokable]
+    public async Task IrADia(string date)
+    {
+        if (DateTime.TryParse(date, out var fecha))
+        {
+            fechaSeleccionada = fecha;
+            citasDelDia = citas
+                .Where(c => c.Inicio.Date == fecha.Date)
+                .OrderBy(c => c.Inicio)
+                .ToList();
+
+            mostrarModalCitasDia = true;
+            StateHasChanged();
+        }
+    }
+
+    private string TipoClase(string? tipo) => tipo?.ToLower() switch
+    {
+        "visita" => "borde-visita",
+        "llamada" => "borde-llamada",
+        "correo" => "borde-correo",
+        "recordatorio" => "borde-recordatorio",
+        _ => ""
+    };
+
+    private void GuardarNuevaCita()
+    {
+        citaSeleccionada!.Id = citas.Max(c => c.Id) + 1;
+    }
+
+    private void EditarCita() { }
+    private void EliminarCita()
+    {
+        if (citaSeleccionada is not null)
+        {
+            citas.Remove(citaSeleccionada);
+            citaSeleccionada = null;
+        }
+    }
+
+    public class CitaProspecto
+    {
+        public int Id { get; set; }
+        public string Titulo { get; set; } = "";
+        public string Tipo { get; set; } = "";
+        public string Descripcion { get; set; } = "";
+        public string Estatus { get; set; } = "";
+        public DateTime Inicio { get; set; }
+        public DateTime Fin { get; set; }
+    }
+}

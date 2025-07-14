@@ -2598,6 +2598,26 @@ body.modo-oscuro .modal-carreras-exclusivo,
         background: var(--azul-info);
     }
 
+.prospectos-btn-calendar {
+    background: linear-gradient(145deg,#ecb91a);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    font-size: 1rem;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0, 116, 217, 0.4);
+}
+
+    .prospectos-btn-calendar:hover {
+        transform: translateY(-2px);
+        background: var(--azul-info);
+    }
+
 @media (max-width: 768px) {
     .prospectos-btn-nuevo {
         position: fixed;
@@ -2614,6 +2634,26 @@ body.modo-oscuro .modal-carreras-exclusivo,
     }
 
         .prospectos-btn-nuevo span {
+            display: none;
+        }
+}
+
+@media (max-width: 768px) {
+    .prospectos-btn-calendar {
+        position: fixed;
+        bottom: 110px;
+        right: 1.25rem;
+        width: 56px;
+        height: 56px;
+        padding: 0;
+        justify-content: center;
+        border-radius: 50%;
+        font-size: 1.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        animation: pulse 1.5s infinite ease-in-out;
+    }
+
+        .prospectos-btn-calendar span {
             display: none;
         }
 }
@@ -2982,4 +3022,327 @@ body.modo-oscuro .modal-carreras-exclusivo,
     .btn {
         font-size: 0.9rem;
     }
+}
+
+/*---------------------- CALENDARIO ----------------------------------*/
+
+.prospectos-calendar {
+    font-family: 'Inter', sans-serif;
+    color: #212529;
+    margin-top: 1rem;
+}
+
+    /* === Panel lateral === */
+    .prospectos-calendar .detalles-panel {
+        background-color: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 0 18px rgba(0, 0, 0, 0.06);
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+/* Colores por tipo */
+.borde-visita {
+    border-left: 5px solid #0074D9 !important;
+}
+
+.borde-llamada {
+    border-left: 5px solid #28A745 !important;
+}
+
+.borde-correo {
+    border-left: 5px solid #17A2B8 !important;
+}
+
+.borde-recordatorio {
+    border-left: 5px solid #FFC107 !important;
+}
+
+/* Eventos completados */
+.prospectos-calendar .evento-completado {
+    background-color: #e0e0e0 !important;
+    text-decoration: line-through;
+    color: #888 !important;
+    opacity: 0.6;
+}
+
+/* Botones */
+.prospectos-calendar .btn {
+    font-size: 0.85rem;
+    padding: 0.5rem 0.9rem;
+    margin-top: 0.5rem;
+    margin-right: 0.4rem;
+    border-radius: 1.5rem;
+}
+
+/* Estilo del scheduler Radzen */
+.prospectos-calendar .rz-scheduler {
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 0 18px rgba(0, 0, 0, 0.08);
+    padding: 0.5rem;
+}
+
+.prospectos-calendar .rz-scheduler-header,
+.prospectos-calendar .rz-scheduler-time-header {
+    background-color: #0074D9;
+    color: white;
+    border-radius: 12px 12px 0 0;
+    font-weight: 600;
+}
+
+.prospectos-calendar .rz-scheduler-time-cell {
+    background-color: #f8f9fa;
+    color: #444;
+}
+
+.prospectos-calendar .rz-scheduler-cell {
+    border: 1px solid #e0e0e0;
+    transition: background 0.2s ease-in-out;
+}
+
+    .prospectos-calendar .rz-scheduler-cell:hover {
+        background-color: #eef6ff;
+    }
+
+.prospectos-calendar .rz-scheduler-appointment {
+    background-color: #0074D9;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.rz-scheduler-appointment.llamada {
+    background-color: #28A745;
+}
+
+.rz-scheduler-appointment.visita {
+    background-color: #17A2B8;
+}
+
+.rz-scheduler-appointment.correo {
+    background-color: #FF851B;
+}
+
+.rz-scheduler-appointment.recordatorio {
+    background-color: #FFC107;
+    color: #000;
+}
+
+/* Responsive */
+@media screen and (max-width: 768px) {
+    .prospectos-calendar .row {
+        flex-direction: column;
+    }
+
+    .prospectos-calendar .col-md-8,
+    .prospectos-calendar .col-md-4 {
+        width: 100%;
+        min-width: 100%;
+    }
+}
+
+
+/* Ajuste para que las celdas tengan bordes suaves y fondo claro */
+.rz-scheduler-cell {
+    background-color: #ffffff;
+    border: 1px solid #eaeaea;
+}
+
+/* Mejor contraste en los encabezados */
+.rz-scheduler-header,
+.rz-scheduler-time-header {
+    background-color: #0074D9;
+    color: white;
+    font-weight: bold;
+}
+
+/* Sombras modernas para eventos */
+.rz-scheduler-appointment {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease-in-out;
+}
+
+    .rz-scheduler-appointment:hover {
+        transform: scale(1.02);
+    }
+
+/* Panel de detalles */
+.prospectos-calendar .detalles-panel {
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+}
+
+/* Tipografía general */
+.prospectos-calendar {
+    font-family: 'Inter', sans-serif;
+}
+
+.rz-scheduler-appointment {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    display: block;
+}
+
+.prospectos-calendar .detalles-panel {
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+
+/* --- MODAL EXCLUSIVO PARA CALENDARIO DE PROSPECTOS --- */
+#prospectos-calendar-modal-citas-overlay.prospectos-calendar-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(11, 24, 56, 0.60);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 12050;
+    backdrop-filter: blur(3.5px);
+    animation: fadeInProspectosCal 0.3s;
+}
+
+@keyframes fadeInProspectosCal {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+#prospectos-calendar-modal-citas.prospectos-calendar-modal-contenido {
+    background: #fff;
+    border-radius: 1.5rem;
+    padding: 2.3rem 2rem 2.1rem 2rem;
+    width: 94vw;
+    max-width: 400px;
+    position: relative;
+    box-shadow: 0 12px 48px #0074D94d, 0 2px 12px #FFD70024;
+    animation: slideInModalCal 0.33s;
+}
+
+@keyframes slideInModalCal {
+    from {
+        transform: translateY(32px) scale(.98);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+.prospectos-calendar-modal-cerrar {
+    position: absolute;
+    top: 1.1rem;
+    right: 1.35rem;
+    font-size: 2rem;
+    background: none;
+    border: none;
+    color: #0074D9;
+    cursor: pointer;
+    font-weight: 800;
+    z-index: 10;
+    transition: color .16s, transform .14s;
+}
+
+    .prospectos-calendar-modal-cerrar:hover {
+        color: #FFD700;
+        transform: scale(1.18);
+    }
+
+.prospectos-calendar-modal-titulo {
+    font-size: 1.25rem;
+    color: #0074D9;
+    margin-bottom: 1.2rem;
+    font-weight: 800;
+}
+
+.prospectos-calendar-lista-citas {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+}
+
+.prospectos-calendar-item-cita {
+    background: #f8faff;
+    border-radius: 0.85rem;
+    margin-bottom: 0.8rem;
+    padding: 1.2em 1em 0.9em 1.1em;
+    border-left: 7px solid #0074D9;
+    box-shadow: 0 3px 10px #0074D911;
+    font-size: 1rem;
+    animation: fadeInProspectosCal 0.18s;
+}
+
+    .prospectos-calendar-item-cita.borde-llamada {
+        border-color: #28A745;
+    }
+
+    .prospectos-calendar-item-cita.borde-visita {
+        border-color: #17A2B8;
+    }
+
+    .prospectos-calendar-item-cita.borde-correo {
+        border-color: #FF851B;
+    }
+
+    .prospectos-calendar-item-cita.borde-recordatorio {
+        border-color: #FFC107;
+    }
+
+.prospectos-calendar-item-titulo {
+    font-weight: 700;
+    color: #0074D9;
+    font-size: 1.09rem;
+    display: block;
+}
+
+.prospectos-calendar-item-hora {
+    color: #636e72;
+    font-size: 0.97rem;
+    font-weight: 600;
+    margin-left: 0.2rem;
+}
+
+.prospectos-calendar-item-desc {
+    font-size: 0.92rem;
+    color: #636e72;
+    margin-top: 0.3em;
+}
+
+.prospectos-calendar-modal-vacio {
+    text-align: center;
+    color: #bbb;
+    font-style: italic;
+    font-size: 1.1rem;
+    margin-top: 1.7rem;
+}
+/* Modo oscuro */
+body.modo-oscuro #prospectos-calendar-modal-citas.prospectos-calendar-modal-contenido {
+    background: #1e2537;
+    color: #e9eaf3;
+    box-shadow: 0 8px 32px #0074D92a;
+}
+
+body.modo-oscuro .prospectos-calendar-item-cita {
+    background: #23283a;
+    color: #e9eaf3;
+}
+
+body.modo-oscuro .prospectos-calendar-modal-cerrar {
+    color: #FFD700;
 }

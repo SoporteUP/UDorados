@@ -617,13 +617,13 @@ namespace DoradosBlazorCrud.Server.Controllers
 
         //ST_S_ProspectoActividades Get
         [HttpGet]
-        [Route("ST_S_ProspectoActividades/{ProspectoID}")]
-        public async Task<IActionResult> ST_S_ProspectoActividades(int ProspectoID)
+        [Route("ST_S_ProspectoActividades/{iTipoOperacion}/{iProspectoID}/{iEjecutivoID}")]
+        public async Task<IActionResult> ST_S_ProspectoActividades(int iTipoOperacion, int iProspectoID, int iEjecutivoID)
         {
             var responseApi = new ResponseAPI<List<ST_S_ProspectoActividadesDTO>>();
             var listaProspectoAct = new List<ST_S_ProspectoActividadesDTO>();
 
-            var Result = _dbContext.sT_S_ProspectoActividades.FromSql($"ST_S_ProspectoActividades {ProspectoID}").ToList();
+            var Result = _dbContext.sT_S_ProspectoActividades.FromSql($"ST_S_ProspectoActividades {iTipoOperacion},{iProspectoID},{iEjecutivoID}").ToList();
 
             try
             {
@@ -638,6 +638,7 @@ namespace DoradosBlazorCrud.Server.Controllers
                         Descripcion = item.Descripcion,
                         FechaProgramada = item.FechaProgramada,
                         Realizado = item.Realizado,
+                        NombreProspecto = item.NombreProspecto,
                     });
 
                 }
@@ -680,6 +681,7 @@ namespace DoradosBlazorCrud.Server.Controllers
                         Descripcion = item.Descripcion,
                         FechaProgramada = item.FechaProgramada,
                         Realizado = item.Realizado,
+                        NombreProspecto = item.NombreProspecto,
                     });
                 }
 
@@ -763,6 +765,7 @@ namespace DoradosBlazorCrud.Server.Controllers
 
             students = _dbContext.Login.FromSql($"ST_S_LoginApp {login.Correo}, {login.Password}").ToList();
 
+            sesionDTO.UsuarioID = students[0].UsuarioID;
             sesionDTO.Nombre = students[0].Nombre.ToString();
             sesionDTO.Correo = students[0].Correo.ToString();
             sesionDTO.Rol = students[0].NombreRol.ToString();
@@ -1449,7 +1452,7 @@ namespace DoradosBlazorCrud.Server.Controllers
 
             var Result1 = new List<Respuesta>();
 
-            Result1 = _dbContext.respuesta.FromSql($"ST_IUD_ProspectoActividad {prospec.iTipoOperacion},{prospec.iActividadID},{prospec.iProspectoID},{prospec.iEjecutivoID},{prospec.sTipo}, {prospec.sDescripcion}, {prospec.dFechaProgramada}, {prospec.bRealizado}").ToList();
+            Result1 = _dbContext.respuesta.FromSql($"ST_IUD_ProspectoActividad {prospec.iTipoOperacion},{prospec.iActividadID},{prospec.iProspectoID},{prospec.iEjecutivoID},{prospec.sTipo}, {prospec.sDescripcion}, {prospec.dFechaProgramada}, {prospec.bRealizado}, {prospec.sNombreProspecto}").ToList();
 
             return StatusCode(StatusCodes.Status200OK, Result1);
 

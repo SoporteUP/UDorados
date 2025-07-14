@@ -14,6 +14,8 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject SweetAlertService Swal
 @inject SesionEmail mySesionEmail;
+@inject SesionUsuario mySesion;
+
 
 <PageTitle>Index</PageTitle>
 
@@ -69,13 +71,19 @@
     <Authorized>
         <h3 class="text-center"> Bienvenido: @context.User.Identity!.Name</h3>
         <h5 class="text-center"> @context.User.FindFirst(ClaimTypes.Email).Value</h5>
+        
     </Authorized>
 </AuthorizeView>
+
+<h5 class="text-center"> @iUsuarioID </h5>
 
 @code{
 
     [Parameter]
     public string sEmail { get; set; } = "";
+
+    [Parameter]
+    public string iUsuarioID { get; set; } = "";
 
     private int PreinscNum;
 
@@ -85,6 +93,7 @@
     {
 
         sEmail = mySesionEmail.Email;
+        iUsuarioID = mySesion.UsuarioID;
 
         listaPREINSCRIPCOUNT = await usuarioService.ST_S_PREINSCRIPCOUNT(3, sEmail, 0, "-");
         if (listaPREINSCRIPCOUNT != null && listaPREINSCRIPCOUNT.Any())

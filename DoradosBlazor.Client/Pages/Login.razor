@@ -1,6 +1,7 @@
 ﻿@page "/"
 @layout LoginLayout
 @inject SesionEmail mySesionEmail;
+@inject SesionUsuario mySesionUsuario
 @inject HttpClient httpClient
 @using DoradosBlazor.Client.Extensiones
 @using DoradosBlazor.Shared
@@ -96,7 +97,7 @@
 
 @code {
     private LoginDTO login = new LoginDTO();
-    private bool mostrarModalRegistro = false;
+    private bool mostrarModalRegistro = false;   
 
     private string loginBgClass => mostrarModalRegistro ? "superwow-login-bg modal-activo" : "superwow-login-bg";
 
@@ -123,6 +124,12 @@
             var sesionUsuario = await loginResponse.Content.ReadFromJsonAsync<SesionDTO>();
             var autenticacionExt = (AutenticacionExtension)autenticacionProvider;
             await autenticacionExt.ActualizarEstadoAutenticacion(sesionUsuario);
+
+            mySesionUsuario.UsuarioID = Convert.ToString(sesionUsuario.UsuarioID);
+            mySesionUsuario.Nombre = Convert.ToString(sesionUsuario.Nombre);
+            mySesionUsuario.Correo = Convert.ToString(sesionUsuario.Correo);
+            mySesionUsuario.Rol = Convert.ToString(sesionUsuario.Rol);
+            mySesionUsuario.MatriculaID = Convert.ToString(sesionUsuario.MatriculaID);
 
             mySesionEmail.Email = login.Correo;
             navManager.NavigateTo($"/Index");

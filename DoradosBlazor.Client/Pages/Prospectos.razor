@@ -9,7 +9,8 @@
 @inject IJSRuntime JSRuntime
 @inject HttpClient httpClient
 @inject SweetAlertService Swal;
-
+@inject NavigationManager navManager;
+@inject SesionUsuario mySesionUsuario
 
 <div class="prospectos-kanban-bg">
     <div class="prospectos-header">
@@ -39,6 +40,9 @@
         </div>
         <button class="prospectos-btn-nuevo" @onclick="NuevoProspecto" title="Crear nuevo prospecto">
             <i class="bi bi-plus-circle"></i> <span>Nuevo</span>
+        </button>
+        <button class="prospectos-btn-calendar" @onclick="NavegarACalendarioE" title="Crear nuevo prospecto">
+            <i class="bi bi-plus-circle"></i> <span>Calendario</span>
         </button>
     </div>
 
@@ -218,6 +222,9 @@
                                     <button class="btn-kanban-accion" title="Ver detalles" @onclick="() => VerDetalles(prospecto)">
                                         <i class="bi bi-eye"></i>
                                     </button>
+                                    <button class="btn-kanban-accion" title="Ver calendario del prospecto" @onclick="() => NavegarACalendario(prospecto)">
+                                        <i class="bi bi-calendar-week-fill"></i>
+                                    </button>
                                 </div>
                             </div>
                         }
@@ -350,6 +357,10 @@
 <LoadingModal Mostrar="cargando" Mensaje="'Cargando...'" />
 
 @code {
+
+    [Parameter]
+    public string UsuarioIDSesion { get; set; } = "";
+
     string filtroBusqueda = "";
     string filtroEstatus = "";
     string Txtfiltro = "";
@@ -368,12 +379,13 @@
 
     private string nombreProspectoSeleccionado = "";
     private int ProspectoSeleccionadoID = 0;
+    private int ProspecSeleccionadoEjecutivoID = 0;
 
     List<string> listaFiltroX = new() { "Nombre", "Telefono", "Estatus", "Celular", "Correo", "Localidad", "AreaInteres", "EscuelaProcedencia", "CicloEscolar", "Edad", "MedioseEntero", "Facebook", "CicloEscolar", "Niv_AcademicoInteres", "Base", "Turno", "Institu_Evento" };
     List<string> listaEstatus = new() { "Nuevo", "Contactado", "En seguimiento", "Inscrito", "No interesado" };
     List<string> listaAreas = new();
 
-    const int PAGE_SIZE = 7;
+    const int PAGE_SIZE = 6;
     Dictionary<string, int> PaginaActualPorEstatus = new();
 
     HashSet<int> prospectosMoviendose = new();
@@ -394,6 +406,8 @@
 
     protected override async Task OnInitializedAsync()
     {
+        UsuarioIDSesion = mySesionUsuario.UsuarioID;
+
         await CargarProspectos();
 
         var todasLasActividades = await usuarioService.ST_S_ProspectoActividadesAll();
@@ -627,11 +641,12 @@
                 iTipoOperacion = 1,              // 1 = insertar nueva
                 iActividadID = 0,
                 iProspectoID = prospecto.ProspectoID,
-                iEjecutivoID = 1,                // TODO: reemplazar con ID del usuario actual logueado
+                iEjecutivoID = Convert.ToInt32(UsuarioIDSesion),                // TODO: reemplazar con ID del usuario actual logueado
                 sTipo = "Llamada",               // valor inicial por defecto
                 sDescripcion = "",
                 dFechaProgramada = DateTime.Now.AddDays(1), // ejemplo: mañana por defecto
-                bRealizado = false
+                bRealizado = false,
+                sNombreProspecto = prospecto.Nombre
             };
         nombreProspectoSeleccionado = prospecto.Nombre ?? "";
         mostrarModalAgendar = true;
@@ -639,7 +654,7 @@
         ProspectoSeleccionadoID = prospecto.ProspectoID;
 
         // Opcional: cargar actividades existentes de este prospecto para mostrar
-        actividadesProspecto = await usuarioService.ST_S_ProspectoActividades(ProspectoSeleccionadoID);
+        actividadesProspecto = await usuarioService.ST_S_ProspectoActividades(1, ProspectoSeleccionadoID, ACTIVIDADDTO.iEjecutivoID);
     }
 
     private async Task GuardarActividad()
@@ -666,7 +681,7 @@
                 });
 
             // ✅ Recargar actividades del prospecto y actualizar el diccionario
-            var nuevasActividades = await usuarioService.ST_S_ProspectoActividades(ProspectoSeleccionadoID);
+            var nuevasActividades = await usuarioService.ST_S_ProspectoActividades(1, ACTIVIDADDTO.iProspectoID, ACTIVIDADDTO.iEjecutivoID);
             actividadesPorProspecto[ProspectoSeleccionadoID] = nuevasActividades;
 
             // También actualizar la lista local del modal, si está abierta
@@ -683,9 +698,10 @@
         prospectoSeleccionado = prospecto;
         nombreProspectoSeleccionado = prospecto.Nombre ?? "";
         ProspectoSeleccionadoID = prospecto.ProspectoID;
+        ProspecSeleccionadoEjecutivoID = prospecto.EjecutivoID;
         mostrarDetalles = true;
 
-        actividadesProspecto = await usuarioService.ST_S_ProspectoActividades(ProspectoSeleccionadoID);
+        actividadesProspecto = await usuarioService.ST_S_ProspectoActividades(1, ProspectoSeleccionadoID, ProspecSeleccionadoEjecutivoID);
     }
 
     private async Task MarcarRealizado(int actividadID)
@@ -699,7 +715,7 @@
                     iTipoOperacion = 2,
                     iActividadID = actividadID,
                     iProspectoID = act.ProspectoID,
-                    iEjecutivoID = 1, // o ID real
+                    iEjecutivoID = Convert.ToInt32(UsuarioIDSesion), // o ID real
                     sTipo = act.Tipo,
                     sDescripcion = act.Descripcion,
                     dFechaProgramada = act.FechaProgramada,
@@ -710,7 +726,7 @@
             {
                 act.Realizado = true;
                 // Refrescar la lista del diccionario
-                var nuevasActividades = await usuarioService.ST_S_ProspectoActividades(ProspectoSeleccionadoID);
+                var nuevasActividades = await usuarioService.ST_S_ProspectoActividades(1, updateDto.iProspectoID, updateDto.iEjecutivoID);
                 actividadesPorProspecto[ProspectoSeleccionadoID] = nuevasActividades;
 
                 actividadesProspecto = nuevasActividades;
@@ -759,6 +775,24 @@
 
     int ObtenerCantidadProspectos(string estatus) =>
         todosLosProspectos.Count(p => p.Estatus == estatus);
+
+
+    void NavegarACalendario(ST_S_ProspecFiltrosDTO prospecto)
+    {
+        if (prospecto != null && prospecto.ProspectoID > 0)
+        {
+            navManager.NavigateTo($"/prospectos/calendario/{prospecto.ProspectoID}");
+        }
+    }
+
+
+    void NavegarACalendarioE()
+    {
+        navManager.NavigateTo($"/prospectos/calendario/0");
+        
+    }
+
+
 }
 
 

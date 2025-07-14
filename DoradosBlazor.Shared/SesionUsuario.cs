@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace DoradosBlazor.Shared
 {
-    public class SesionDTO
+    public class SesionUsuario
     {
-        public int UsuarioID { get; set; }
+        public string UsuarioID { get; set; }
         public string Nombre { get; set; }
         public string Correo { get; set; }
         public string Rol { get; set; }

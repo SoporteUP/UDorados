@@ -23,6 +23,7 @@ namespace DoradosBlazor.Client.Extensiones
             {
                 claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
                 {
+                    new Claim("UsuarioID",Convert.ToString(sesionUsuario.UsuarioID)),
                     new Claim(ClaimTypes.Name,sesionUsuario.Nombre),
                     new Claim(ClaimTypes.Email,sesionUsuario.Correo),
                     new Claim(ClaimTypes.Role,sesionUsuario.Rol),
@@ -53,9 +54,11 @@ namespace DoradosBlazor.Client.Extensiones
 
             var claimPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
                 {
+                    new Claim("UsuarioID",Convert.ToString(sesionUsuario.UsuarioID)),
                     new Claim(ClaimTypes.Name,sesionUsuario.Nombre),
                     new Claim(ClaimTypes.Email,sesionUsuario.Correo),
-                    new Claim(ClaimTypes.Role,sesionUsuario.Rol)
+                    new Claim(ClaimTypes.Role,sesionUsuario.Rol),
+                    new Claim("MatriculaID",sesionUsuario.MatriculaID),
                 }, "JwtAuth"));
 
 
