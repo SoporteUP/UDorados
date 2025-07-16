@@ -20,8 +20,8 @@
                          AppointmentRender="@OnAppointmentRender"
                          SchedulerNavigate="OnSchedulerNavigate"
                          Style="height: 600px;">
-            <RadzenDayView />
-            <RadzenWeekView />
+            <RadzenDayView StartTime=@TimeSpan.FromHours(6) />
+            <RadzenWeekView StartTime=@TimeSpan.FromHours(6) />
             <RadzenMonthView />
         </RadzenScheduler>
     </div>
@@ -29,7 +29,7 @@
     <div class="col-md-4 detalles-panel @TipoClase(citaSeleccionada?.Tipo)">
         @if (citaSeleccionada is not null)
         {
-            <h4>Detalles de la actividad</h4>            
+            <h4>Detalles de la actividad</h4>
             <p><strong>Asunto:</strong> @citaSeleccionada.Titulo</p>
             <p><strong>Tipo:</strong> @citaSeleccionada.Tipo</p>
             <p><strong>Descripción:</strong> @citaSeleccionada.Descripcion</p>
@@ -50,7 +50,7 @@
                 <button class="btn btn-danger btn-sm" @onclick="EliminarCita">
                     <i class="bi bi-trash-fill"></i> Eliminar
                 </button>
-                <button class="btn btn-success btn-sm" >
+                <button class="btn btn-success btn-sm">
                     <i class="bi bi-eye"></i> Información de Prospec.
                 </button>
             }
@@ -168,7 +168,7 @@
             </div>
         </div>
     }
-   
+
 
 </div>
 
@@ -330,7 +330,6 @@
 
         await JS.InvokeVoidAsync("mostrarModal", "#modalProspectos");
 
-       
 
         if (listaPROSPECTOS70 != null || listaPROSPECTOS70.Count != 0)
         {
@@ -340,7 +339,7 @@
 
         textoFecha = args.Start;
 
-        
+
 
         // citas.Add(citaSeleccionada);
     }
@@ -391,8 +390,8 @@
     {
 
         ACTIVIDADDTO = new ST_IUD_ProspectoActividadDTO
-        {
-            iTipoOperacion = 2,              // 2 = actualizar
+            {
+                iTipoOperacion = 2,              // 2 = actualizar
                 iActividadID = citaSeleccionada.Id,
                 iProspectoID = citaSeleccionada.ProspectoID,
                 iEjecutivoID = Convert.ToInt32(iUsuarioID),                // TODO: reemplazar con ID del usuario actual logueado
@@ -401,7 +400,7 @@
                 dFechaProgramada = citaSeleccionada.Inicio,
                 bRealizado = citaSeleccionada.Realizado,
                 sNombreProspecto = citaSeleccionada.NombreProspecto
-        };
+            };
 
         nombreProspectoSeleccionado = citaSeleccionada.NombreProspecto;
         mostrarModalAgendar = true;
@@ -428,22 +427,22 @@
                     Icon = SweetAlertIcon.Success
                 });
 
-            // ✅ Recargar actividades del prospecto y actualizar el diccionario           
+            // ✅ Recargar actividades del prospecto y actualizar el diccionario
 
             var resultado = await usuarioService.ST_S_ProspectoActividades(2, 0, Convert.ToInt32(iUsuarioID));
             citas = resultado.Select(x => new CitaProspecto
-            {
-                Id = x.ActividadID,
-                ProspectoID = x.ProspectoID,
-                Titulo = $"{x.Tipo} con {x.NombreProspecto}",
-                Tipo = x.Tipo,
-                Descripcion = x.Descripcion,
-                Estatus = x.Realizado ? "COMPLETADA" : "PENDIENTE",
-                Inicio = x.FechaProgramada,
-                Fin = x.FechaProgramada.AddMinutes(30),
-                Realizado = x.Realizado,
-                NombreProspecto = x.NombreProspecto,
-            }).ToList();
+                {
+                    Id = x.ActividadID,
+                    ProspectoID = x.ProspectoID,
+                    Titulo = $"{x.Tipo} con {x.NombreProspecto}",
+                    Tipo = x.Tipo,
+                    Descripcion = x.Descripcion,
+                    Estatus = x.Realizado ? "COMPLETADA" : "PENDIENTE",
+                    Inicio = x.FechaProgramada,
+                    Fin = x.FechaProgramada.AddMinutes(30),
+                    Realizado = x.Realizado,
+                    NombreProspecto = x.NombreProspecto,
+                }).ToList();
 
             if (citaSeleccionada != null)
             {
@@ -540,7 +539,7 @@
     {
         var filtro = e.Value?.ToString();
 
-        
+
 
         if (!string.IsNullOrWhiteSpace(filtro))
         {
@@ -550,7 +549,7 @@
         {
             listaPROSPECTOS70 = await usuarioService.ST_S_ProspecFiltrosTop70("NOMBRE", "-", "Nombre", "-");
         }
-       
+
 
         StateHasChanged();
     }
@@ -574,7 +573,7 @@
     private async Task ConfirmarProspecto()
     {
         if (prospectoSeleccionado != null)
-        {            
+        {
             await JS.InvokeVoidAsync("cerrarModal", "#modalProspectos");
 
             await AbrirModalAgendar(prospectoSeleccionado);
