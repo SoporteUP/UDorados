@@ -7,3 +7,5 @@
         }, 300); // coincide con la duración en CSS
     }
 };
+
+window.isDesktop = () => window.innerWidth > 768;

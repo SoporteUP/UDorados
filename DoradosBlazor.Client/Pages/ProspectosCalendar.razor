@@ -265,6 +265,7 @@
     private CitaProspecto? citaSeleccionada;
     private RadzenScheduler<CitaProspecto>? schedulerRef;
 
+    private List<ST_S_ProspectoActividadesDTO> listaPROSPECTOSACT = new(); // Lista de resultados
     private List<ST_S_ProspecFiltrosTop70DTO> listaPROSPECTOS70 = new(); // Lista de resultados
     private ST_S_ProspecFiltrosTop70DTO? prospectoSeleccionado;
 
@@ -308,6 +309,7 @@
         if (firstRender)
         {
             await JS.InvokeVoidAsync("calendarUtils.setupMoreClick", DotNetObjectReference.Create(this));
+
         }
     }
 

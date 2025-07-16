@@ -1698,7 +1698,7 @@ body.modo-oscuro,
     border: 2.5px solid rgba(0, 116, 217, 0.13);
     padding-bottom: 0 !important;
     overflow: hidden;
-    position: relative;
+    position: relative;    
 }
 
     
@@ -1904,6 +1904,7 @@ body.modo-oscuro .modal-carreras-exclusivo,
 @media (max-width: 600px) {
     .modal-carreras-exclusivo {
         border-radius: 1rem !important;
+        z-index: 3050 !important;
     }
 
     .tabla-carreras-exclusiva th, .tabla-carreras-exclusiva td {
@@ -3478,4 +3479,171 @@ body.modo-oscuro .prospectos-calendar-item-cita {
 
 body.modo-oscuro .prospectos-calendar-modal-cerrar {
     color: #FFD700;
+}
+
+/*----------------- agendar exclusivo: backdrop y modal ----------------------*/
+
+#modal-agendar-actividad.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(40,56,82,0.18);
+    z-index: 3030;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+#modal-agendar-actividad .modern-card-title {
+    position: relative;
+    padding-right: 48px; /* Espacio para el botón de cerrar */
+    min-height: 46px;
+    font-size: 1.12rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    overflow: hidden;
+}
+
+/* Formulario principal */
+#modal-agendar-actividad .prospecto-actividad-form {
+    max-width: 440px;
+    min-width: 320px;
+    margin: 70px auto 0 auto;
+    position: relative;
+    z-index: 1300;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 6px 32px 0 rgba(0,0,0,0.10);
+    padding-bottom: 18px;
+}
+
+/* ---------- Header con botón de cerrar siempre visible ---------- */
+#modal-agendar-actividad .modal-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-right: 6px;
+    min-height: 46px;
+    margin-bottom: 1.1rem;
+}
+
+#modal-agendar-actividad .modal-title-text {
+    flex: 1 1 auto;
+    font-size: 1.12rem;
+    font-weight: 600;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 88vw;
+}
+
+/* Botón cerrar bien visible, accesible, y responsivo */
+#modal-agendar-actividad .btn-closepros {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    min-width: 36px;
+    min-height: 36px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1.5px solid #e1e8ef;
+    font-size: 1.4rem;
+    color: #0074d9;
+    cursor: pointer;
+    z-index: 1400;
+    box-shadow: 0 1px 8px 0 #0074d930;
+    transition: color 0.2s, border 0.2s, background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    #modal-agendar-actividad .btn-closepros:hover,
+    #modal-agendar-actividad .btn-closepros:focus {
+        color: #ff851b;
+        background: #f8f9fa;
+        border: 2px solid #ff851b;
+        outline: none;
+    }
+
+/*------------------- Sidebar lateral exclusivo de computadora ------------------*/
+#modal-agendar-actividad .sidebar-modal-agendar {
+    position: fixed;
+    top: 70px;
+    left: 0;
+    width: 340px;
+    height: calc(100% - 90px);
+    background: #fff;
+    border-top-right-radius: 32px;
+    border-bottom-right-radius: 32px;
+    box-shadow: 0 6px 32px 0 rgba(0,0,0,0.12);
+    z-index: 1200;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem 1rem 1rem 1.5rem;
+    animation: slideInLeft 0.3s;
+}
+
+#modal-agendar-actividad .sidebar-header {
+    font-size: 1.12rem;
+    font-weight: bold;
+}
+
+#modal-agendar-actividad .sidebar-content {
+    flex: 1 1 auto;
+    overflow-y: auto;
+}
+
+/* Scroll solo en computadora para la sidebar (ajusta max-height si quieres) */
+#modal-agendar-actividad .tabla-actividades-scroll {
+    max-height: 340px;
+    overflow-y: auto;
+    overflow-x: auto;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 2px 12px 0 #0074d920;
+}
+
+/* Responsive: sidebar desaparece en móvil/tablet */
+@media (max-width: 991px) {
+    #modal-agendar-actividad .sidebar-modal-agendar {
+        display: none !important;
+    }
+
+    #modal-agendar-actividad .prospecto-actividad-form {
+        margin: 32px auto 0 auto;
+        min-width: unset;
+        max-width: 99vw;
+    }
+
+    #modal-agendar-actividad .tabla-actividades-scroll {
+        max-height: 200px;
+    }
+}
+
+/* Tabla visual solo aquí */
+#modal-agendar-actividad table {
+    font-size: 0.98rem;
+    background: transparent;
+}
+
+/* Scrollbar personalizado SOLO aquí */
+#modal-agendar-actividad .tabla-actividades-scroll::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+    background: #f3f5fa;
+    border-radius: 8px;
+}
+
+#modal-agendar-actividad .tabla-actividades-scroll::-webkit-scrollbar-thumb {
+    background: #0074D930;
+    border-radius: 8px;
 }

@@ -263,14 +263,14 @@
 
 @if (mostrarModalAgendar)
 {
-    <div class="modal-backdrop">
-        @* podría usar clases de Bootstrap si ya están incluidas *@
-        <div class="modern-card sombra-azul prospecto-actividad-form">
-            <button class="btn-closepros" @onclick="() => mostrarModalAgendar=false">
-                <i class="bi bi-x"></i>
-            </button>
-            <div class="modern-card-title mb-3">
+    <div id="modal-agendar-actividad" class="modal-backdrop">
+        <div class="modern-card sombra-azul prospecto-actividad-form"
+             style="@((esComputadora ? "margin-left:360px; min-width:330px;" : ""))">
+            <div class="modern-card-title">
                 <i class="bi bi-calendar-event"></i> Agendar actividad para @nombreProspectoSeleccionado
+                <button class="btn-closepros" @onclick="() => mostrarModalAgendar = false" title="Cerrar">
+                    <i class="bi bi-x"></i>
+                </button>
             </div>
             <div class="mb-2">
                 <label class="modern-label">Tipo de actividad</label>
@@ -296,7 +296,90 @@
                     <i class="bi bi-save"></i> Guardar
                 </button>
             </div>
+
+            <!-- Solo en móvil: la tabla abajo del formulario, dentro de acordeón -->
+            @if (!esComputadora)
+            {
+                <details class="mb-2 mt-3">
+                    <summary class="fw-bold text-azul mb-1" style="cursor:pointer;">
+                        Ver actividades recientes
+                    </summary>
+                    <div class="tabla-actividades-scroll">
+                        <table class="table tabla-carreras tabla-carreras-exclusiva align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Tipo</th>
+                                    <th>Fecha programada</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (listaPROSPECTOSACT == null || listaPROSPECTOSACT.Count == 0)
+                                {
+                                    <tr>
+                                        <td colspan="2" class="text-center text-muted py-4">
+                                            <i class="bi bi-emoji-frown fs-3"></i>
+                                            <div>No se encontró ninguna actividad</div>
+                                        </td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    @foreach (var act in listaPROSPECTOSACT)
+                                    {
+                                        <tr>
+                                            <td class="fw-bold">@act.Tipo</td>
+                                            <td>@(act.FechaProgramada.ToString("dd/MM/yyyy HH:mm"))</td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </details>
+            }
         </div>
+
+        <!-- Sidebar solo para computadora -->
+        @if (esComputadora)
+        {
+            <div class="sidebar-modal-agendar sombra-azul">
+                <div class="sidebar-header d-flex justify-content-between align-items-center mb-2">
+                    <span class="fw-bold text-azul">Actividades recientes</span>
+                </div>
+                <div class="sidebar-content px-1">
+                    <!-- OJO: Sin la clase tabla-actividades-scroll aquí -->
+                    <table class="table tabla-carreras tabla-carreras-exclusiva align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Tipo</th>
+                                <th>Fecha programada</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (listaPROSPECTOSACT == null || listaPROSPECTOSACT.Count == 0)
+                            {
+                                <tr>
+                                    <td colspan="2" class="text-center text-muted py-4">
+                                        <i class="bi bi-emoji-frown fs-3"></i>
+                                        <div>No se encontró ninguna actividad</div>
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var act in listaPROSPECTOSACT)
+                                {
+                                    <tr>
+                                        <td class="fw-bold">@act.Tipo</td>
+                                        <td>@(act.FechaProgramada.ToString("dd/MM/yyyy HH:mm"))</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
     </div>
 }
 
@@ -388,6 +471,8 @@
     private bool mostrarBtnModalA = false;
     private bool mostrarModalAgendar = false;
     private bool mostrarDetalles = false;
+    private bool mostrarSidebarAgendar = false;
+    private bool esComputadora = true;
 
     private string nombreProspectoSeleccionado = "";
     private int ProspectoSeleccionadoID = 0;
@@ -411,6 +496,8 @@
     private ST_IUD_ProspectosDTO PROSPECTODTO = new ST_IUD_ProspectosDTO();
     private ST_IUD_ProspectoActividadDTO ACTIVIDADDTO = new ST_IUD_ProspectoActividadDTO();
 
+    private List<ST_S_ProspectoActividadesDTO> listaPROSPECTOSACT = new(); // Lista de resultados
+
     private List<ST_S_ProspectoActividadesDTO> actividadesProspecto = new List<ST_S_ProspectoActividadesDTO>();
     private ST_S_ProspecFiltrosDTO prospectoSeleccionado = new();
 
@@ -428,6 +515,15 @@
             .ToDictionary(g => g.Key, g => g.ToList());
 
         ConstruirKanban();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            esComputadora = await JSRuntime.InvokeAsync<bool>("isDesktop");
+            StateHasChanged();
+        }
     }
 
     async Task CargarProspectos()
@@ -661,7 +757,15 @@
                 sNombreProspecto = prospecto.Nombre
             };
         nombreProspectoSeleccionado = prospecto.Nombre ?? "";
+
         mostrarModalAgendar = true;
+
+        listaPROSPECTOSACT = await usuarioService.ST_S_ProspectoActividades(2, 0, Convert.ToInt32(UsuarioIDSesion));
+
+        
+
+        esComputadora = await JSRuntime.InvokeAsync<bool>("isDesktop");
+        mostrarSidebarAgendar = esComputadora;
 
         ProspectoSeleccionadoID = prospecto.ProspectoID;
 
