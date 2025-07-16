@@ -13,37 +13,49 @@
 @inject SesionUsuario mySesionUsuario
 
 <div class="prospectos-kanban-bg">
-    <div class="prospectos-header">
-        <div>
-            <h2 class="prospectos-title">
-                Prospectos <span class="prospectos-title-sub">/ CRM visual</span>
-            </h2>
-            <div class="prospectos-filtros">
-                <input class="prospectos-buscador"
+    <div class="prospectos-header-glass">
+        <div class="prospectos-header-left">
+            <div class="prospectos-header-icon">
+                <i class="bi bi-kanban"></i> <!-- Cambia el ícono por el tuyo si quieres -->
+            </div>
+            <div>
+                <h2 class="prospectos-header-title">
+                    Prospectos <span class="prospectos-header-title-sub">/ CRM visual</span>
+                </h2>
+                <div class="prospectos-header-subdesc d-none d-md-block">
+                    Gestiona y visualiza tus prospectos de forma moderna.
+                </div>
+            </div>
+        </div>
+
+        <div class="prospectos-header-actions">
+            <div class="prospectos-header-filtros-group">
+                <input class="prospectos-header-buscador"
                        value="@filtroBusqueda"
                        @oninput="FiltrarProspecto"
                        type="text"
                        placeholder="Buscar nombre, correo, tel..." />
-
-
-                <select class="prospectos-select" @bind="Txtfiltro">
+                <select class="prospectos-header-select" @bind="Txtfiltro">
                     <option value="">Filtro por:</option>
                     @foreach (var FX in listaFiltroX)
                     {
                         <option value="@FX">@FX</option>
                     }
-                </select>                
-                <button class="prospectos-btn-limpiar" @onclick="LimpiarFiltros" title="Limpiar filtros">
+                </select>
+                <button class="prospectos-header-limpiar" @onclick="LimpiarFiltros" title="Limpiar filtros">
                     <i class="bi bi-x-lg"></i>
                 </button>
             </div>
+
+            <div class="prospectos-header-buttons">
+                <button class="prospectos-header-btn-nuevo" @onclick="NuevoProspecto" title="Nuevo prospecto">
+                    <i class="bi bi-plus-circle"></i> <span class="d-none d-md-inline">Nuevo</span>
+                </button>
+                <button class="prospectos-header-btn-calendar" @onclick="NavegarACalendarioE" title="Ver calendario">
+                    <i class="bi bi-calendar-week"></i> <span class="d-none d-md-inline">Calendario</span>
+                </button>
+            </div>
         </div>
-        <button class="prospectos-btn-nuevo" @onclick="NuevoProspecto" title="Crear nuevo prospecto">
-            <i class="bi bi-plus-circle"></i> <span>Nuevo</span>
-        </button>
-        <button class="prospectos-btn-calendar" @onclick="NavegarACalendarioE" title="Crear nuevo prospecto">
-            <i class="bi bi-plus-circle"></i> <span>Calendario</span>
-        </button>
     </div>
 
     @if (mostrarFormulario)
@@ -385,7 +397,7 @@
     List<string> listaEstatus = new() { "Nuevo", "Contactado", "En seguimiento", "Inscrito", "No interesado" };
     List<string> listaAreas = new();
 
-    const int PAGE_SIZE = 6;
+    const int PAGE_SIZE = 5;
     Dictionary<string, int> PaginaActualPorEstatus = new();
 
     HashSet<int> prospectosMoviendose = new();

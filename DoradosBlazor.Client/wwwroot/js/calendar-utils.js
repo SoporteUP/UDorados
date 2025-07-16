@@ -1,43 +1,46 @@
 ﻿window.calendarUtils = {
     setupMoreClick: function (dotnetHelper) {
-        // Elimina listeners previos para evitar duplicados
         if (window.__calendarMoreHandler) {
             document.body.removeEventListener('click', window.__calendarMoreHandler, true);
         }
-
-        // Handler delegado
         window.__calendarMoreHandler = function (e) {
             if (e.target && e.target.classList.contains('rz-event-list-btn')) {
-                // Busca el atributo 'data-date' o extrae la fecha del día desde el DOM
-                let parentCell = e.target.closest('.rz-scheduler-cell, .rz-scheduler-month-cell');
-                let dateStr = e.target.getAttribute('data-date'); // Algunas versiones lo tienen
-                if (!dateStr && parentCell) {
-                    // Busca un span con la fecha visible en la celda (normalmente el número del día)
-                    let span = parentCell.querySelector('.rz-scheduler-cell-date, .rz-scheduler-month-cell-date');
-                    if (span) {
-                        // Construye la fecha basada en el mes/año visible (requiere ajustar si tienes localización)
-                        let day = parseInt(span.textContent.trim(), 10);
-                        let today = new Date();
-                        let year = today.getFullYear();
-                        let month = today.getMonth();
+                let btn = e.target;
+                let leftStr = btn.style.left; // e.g. "85.71428571428572%"
+                let leftVal = parseFloat(leftStr);
+                let dayIndex = Math.round(leftVal / 14.285714285714286);
 
-                        // Busca el mes/año actual en el calendario (opcional: puedes pasar este dato desde Blazor)
-                        // Para precisión total, puedes guardar el mes visible en una variable global al cambiar de mes.
+                let weekDiv = btn.closest('.rz-week');
+                let slots = weekDiv ? weekDiv.querySelectorAll('.rz-slot') : [];
+                let slot = slots[dayIndex];
+                let dia = null;
 
-                        let dateObj = new Date(year, month, day);
-                        dateStr = dateObj.toISOString().substring(0, 10);
+                if (slot) {
+                    let slotTitle = slot.querySelector('.rz-slot-title');
+                    if (slotTitle) {
+                        dia = slotTitle.textContent.trim();
                     }
                 }
-                // Llama a tu método Blazor solo si tienes la fecha
-                if (dateStr) {
+                let year = new Date().getFullYear();
+                let month = new Date().getMonth();
+                if (window.visibleCalendarYear !== undefined && window.visibleCalendarMonth !== undefined) {
+                    year = window.visibleCalendarYear;
+                    month = window.visibleCalendarMonth;
+                }
+                if (dia) {
+                    let dateObj = new Date(year, month, parseInt(dia, 10));
+                    let dateStr = dateObj.toISOString().substring(0, 10);
                     dotnetHelper.invokeMethodAsync('IrADia', dateStr);
                 }
                 e.preventDefault();
                 e.stopPropagation();
             }
         };
-
-        // Agrega el listener en captura
         document.body.addEventListener('click', window.__calendarMoreHandler, true);
+    },
+
+    setVisibleMonth: function (year, month) {
+        window.visibleCalendarYear = year;
+        window.visibleCalendarMonth = month;
     }
 };
