@@ -35,7 +35,7 @@
             <p><strong>Descripción:</strong> @citaSeleccionada.Descripcion</p>
             <p><strong>Inicio:</strong> @citaSeleccionada.Inicio.ToString("g")</p>
             @* <p><strong>Fin:</strong> @citaSeleccionada.Fin.ToString("g")</p> *@
-            <p><strong>Estatus:</strong> @citaSeleccionada.Estatus</p>
+            <p><strong>Realizado:</strong> @citaSeleccionada.Estatus</p>
             @if (citaSeleccionada.Id == 0)
             {
                 <button class="btn btn-success btn-sm" @onclick="GuardarNuevaCita">
@@ -202,7 +202,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @if (listaPROSPECTOS == null || listaPROSPECTOS.Count == 0)
+                            @if (listaPROSPECTOS70 == null || listaPROSPECTOS70.Count == 0)
                             {
                                 <tr>
                                     <td colspan="2" class="text-center text-muted py-4">
@@ -213,7 +213,7 @@
                             }
                             else
                             {
-                                @foreach (var prospec in listaPROSPECTOS)
+                                @foreach (var prospec in listaPROSPECTOS70)
                                 {
                                     <tr @onclick="() => SeleccionarProspecto(prospec)"
                                         class="fila-carrera @(prospectoSeleccionado?.ProspectoID == prospec.ProspectoID ? "fila-carrera-seleccionada" : "")"
@@ -265,8 +265,8 @@
     private CitaProspecto? citaSeleccionada;
     private RadzenScheduler<CitaProspecto>? schedulerRef;
 
-    private List<ST_S_ProspecFiltrosDTO> listaPROSPECTOS = new(); // Lista de resultados
-    private ST_S_ProspecFiltrosDTO? prospectoSeleccionado;
+    private List<ST_S_ProspecFiltrosTop70DTO> listaPROSPECTOS70 = new(); // Lista de resultados
+    private ST_S_ProspecFiltrosTop70DTO? prospectoSeleccionado;
 
     private List<ST_S_ProspectoActividadesDTO> actividadesProspecto = new List<ST_S_ProspectoActividadesDTO>();
 
@@ -330,14 +330,13 @@
 
         await JS.InvokeVoidAsync("mostrarModal", "#modalProspectos");
 
-        List<ST_S_ProspecFiltrosDTO> resultados;
+       
 
-        if (listaPROSPECTOS != null || listaPROSPECTOS.Count != 0)
+        if (listaPROSPECTOS70 != null || listaPROSPECTOS70.Count != 0)
         {
-            resultados = await usuarioService.ST_S_ProspecFiltros("NOMBRE", "-", "NOMBRE", "-");
-            // Tomar solo los primeros 50, si hay más
-            listaPROSPECTOS = resultados.Take(48).ToList();
+            listaPROSPECTOS70 = await usuarioService.ST_S_ProspecFiltrosTop70("NOMBRE", "-", "NOMBRE", "-");
         }
+
 
         textoFecha = args.Start;
 
@@ -541,24 +540,22 @@
     {
         var filtro = e.Value?.ToString();
 
-        List<ST_S_ProspecFiltrosDTO> resultados;
+        
 
         if (!string.IsNullOrWhiteSpace(filtro))
         {
-            resultados = await usuarioService.ST_S_ProspecFiltros("NOMBRE", filtro, "Nombre", "-");
+            listaPROSPECTOS70 = await usuarioService.ST_S_ProspecFiltrosTop70("NOMBRE", filtro, "Nombre", "-");
         }
         else
         {
-            resultados = await usuarioService.ST_S_ProspecFiltros("NOMBRE", "-", "Nombre", "-");
+            listaPROSPECTOS70 = await usuarioService.ST_S_ProspecFiltrosTop70("NOMBRE", "-", "Nombre", "-");
         }
-
-        // Tomar solo los primeros 50, si hay más
-        listaPROSPECTOS = resultados.Take(50).ToList();
+       
 
         StateHasChanged();
     }
 
-    private void SeleccionarProspecto(ST_S_ProspecFiltrosDTO pros)
+    private void SeleccionarProspecto(ST_S_ProspecFiltrosTop70DTO pros)
     {
         if (prospectoSeleccionado == pros)
         {
@@ -597,7 +594,7 @@
     }
 
 
-    private async Task AbrirModalAgendar(ST_S_ProspecFiltrosDTO prospecto)
+    private async Task AbrirModalAgendar(ST_S_ProspecFiltrosTop70DTO prospecto)
     {
         // Preparar nueva actividad con valores por defecto
         ACTIVIDADDTO = new ST_IUD_ProspectoActividadDTO

@@ -49,6 +49,7 @@ public partial class DbcrudBlazorContext : DbContext
     public virtual DbSet<ST_S_CorreosMisCuentas> sT_S_CorreosMisCuentas { get; set; }
     public virtual DbSet<ST_S_ProspecFiltros> sT_S_ProspecFiltros { get; set; }
     public virtual DbSet<ST_S_ProspectoActividades> sT_S_ProspectoActividades { get; set; }
+    public virtual DbSet<ST_S_ProspecFiltrosTop70> sT_S_ProspecFiltrosTop70 { get; set; }
 
 
     public virtual DbSet<Respuesta> respuesta { get; set; }

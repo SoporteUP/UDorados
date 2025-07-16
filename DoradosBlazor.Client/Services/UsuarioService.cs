@@ -274,6 +274,15 @@ namespace DoradosBlazor.Client.Services
                 throw new Exception(result.Mensaje);
         }
 
+        public async Task<List<ST_S_ProspecFiltrosTop70DTO>> ST_S_ProspecFiltrosTop70(string cCampo, string cBusqueda, string cCampo2, string cBusqueda2)
+        {
+            var result = await _http.GetFromJsonAsync<ResponseAPI<List<ST_S_ProspecFiltrosTop70DTO>>>($"api/Usuario/ST_S_ProspecFiltrosTop70/{cCampo}/{cBusqueda}/{cCampo2}/{cBusqueda2}");
+            if (result!.EsCorrecto)
+                return result.Valor!;
+            else
+                throw new Exception(result.Mensaje);
+        }
+
 
         public async Task<List<ST_S_ProspectoActividadesDTO>> ST_S_ProspectoActividades(int iTipoOperacion, int iProspectoID, int iEjecutivoID)
         {
