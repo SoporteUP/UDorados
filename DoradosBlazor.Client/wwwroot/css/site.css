@@ -1701,6 +1701,12 @@ body.modo-oscuro,
     position: relative;    
 }
 
+/* Elevar el modal de carreras por encima del menú hamburguesa */
+#modalCarreras,
+#modalCarreras .modal-dialog,
+#modalCarreras .modal-content {
+    z-index: 4050 !important; /* valor alto, mayor que 3002 */
+}
     
     .modal-carreras-exclusivo .modal-header {
         background: none;
@@ -3163,7 +3169,7 @@ body.modo-oscuro .modal-carreras-exclusivo,
 .prospectos-calendar {
     font-family: 'Inter', sans-serif;
     color: #212529;
-    margin-top: 1rem;
+    margin-top: 1rem;    
 }
 
     /* === Panel lateral === */
@@ -3268,13 +3274,19 @@ body.modo-oscuro .modal-carreras-exclusivo,
 /* Responsive */
 @media screen and (max-width: 768px) {
     .prospectos-calendar .row {
-        flex-direction: column;
+        flex-direction: column;       
     }
 
     .prospectos-calendar .col-md-8,
     .prospectos-calendar .col-md-4 {
         width: 100%;
         min-width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .prospectos-calendar {
+        padding-bottom: 110px; /* suficiente para evitar que se tape */
     }
 }
 
@@ -3521,6 +3533,14 @@ body.modo-oscuro .prospectos-calendar-modal-cerrar {
     padding-bottom: 18px;
 }
 
+
+/* Elevar el modal de modalProspectos por encima del menú hamburguesa */
+#modalProspectos,
+#modalProspectos .modal-dialog,
+#modalProspectos .modal-content {
+    z-index: 4055 !important; /* valor alto, mayor que 3002 */
+}
+
 /* ---------- Header con botón de cerrar siempre visible ---------- */
 #modal-agendar-actividad .modal-title-row {
     display: flex;
@@ -3647,3 +3667,62 @@ body.modo-oscuro .prospectos-calendar-modal-cerrar {
     background: #0074D930;
     border-radius: 8px;
 }
+
+/*------------------------------header calendario-------------------------------------------*/
+
+
+.calendario-kanban-min {
+    padding: 1rem;
+    background: linear-gradient(135deg, var(--fondo-claro), #ffffff);
+    min-height: 2vh;
+    padding-bottom: 0rem;
+}
+
+
+.calendario-kanban {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    margin-top: 1rem;
+}
+
+
+.calendario-header-btn-whats {
+    background: linear-gradient(90deg, #0074D9 70%, #FFD700 120%);
+    color: #fff;
+    border: none;
+    border-radius: 1.2rem;
+    font-weight: 700;
+    font-size: 1.05rem;
+    padding: 0.68rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    box-shadow: 0 3px 14px #0074D922, 0 2px 9px #FFD70018;
+    transition: background 0.21s, box-shadow 0.13s, transform 0.13s;
+}
+
+.calendario-header-btn-whats {
+    background: linear-gradient(90deg, #44b002 70%, #3a9006 100%);
+}
+
+
+.calendario-header-btn-whats:hover {
+    transform: translateY(-2px) scale(1.035);
+    box-shadow: 0 7px 24px #0074D940;
+}
+
+.calendario-header-btn-whats {
+    font-size: 1.11rem;
+    width: 100%;
+    padding: 0.7rem 0;
+    justify-content: center;
+    margin-bottom: 0.32rem;
+}
+
+
+@media (max-width: 500px) {
+    .calendario-header-btn-whats {
+        font-size: 0.99rem;
+    }
+

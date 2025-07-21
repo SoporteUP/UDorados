@@ -1513,6 +1513,20 @@ namespace DoradosBlazorCrud.Server.Controllers
 
         }
 
+
+        [HttpPost]
+        [Route("ST_IUD_PreEnvios")]
+        public async Task<ActionResult> ST_IUD_PreEnvios([FromBody] ST_IUD_PreEnviosDTO envia)
+        {
+
+            var Result1 = new List<Respuesta>();
+
+            Result1 = _dbContext.respuesta.FromSql($"ST_IUD_PreEnvios {envia.iTipoOperacion},{envia.iUsuarioID},{envia.sNombre},{envia.sTelefono}").ToList();
+
+            return StatusCode(StatusCodes.Status200OK, Result1);
+
+        }
+
         [HttpPost]
         [Route("ST_IUE_ALUMNOSPREINSC")]
         public async Task<ActionResult> ST_IUE_ALUMNOSPREINSC([FromBody] ST_IUE_ALUMNOSPREINSCDTO alumnosp)

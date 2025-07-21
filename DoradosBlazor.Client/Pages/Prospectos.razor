@@ -302,7 +302,7 @@
             {
                 <details class="mb-2 mt-3">
                     <summary class="fw-bold text-azul mb-1" style="cursor:pointer;">
-                        Ver actividades recientes
+                        Ver actividades pendientes
                     </summary>
                     <div class="tabla-actividades-scroll">
                         <table class="table tabla-carreras tabla-carreras-exclusiva align-middle mb-0">
@@ -327,7 +327,7 @@
                                     @foreach (var act in listaPROSPECTOSACT)
                                     {
                                         <tr>
-                                            <td class="fw-bold">@act.Tipo</td>
+                                            <td class="fw-bold">@act.Tipo</td>                                            
                                             <td>@(act.FechaProgramada.ToString("dd/MM/yyyy HH:mm"))</td>
                                         </tr>
                                     }
@@ -344,7 +344,7 @@
         {
             <div class="sidebar-modal-agendar sombra-azul">
                 <div class="sidebar-header d-flex justify-content-between align-items-center mb-2">
-                    <span class="fw-bold text-azul">Actividades recientes</span>
+                    <span class="fw-bold text-azul">Actividades pendientes</span>
                 </div>
                 <div class="sidebar-content px-1">
                     <!-- OJO: Sin la clase tabla-actividades-scroll aquí -->
@@ -760,7 +760,7 @@
 
         mostrarModalAgendar = true;
 
-        listaPROSPECTOSACT = await usuarioService.ST_S_ProspectoActividades(2, 0, Convert.ToInt32(UsuarioIDSesion));
+        listaPROSPECTOSACT = await usuarioService.ST_S_ProspectoActividades(3, 0, Convert.ToInt32(UsuarioIDSesion));
 
         
 

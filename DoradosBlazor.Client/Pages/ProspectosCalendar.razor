@@ -4,14 +4,41 @@
 @using Radzen.Blazor
 @using Radzen.Blazor.Rendering
 @using DoradosBlazor.Client.Services
+@using System.Text
+@using System.Text.Json
 @inject IUsuarioService usuarioService
 @inject SesionUsuario mySesion
 @inject IJSRuntime JS
 @inject SweetAlertService Swal;
 @inject HttpClient httpClient
+@inject NavigationManager navManager;
+
+<div class="calendario-kanban-min">
+    <div class="prospectos-header-glass">
+        <div class="prospectos-header-left">
+            <div class="prospectos-header-icon">
+                <i class="bi bi-calendar-event-fill"></i>
+            </div>
+            <div>
+                <h2 class="prospectos-header-title">
+                    Calendario <span class="prospectos-header-title-sub">/ CRM visual</span>
+                </h2>
+            </div>
+        </div>
+
+        <div class="prospectos-header-actions">
+            <div class="prospectos-header-buttons">
+                <button class="calendario-header-btn-whats" @onclick="EnviosWhatsapp" title="Nuevo prospecto">
+                    <i class="bi bi-whatsapp"></i> <span class="d-none d-md-inline">Enviar Whats</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <div class="row prospectos-calendar">
-    <div class="col-md-8">
+    <div class="col-md-8">        
         <RadzenScheduler TItem="CitaProspecto" @ref="schedulerRef"
                          Data="@citas"
                          StartProperty="Inicio" EndProperty="Fin" TextProperty="Titulo"
@@ -19,7 +46,7 @@
                          SlotSelect="@OnSlotSelect"
                          AppointmentRender="@OnAppointmentRender"
                          SchedulerNavigate="OnSchedulerNavigate"
-                         Style="height: 600px;">
+                         Style="height: 650px;">
             <RadzenDayView StartTime=@TimeSpan.FromHours(6) />
             <RadzenWeekView StartTime=@TimeSpan.FromHours(6) />
             <RadzenMonthView />
@@ -33,9 +60,34 @@
             <p><strong>Asunto:</strong> @citaSeleccionada.Titulo</p>
             <p><strong>Tipo:</strong> @citaSeleccionada.Tipo</p>
             <p><strong>Descripción:</strong> @citaSeleccionada.Descripcion</p>
-            <p><strong>Inicio:</strong> @citaSeleccionada.Inicio.ToString("g")</p>
-            @* <p><strong>Fin:</strong> @citaSeleccionada.Fin.ToString("g")</p> *@
+            <p><strong>Inicio:</strong> @citaSeleccionada.Inicio.ToString("g")</p>            
             <p><strong>Realizado:</strong> @citaSeleccionada.Estatus</p>
+            <ul class="list-group mb-3">
+
+                @if (citaSeleccionada.Realizado == false)
+                {
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>
+                            <i class="bi @(citaSeleccionada.Tipo == "Llamada" ? "bi-telephone" : citaSeleccionada.Tipo == "Correo" ? "bi-envelope" : citaSeleccionada.Tipo == "Visita" ? "bi-geo" : "bi-alarm")"></i>
+                            <strong>@citaSeleccionada.Tipo:</strong> Marcar como Realizado                           
+                        </span>
+                        <button class="btn btn-success btn-sm" title="Marcar como realizado" @onclick="() => MarcarRealizado(citaSeleccionada.Id)">
+                            ✔️
+                        </button>
+                    </li>
+                }
+                else
+                {
+                    
+                    <li class="list-group-item">
+                        <i class="bi bi-check-circle-fill text-success"></i>
+                        <strong>@citaSeleccionada.Tipo realizada:</strong> @citaSeleccionada.Descripcion
+                        – <small>Realizado el @citaSeleccionada.Inicio.ToString("g")</small>
+                    </li>
+                    
+                }               
+               
+            </ul>
             @if (citaSeleccionada.Id == 0)
             {
                 <button class="btn btn-success btn-sm" @onclick="GuardarNuevaCita">
@@ -50,8 +102,11 @@
                 <button class="btn btn-danger btn-sm" @onclick="EliminarCita">
                     <i class="bi bi-trash-fill"></i> Eliminar
                 </button>
-                <button class="btn btn-success btn-sm">
+                <button class="btn btn-success btn-sm" @onclick="VerDetalles">
                     <i class="bi bi-eye"></i> Información de Prospec.
+                </button>
+                <button class="btn btn-success btn-sm" @onclick="EjecutarWorkflow">
+                    <i class="bi bi-eye"></i> Prueba hook.
                 </button>
             }
         }
@@ -72,7 +127,7 @@
                     <ul class="prospectos-calendar-lista-citas mt-3">
                         @foreach (var cita in citasDelDia)
                         {
-                            <li class="prospectos-calendar-item-cita @TipoClase(cita.Tipo)">
+                            <li class="prospectos-calendar-item-cita @TipoClase(cita.Tipo)" @onclick="@(() => OnCitaClick(cita))">
                                 <div>
                                     <span class="prospectos-calendar-item-titulo"><strong>@cita.Titulo</strong></span>
                                     <span class="prospectos-calendar-item-hora">@cita.Tipo - @cita.Inicio.ToString("t")</span>
@@ -93,14 +148,14 @@
 
     @if (mostrarModalAgendar)
     {
-        <div class="modal-backdrop">
-            @* podría usar clases de Bootstrap si ya están incluidas *@
-            <div class="modern-card sombra-azul prospecto-actividad-form">
-                <button class="btn-closepros" @onclick="() => mostrarModalAgendar=false">
-                    <i class="bi bi-x"></i>
-                </button>
-                <div class="modern-card-title mb-3">
+        <div id="modal-agendar-actividad" class="modal-backdrop">
+            <div class="modern-card sombra-azul prospecto-actividad-form"
+                 style="@((esComputadora ? "margin-left:360px; min-width:330px;" : ""))">
+                <div class="modern-card-title">
                     <i class="bi bi-calendar-event"></i> Editar actividad para @nombreProspectoSeleccionado
+                    <button class="btn-closepros" @onclick="() => mostrarModalAgendar = false" title="Cerrar">
+                        <i class="bi bi-x"></i>
+                    </button>
                 </div>
                 <div class="mb-2">
                     <label class="modern-label">Tipo de actividad</label>
@@ -126,20 +181,104 @@
                         <i class="bi bi-save"></i> Guardar
                     </button>
                 </div>
+
+                <!-- Solo en móvil: la tabla abajo del formulario, dentro de acordeón -->
+                @if (!esComputadora)
+                {
+                    <details class="mb-2 mt-3">
+                        <summary class="fw-bold text-azul mb-1" style="cursor:pointer;">
+                            Ver actividades pendientes
+                        </summary>
+                        <div class="tabla-actividades-scroll">
+                            <table class="table tabla-carreras tabla-carreras-exclusiva align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Tipo</th>
+                                        <th>Fecha programada</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (listaPROSPECTOSACT == null || listaPROSPECTOSACT.Count == 0)
+                                    {
+                                        <tr>
+                                            <td colspan="2" class="text-center text-muted py-4">
+                                                <i class="bi bi-emoji-frown fs-3"></i>
+                                                <div>No se encontró ninguna actividad</div>
+                                            </td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        @foreach (var act in listaPROSPECTOSACT)
+                                        {
+                                            <tr>
+                                                <td class="fw-bold">@act.Tipo</td>
+                                                <td>@(act.FechaProgramada.ToString("dd/MM/yyyy HH:mm"))</td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </details>
+                }
             </div>
+
+            <!-- Sidebar solo para computadora -->
+            @if (esComputadora)
+            {
+                <div class="sidebar-modal-agendar sombra-azul">
+                    <div class="sidebar-header d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold text-azul">Actividades pendientes</span>
+                    </div>
+                    <div class="sidebar-content px-1">
+                        <!-- OJO: Sin la clase tabla-actividades-scroll aquí -->
+                        <table class="table tabla-carreras tabla-carreras-exclusiva align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Tipo</th>
+                                    <th>Fecha programada</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (listaPROSPECTOSACT == null || listaPROSPECTOSACT.Count == 0)
+                                {
+                                    <tr>
+                                        <td colspan="2" class="text-center text-muted py-4">
+                                            <i class="bi bi-emoji-frown fs-3"></i>
+                                            <div>No se encontró ninguna actividad</div>
+                                        </td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    @foreach (var act in listaPROSPECTOSACT)
+                                    {
+                                        <tr>
+                                            <td class="fw-bold">@act.Tipo</td>
+                                            <td>@(act.FechaProgramada.ToString("dd/MM/yyyy HH:mm"))</td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
         </div>
     }
 
+
     @if (mostrarModalAgendarNueva)
     {
-        <div class="modal-backdrop">
-            @* podría usar clases de Bootstrap si ya están incluidas *@
-            <div class="modern-card sombra-azul prospecto-actividad-form">
-                <button class="btn-closepros" @onclick="() => mostrarModalAgendarNueva=false">
-                    <i class="bi bi-x"></i>
-                </button>
-                <div class="modern-card-title mb-3">
+        <div id="modal-agendar-actividad" class="modal-backdrop">
+            <div class="modern-card sombra-azul prospecto-actividad-form"
+                 style="@((esComputadora ? "margin-left:360px; min-width:330px;" : ""))">
+                <div class="modern-card-title">
                     <i class="bi bi-calendar-event"></i> Agendar actividad para @nombreProspectoSeleccionado
+                    <button class="btn-closepros" @onclick="() => mostrarModalAgendarNueva = false" title="Cerrar">
+                        <i class="bi bi-x"></i>
+                    </button>
                 </div>
                 <div class="mb-2">
                     <label class="modern-label">Tipo de actividad</label>
@@ -165,9 +304,117 @@
                         <i class="bi bi-save"></i> Guardar
                     </button>
                 </div>
+
+                <!-- Solo en móvil: la tabla abajo del formulario, dentro de acordeón -->
+                @if (!esComputadora)
+                {
+                    <details class="mb-2 mt-3">
+                        <summary class="fw-bold text-azul mb-1" style="cursor:pointer;">
+                            Ver actividades pendientes
+                        </summary>
+                        <div class="tabla-actividades-scroll">
+                            <table class="table tabla-carreras tabla-carreras-exclusiva align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Tipo</th>
+                                        <th>Fecha programada</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (listaPROSPECTOSACT == null || listaPROSPECTOSACT.Count == 0)
+                                    {
+                                        <tr>
+                                            <td colspan="2" class="text-center text-muted py-4">
+                                                <i class="bi bi-emoji-frown fs-3"></i>
+                                                <div>No se encontró ninguna actividad</div>
+                                            </td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        @foreach (var act in listaPROSPECTOSACT)
+                                        {
+                                            <tr>
+                                                <td class="fw-bold">@act.Tipo</td>
+                                                <td>@(act.FechaProgramada.ToString("dd/MM/yyyy HH:mm"))</td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </details>
+                }
+            </div>
+
+            <!-- Sidebar solo para computadora -->
+            @if (esComputadora)
+            {
+                <div class="sidebar-modal-agendar sombra-azul">
+                    <div class="sidebar-header d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold text-azul">Actividades pendientes</span>
+                    </div>
+                    <div class="sidebar-content px-1">
+                        <!-- OJO: Sin la clase tabla-actividades-scroll aquí -->
+                        <table class="table tabla-carreras tabla-carreras-exclusiva align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Tipo</th>
+                                    <th>Fecha programada</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (listaPROSPECTOSACT == null || listaPROSPECTOSACT.Count == 0)
+                                {
+                                    <tr>
+                                        <td colspan="2" class="text-center text-muted py-4">
+                                            <i class="bi bi-emoji-frown fs-3"></i>
+                                            <div>No se encontró ninguna actividad</div>
+                                        </td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    @foreach (var act in listaPROSPECTOSACT)
+                                    {
+                                        <tr>
+                                            <td class="fw-bold">@act.Tipo</td>
+                                            <td>@(act.FechaProgramada.ToString("dd/MM/yyyy HH:mm"))</td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+
+    @if (mostrarDetalles)
+    {
+        <div class="modal-backdrop">
+            <div class="modern-card sombra-azul prospecto-detalle">
+                <button class="btn-closepros" @onclick="() => mostrarDetalles=false">
+                    <i class="bi bi-x"></i>
+                </button>
+                <div class="modern-card-title mb-3">
+                    <i class="bi bi-eye"></i> Detalles de @nombreProspectoSeleccionado
+                </div>
+                <!-- Información del prospecto -->
+                <div class="mb-3">
+                    <strong>Correo:</strong> @CorreoDetalle <br />
+                    <strong>Teléfono:</strong> <a href="tel:@TelefonoDetalle">@TelefonoDetalle</a>
+                    - <strong>Cel:</strong> <a href="tel:@CelularDetalle">@CelularDetalle</a> <br />
+                    <strong>Localidad:</strong> @LocalidadDetalle <br />
+                    <strong>Estatus:</strong> @EstatusDetalle <br />
+                    <!-- ... otros campos relevantes ... -->
+                </div>               
             </div>
         </div>
     }
+
 
 
 </div>
@@ -244,7 +491,22 @@
     <link rel="stylesheet" href="_content/Radzen.Blazor/css/material.css" />
 </HeadContent>
 
+
+
+
+@if (cargando)
+{
+    <span>Cargando...</span>
+}
+@if (!string.IsNullOrEmpty(mensaje))
+{
+    <div>@mensaje</div>
+}
+
+
+
 @code {
+
     [Parameter] public int ProspectoID { get; set; }
     [Parameter] public string iUsuarioID { get; set; } = "";
 
@@ -253,6 +515,8 @@
     private bool mostrarModalAgendarNueva = false;
     private bool mostrarDetalles = false;
     private bool mostrarFormulario = false;
+    private bool esComputadora = true;
+    private bool mostrarSidebarAgendar = false;
 
     private int ProspectoSeleccionadoID = 0;
 
@@ -271,6 +535,7 @@
 
     private List<ST_S_ProspectoActividadesDTO> actividadesProspecto = new List<ST_S_ProspectoActividadesDTO>();
 
+
     private ST_IUD_ProspectoActividadDTO ACTIVIDADDTO = new ST_IUD_ProspectoActividadDTO();
 
     // Guardo mes/año visible para el JS
@@ -278,6 +543,13 @@
     private int anioVisible = 0;
 
     private string nombreProspectoSeleccionado = "";
+    private string CorreoDetalle = "";
+    private string TelefonoDetalle = "";
+    private string CelularDetalle = "";
+    private string LocalidadDetalle = "";
+    private string EstatusDetalle = "";
+
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -322,9 +594,10 @@
         await JS.InvokeVoidAsync("calendarUtils.setVisibleMonth", anioVisible, mesVisible);
     }
 
-    private void OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<CitaProspecto> args)
+    private async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<CitaProspecto> args)
     {
         citaSeleccionada = args.Data;
+
     }
 
     private async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)
@@ -388,7 +661,7 @@
         citaSeleccionada!.Id = citas.Max(c => c.Id) + 1;
     }
 
-    private void EditarCita()
+    private async Task EditarCita()
     {
 
         ACTIVIDADDTO = new ST_IUD_ProspectoActividadDTO
@@ -406,6 +679,11 @@
 
         nombreProspectoSeleccionado = citaSeleccionada.NombreProspecto;
         mostrarModalAgendar = true;
+
+        listaPROSPECTOSACT = await usuarioService.ST_S_ProspectoActividades(3, 0, Convert.ToInt32(iUsuarioID));
+        esComputadora = await JS.InvokeAsync<bool>("isDesktop");
+        mostrarSidebarAgendar = esComputadora;
+
     }
 
     private async Task EditarActividad()
@@ -478,6 +756,9 @@
         citaSeleccionada.NombreProspecto = ACTIVIDADDTO.sNombreProspecto;
     }
 
+
+
+
     private async Task EliminarCita()
     {
         if (citaSeleccionada is not null)
@@ -537,6 +818,8 @@
         }
     }
 
+
+
     private async void FiltrarProspectos(ChangeEventArgs e)
     {
         var filtro = e.Value?.ToString();
@@ -594,7 +877,6 @@
 
     }
 
-
     private async Task AbrirModalAgendar(ST_S_ProspecFiltrosTop70DTO prospecto)
     {
         // Preparar nueva actividad con valores por defecto
@@ -612,6 +894,12 @@
             };
         nombreProspectoSeleccionado = prospecto.Nombre ?? "";
         mostrarModalAgendarNueva = true;
+
+
+        listaPROSPECTOSACT = await usuarioService.ST_S_ProspectoActividades(3, 0, Convert.ToInt32(iUsuarioID));
+        esComputadora = await JS.InvokeAsync<bool>("isDesktop");
+        mostrarSidebarAgendar = esComputadora;
+
 
         ProspectoSeleccionadoID = prospecto.ProspectoID;
 
@@ -662,6 +950,105 @@
         }
     }
 
+    private async Task MarcarRealizado(int actividadID)
+    {
+
+        if (actividadID != null)
+        {
+            ACTIVIDADDTO = new ST_IUD_ProspectoActividadDTO
+             {
+                 iTipoOperacion = 2,
+                 iActividadID = actividadID,
+                 iProspectoID = citaSeleccionada.ProspectoID,
+                 iEjecutivoID = Convert.ToInt32(iUsuarioID), // o ID real
+                 sTipo = citaSeleccionada.Tipo,
+                 sDescripcion = citaSeleccionada.Descripcion,
+                 dFechaProgramada = citaSeleccionada.Inicio,
+                 bRealizado = true,
+                 sNombreProspecto = citaSeleccionada.NombreProspecto
+             };
+
+            var resp = await httpClient.PostAsJsonAsync("/api/Usuario/ST_IUD_ProspectoActividad", ACTIVIDADDTO);
+            if (resp.IsSuccessStatusCode)
+            {
+                citaSeleccionada.Realizado = true;
+                // Refrescar el calendario
+
+                var resultado = await usuarioService.ST_S_ProspectoActividades(2, 0, Convert.ToInt32(iUsuarioID));
+                citas = resultado.Select(x => new CitaProspecto
+                    {
+                        Id = x.ActividadID,
+                        ProspectoID = x.ProspectoID,
+                        Titulo = $"{x.Tipo} con {x.NombreProspecto}",
+                        Tipo = x.Tipo,
+                        Descripcion = x.Descripcion,
+                        Estatus = x.Realizado ? "COMPLETADA" : "PENDIENTE",
+                        Inicio = x.FechaProgramada,
+                        Fin = x.FechaProgramada.AddMinutes(30),
+                        Realizado = x.Realizado,
+                        NombreProspecto = x.NombreProspecto,
+                    }).ToList();
+
+                if (citaSeleccionada != null)
+                {
+                    await CargarCita();
+                }
+                else
+                {
+                    citaSeleccionada = null;
+                }
+
+
+                StateHasChanged();
+            }
+            else
+            {
+                await Swal.FireAsync("Error", "No se pudo actualizar la actividad", SweetAlertIcon.Error);
+            }
+        }
+    }
+
+    private async Task VerDetalles()
+    {
+        listaPROSPECTOS70 = await usuarioService.ST_S_ProspecFiltrosTop70("ProspectoID", Convert.ToString(citaSeleccionada.ProspectoID), "NOMBRE", citaSeleccionada.NombreProspecto);
+        nombreProspectoSeleccionado = listaPROSPECTOS70[0].Nombre;
+        CorreoDetalle = listaPROSPECTOS70[0].Correo;
+        TelefonoDetalle = listaPROSPECTOS70[0].Telefono;
+        CelularDetalle = listaPROSPECTOS70[0].Celular;
+        LocalidadDetalle = listaPROSPECTOS70[0].Localidad;
+        EstatusDetalle = listaPROSPECTOS70[0].Estatus;
+        mostrarDetalles = true;
+    }
+
+    private async Task OnCitaClick(CitaProspecto cita)
+    {
+        ACTIVIDADDTO = new ST_IUD_ProspectoActividadDTO
+            {
+                iTipoOperacion = 2,              // 2 = actualizar
+                iActividadID = cita.Id,
+                iProspectoID = cita.ProspectoID,
+                iEjecutivoID = Convert.ToInt32(iUsuarioID),                // TODO: reemplazar con ID del usuario actual logueado
+                sTipo = cita.Tipo,               // valor inicial por defecto
+                sDescripcion = cita.Descripcion,
+                dFechaProgramada = cita.Inicio,
+                bRealizado = cita.Realizado,
+                sNombreProspecto = cita.NombreProspecto
+            };
+
+        nombreProspectoSeleccionado = cita.NombreProspecto;
+        mostrarModalAgendar = true;
+        mostrarModalCitasDia = false;
+
+        listaPROSPECTOSACT = await usuarioService.ST_S_ProspectoActividades(3, 0, Convert.ToInt32(iUsuarioID));
+        esComputadora = await JS.InvokeAsync<bool>("isDesktop");
+        mostrarSidebarAgendar = esComputadora;
+    }
+
+    private async Task EnviosWhatsapp()
+    {
+        navManager.NavigateTo($"/envioswhatsapp");
+    }
+
     public class CitaProspecto
     {
         public int Id { get; set; }
@@ -675,4 +1062,42 @@
         public bool Realizado { get; set; }
         public string NombreProspecto { get; set; }
     }
+
+    // -----------------------------------WEB HOOK---------------------------------------------------
+
+    private async Task EjecutarWorkflow()
+    {
+        cargando = true;
+        mensaje = null;
+        StateHasChanged();
+        try
+        {
+            var url = $"https://n8n-whatsapp-n8n.fan1d1.easypanel.host/webhook/a60c62e4-ebf6-4a98-9c00-8d15c04a2936?sUsuarioID={sUsuarioID}&stexto={stexto}";
+            var response = await httpClient.GetAsync(url); // Cambia a GetAsync
+
+            if (response.IsSuccessStatusCode)
+            {
+                mensaje = "¡Workflow ejecutado correctamente!";
+            }
+            else
+            {
+                mensaje = $"Error: {response.StatusCode}";
+            }
+        }
+        catch (Exception ex)
+        {
+            mensaje = "Error de conexión: " + ex.Message;
+        }
+        cargando = false;
+        StateHasChanged();
+    }
+
+
+    bool cargando = false;
+    string mensaje;
+    string sUsuarioID = "13"; // O el valor que necesites
+    string stexto = "Hola que tal: https://www.facebook.com/share/p/1EvSiQNZN3/"; // O el valor que necesites
+
+
+
 }
