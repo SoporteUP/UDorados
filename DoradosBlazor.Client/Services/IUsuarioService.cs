@@ -29,6 +29,9 @@ namespace DoradosBlazor.Client.Services
         Task<List<ST_S_ProspecFiltrosTop70DTO>> ST_S_ProspecFiltrosTop70(string cCampo, string cBusqueda, string cCampo2, string cBusqueda2);
         Task<List<ST_S_ProspectoActividadesDTO>> ST_S_ProspectoActividades(int iTipoOperacion, int iProspectoID, int iEjecutivoID);
         Task<List<ST_S_ProspectoActividadesDTO>> ST_S_ProspectoActividadesAll();
+        Task<List<ST_S_PreEnviosDTO>> ST_S_PreEnvios(int iUsuarioID);
+        Task<List<ST_S_MensajesDTO>> ST_S_Mensajes(int iUsuarioID);
+
         Task<UsuarioDTO>Buscar(int id); 
 
         Task<int>Guardar(UsuarioDTO usuario);

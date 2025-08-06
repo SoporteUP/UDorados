@@ -1,0 +1,656 @@
+﻿@page "/mensajeswhatsapp"
+
+@inject IUsuarioService usuarioService
+@inject SesionUsuario mySesion
+@inject HttpClient httpClient
+@inject SweetAlertService Swal;
+@inject IJSRuntime JS
+@using DoradosBlazor.Shared
+@using DoradosBlazor.Client.Services
+
+<div id="mensajes-whatsapp-wrapper">
+    <div class="mensajes-whatsapp-main">
+
+        <!-- CHAT PRINCIPAL -->
+        <div class="mensajes-whatsapp-chat">
+            <div class="Enviosw-header-glass">
+                <div class="Enviosw-header-left">
+                    <div class="mensajes-whatsapp-toggle-btn">
+                        <button @onclick="TogglePanelMovil" aria-label="Abrir panel derecho">
+                            <i class="bi bi-list" style="font-size: 1.6rem; color: #128C7E;"></i>
+                        </button>
+                    </div>
+                    <div class="Enviosw-header-icon">
+                        <i class="bi bi-whatsapp"></i>
+                    </div>
+                    <div>
+                        <h2 class="Enviosw-header-title">
+                            Mensajes <span class="Enviosw-header-title-sub">/ Mensajes Predeterminados</span>
+                        </h2>
+                        <div class="Enviosw-header-subdesc d-none d-md-block">
+                            Escribe e inserta mensajes
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mensajes-whatsapp-header">
+                Whatsapp - <span class="subnombre-contacto">Estos mensajes son aleatorios</span>
+            </div>
+
+            <div class="mensajes-whatsapp-conversacion" @ref="conversacionDiv">
+                @if (mensajesPredeterminados != null && mensajesPredeterminados.Count > 0)
+                {
+                    @foreach (var mensaje in mensajesPredeterminados)
+                    {
+                        <div class="mensaje-burbuja enviado" @onmouseleave="() => OcultarMenu(mensaje)" @onmouseenter="() => MostrarMenu(mensaje)">
+                            @mensaje.Mensaje
+
+                            <button class="btn-menu" style="display: @(mensajeHover == mensaje ? "block" : "none")" @onclick="() => ToggleMenu(mensaje)">
+                                <i class="bi bi-caret-down-fill"></i>
+                            </button>
+
+                            @if (mensaje == mensajeConMenuVisible)
+                            {
+                                <div class="menu-opciones">
+                                    <button @onclick="() => CopiarMensaje(mensaje)">Copiar</button>
+                                    <button @onclick="() => AbrirModalEditar(mensaje)">Editar</button>
+                                    <button @onclick="() => EliminarMensaje(mensaje)">Eliminar</button>
+                                </div>
+                            }
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div>No hay mensajes predeterminados.</div>
+                }
+            </div>
+
+            <div class="mensajes-whatsapp-input">
+                <input type="text" placeholder="Escribe un mensaje..." @bind="nuevoMensaje" @onkeypress="CheckEnter" />
+                <button @onclick="InsertarMensaje">Insertar Mensaje</button>
+            </div>
+        </div>
+
+        <!-- PANEL DERECHO -->
+        <div class="mensajes-whatsapp-lateral @(panelMovilVisible ? "visible" : "")">
+            <!-- Botón para cerrar panel en móvil -->
+            <div class="cerrar-panel-btn d-md-none">
+                <button @onclick="TogglePanelMovil" aria-label="Cerrar panel derecho">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <!-- Acordeones -->
+            <div class="acordeon-item">
+                <button class="acordeon-header" @onclick="() => TogglePanel(Panel.Atributos)">
+                    OPCIONES
+                    <span class="icono">@((panelActivo == Panel.Atributos) ? "▾" : "▸")</span>
+                </button>
+                @if (panelActivo == Panel.Atributos)
+                {
+                    <div class="acordeon-contenido">
+                        <div class="mensajes-whatsapp-eliminar">
+                            <button @onclick="VaciarMensajes">Vaciar Mensajes</button>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="acordeon-item">
+                <button class="acordeon-header" @onclick="() => TogglePanel(Panel.ProximoEvento)">
+                    Próximo Evento
+                    <span class="icono">@((panelActivo == Panel.ProximoEvento) ? "▾" : "▸")</span>
+                </button>
+                @if (panelActivo == Panel.ProximoEvento)
+                {
+                    <div class="acordeon-contenido">
+                        <div class="evento-vacio">
+                            <i class="bi bi-calendar-event"></i>
+                            <span>Nada planeado para este prospecto</span>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="acordeon-item">
+                <button class="acordeon-header" @onclick="() => TogglePanel(Panel.Notas)">
+                    Notas
+                    <span class="icono">@((panelActivo == Panel.Notas) ? "▾" : "▸")</span>
+                </button>
+                @if (panelActivo == Panel.Notas)
+                {
+                    <div class="acordeon-contenido">
+                        <p>Aquí podrás ver y editar notas.</p>
+                    </div>
+                }
+            </div>
+
+            <div class="acordeon-item">
+                <button class="acordeon-header" @onclick="() => TogglePanel(Panel.MensajesProgramados)">
+                    Mensajes Programados
+                    <span class="icono">@((panelActivo == Panel.MensajesProgramados) ? "▾" : "▸")</span>
+                </button>
+                @if (panelActivo == Panel.MensajesProgramados)
+                {
+                    <div class="acordeon-contenido">
+                        <p>Aquí verás los mensajes programados.</p>
+                    </div>
+                }
+            </div>
+
+            <div class="acordeon-item">
+                <button class="acordeon-header" @onclick="() => TogglePanel(Panel.Seleccionados)">
+                    Seleccionados
+                    <span class="icono">@((panelActivo == Panel.Seleccionados) ? "▾" : "▸")</span>
+                </button>
+                @if (panelActivo == Panel.Seleccionados)
+                {
+                    <div class="acordeon-contenido">
+                        @if (listaPREENVIOS != null && listaPREENVIOS.Count > 0)
+                        {
+                            <ul>
+                                @foreach (var pre in listaPREENVIOS)
+                                {
+                                    <li><strong>@pre.Nombre</strong> - @pre.Telefono</li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <p>No hay seleccionados.</p>
+                        }
+                    </div>
+                }
+            </div>
+
+            <div class="acordeon-item">
+                <button class="acordeon-header" @onclick="() => TogglePanel(Panel.MensajesDestacados)">
+                    Mensajes Destacados
+                    <span class="icono">@((panelActivo == Panel.MensajesDestacados) ? "▾" : "▸")</span>
+                </button>
+                @if (panelActivo == Panel.MensajesDestacados)
+                {
+                    <div class="acordeon-contenido">
+                        <p>Aquí irán los mensajes destacados.</p>
+                    </div>
+                }
+            </div>
+
+            <div class="enviar-whatsapp-footer">
+                <button class="btn-enviar-whatsapp" @onclick="EnviarWhatsApp">Enviar a WhatsApp</button>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal para Editar Mensaje -->
+@if (modalEditarVisible)
+{
+    <div class="modal-overlay" @onclick="CerrarModalEditar">
+        <div class="modal-contenido" @onclick:stopPropagation>
+            <div class="modal-header">
+                <button class="btn-cerrar" @onclick="CerrarModalEditar">×</button>
+                <h5>Edita el mensaje</h5>
+            </div>
+
+            <div class="modal-preview-mensaje">
+                <div class="mensaje-burbuja enviado">
+                    @mensajeEditandoTexto
+                    <span class="hora-mensaje">@DateTime.Now.ToString("h:mm tt")</span>
+                    <span class="icon-checks">✔✔</span>
+                </div>
+            </div>
+
+            <div class="modal-editar-input">
+                <textarea @bind="mensajeEditandoTexto" rows="3" placeholder="Edita tu mensaje aquí..."></textarea>
+                <button class="btn-enviar" @onclick="GuardarEdicion">
+                    <i class="bi bi-check2"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@if (cargando)
+{
+    <div class="modal-carga-overlay">
+        <div class="modal-carga-contenido">
+            <div class="spinner-border text-success" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+            <p>Cargando, por favor espera...</p>
+        </div>
+    </div>
+}
+
+
+@code {
+    [Parameter]
+    public string iUsuarioID { get; set; } = "";    
+
+    private Panel panelActivo = Panel.Ninguno;
+
+    private ST_S_MensajesDTO mensajeHover = null;
+    private ST_S_MensajesDTO mensajeConMenuVisible = null;
+    private ElementReference conversacionDiv;
+
+    private bool cargando = false;
+
+    private bool modalEditarVisible = false;
+    private ST_S_MensajesDTO mensajeEditando;
+    private string mensajeEditandoTexto;
+
+    private DotNetObjectReference<MensajesWhatsapp> dotNetObjRef;
+
+    private string nuevoMensaje = string.Empty;
+    private List<ST_S_MensajesDTO> mensajesPredeterminados = new();
+    private List<ST_S_PreEnviosDTO> listaPREENVIOS = new();
+    private ST_IUD_MensajesDTO MENSAJESDTO = new ST_IUD_MensajesDTO();
+    private ST_U_AsignarMensajesSinRepetirDTO AsigMensajesSinRepetirDTO = new ST_U_AsignarMensajesSinRepetirDTO();
+
+    private bool panelMovilVisible = false;
+
+    private void TogglePanelMovil()
+    {
+        panelMovilVisible = !panelMovilVisible;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        iUsuarioID = mySesion.UsuarioID;
+        mensajesPredeterminados = await usuarioService.ST_S_Mensajes(Convert.ToInt32(iUsuarioID));
+        listaPREENVIOS = await usuarioService.ST_S_PreEnvios(Convert.ToInt32(iUsuarioID));
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            dotNetObjRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("mensajeswhatsapp.registerClickOutside", conversacionDiv, dotNetObjRef);
+        }
+    }
+
+    [JSInvokable]
+    public void OcultarMenuGlobal()
+    {
+        if (mensajeConMenuVisible != null)
+        {
+            mensajeConMenuVisible = null;
+            StateHasChanged();
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (dotNetObjRef != null)
+        {
+            await JS.InvokeVoidAsync("mensajeswhatsapp.unregisterClickOutside");
+            dotNetObjRef.Dispose();
+        }
+    }
+
+    private enum Panel
+    {
+        Ninguno,
+        Atributos,
+        ProximoEvento,
+        Notas,
+        MensajesProgramados,
+        MensajesDestacados,
+        Seleccionados
+    }
+
+    private void TogglePanel(Panel panel)
+    {
+        if (panelActivo == panel)
+            panelActivo = Panel.Ninguno;
+        else
+            panelActivo = panel;
+    }
+
+    private async Task InsertarMensaje()
+    {
+        if (!string.IsNullOrWhiteSpace(nuevoMensaje))
+        {
+            var mensajeActual = nuevoMensaje;
+
+            mensajesPredeterminados.Add(new ST_S_MensajesDTO
+                {
+                    UsuarioID = Convert.ToInt32(iUsuarioID),
+                    Mensaje = mensajeActual
+                });
+
+            // Aquí defines los datos para el backend
+            MENSAJESDTO.iTipoConsulta = 1;
+            MENSAJESDTO.iUsuarioID = Convert.ToInt32(iUsuarioID);
+            MENSAJESDTO.iMensajeID = 0;
+            MENSAJESDTO.sMensaje = mensajeActual; // Usa el mensaje guardado
+
+            // POST al backend
+            var response = await httpClient.PostAsJsonAsync("/api/Usuario/ST_IUD_Mensajes", MENSAJESDTO);
+
+            if (response.IsSuccessStatusCode)
+            {
+
+                await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Mensaje Agregado",
+                    Text = "Se ha agregado el mensaje correctamente.",
+                    Icon = SweetAlertIcon.Success
+                });
+
+                AsigMensajesSinRepetirDTO.UsuarioID = Convert.ToInt32(iUsuarioID);
+
+                var response2 = await httpClient.PostAsJsonAsync("/api/Usuario/ST_U_AsignarMensajesSinRepetir", AsigMensajesSinRepetirDTO);
+
+                // Recarga la lista de mensajes predeterminados
+                mensajesPredeterminados = await usuarioService.ST_S_Mensajes(Convert.ToInt32(iUsuarioID));
+            }
+            else
+            {
+                await Swal.FireAsync("Error", "No se pudo agregar el mensaje", SweetAlertIcon.Error);
+            }
+
+            // Hasta el final limpia el input
+            nuevoMensaje = string.Empty;
+        }
+    }
+
+    void AbrirModalEditar(ST_S_MensajesDTO mensaje)
+    {
+        mensajeEditando = mensaje;
+        mensajeEditandoTexto = mensaje.Mensaje;
+        modalEditarVisible = true;
+        mensajeConMenuVisible = null;
+    }
+
+    void CerrarModalEditar()
+    {
+        modalEditarVisible = false;
+        mensajeEditando = null;
+        mensajeEditandoTexto = null;
+    }
+
+    async Task GuardarEdicion()
+    {
+        if (string.IsNullOrWhiteSpace(mensajeEditandoTexto))
+        {
+            await Swal.FireAsync("Error", "El mensaje no puede quedar vacío", SweetAlertIcon.Error);
+            return;
+        }
+
+        // Actualiza el texto localmente
+        mensajeEditando.Mensaje = mensajeEditandoTexto;
+
+        // Prepara el DTO para backend
+        MENSAJESDTO.iTipoConsulta = 2; // Editar
+        MENSAJESDTO.iUsuarioID = Convert.ToInt32(iUsuarioID);
+        MENSAJESDTO.iMensajeID = mensajeEditando.MensajeID;
+        MENSAJESDTO.sMensaje = mensajeEditandoTexto;
+
+        // Envía el cambio al backend
+        var response = await httpClient.PostAsJsonAsync("/api/Usuario/ST_IUD_Mensajes", MENSAJESDTO);
+
+        if (response.IsSuccessStatusCode)
+        {
+            modalEditarVisible = false;
+            await Swal.FireAsync("Mensaje editado", "El mensaje se actualizó correctamente", SweetAlertIcon.Success);
+
+            AsigMensajesSinRepetirDTO.UsuarioID = Convert.ToInt32(iUsuarioID);
+            var response2 = await httpClient.PostAsJsonAsync("/api/Usuario/ST_U_AsignarMensajesSinRepetir", AsigMensajesSinRepetirDTO);
+
+            mensajesPredeterminados = await usuarioService.ST_S_Mensajes(Convert.ToInt32(iUsuarioID));
+        }
+        else
+        {
+
+            await Swal.FireAsync("Error", "No se pudo editar el mensaje", SweetAlertIcon.Error);
+        }
+
+
+    }
+
+    private async Task EditarMensaje(ST_S_MensajesDTO mensaje)
+    {
+        var resultado = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Eliminar Mensajes",
+                Text = "¿Desea eliminar este mensaje?",
+                Icon = SweetAlertIcon.Info,
+                ShowCancelButton = true
+            });
+
+        if (resultado.IsConfirmed)
+        {
+            // Aquí defines los datos para el backend
+            MENSAJESDTO.iTipoConsulta = 3;
+            MENSAJESDTO.iUsuarioID = Convert.ToInt32(iUsuarioID);
+            MENSAJESDTO.iMensajeID = mensaje.MensajeID;
+            MENSAJESDTO.sMensaje = mensaje.Mensaje;
+
+            // POST al backend
+            var response = await httpClient.PostAsJsonAsync("/api/Usuario/ST_IUD_Mensajes", MENSAJESDTO);
+
+            if (response.IsSuccessStatusCode)
+            {
+
+                await Swal.FireAsync(new SweetAlertOptions
+                    {
+                        Title = "Mensaje Eliminado",
+                        Text = "Se eliminado el mensaje correctamente.",
+                        Icon = SweetAlertIcon.Success
+                    });
+
+                // Recarga la lista de mensajes predeterminados
+                mensajesPredeterminados = await usuarioService.ST_S_Mensajes(Convert.ToInt32(iUsuarioID));
+            }
+            else
+            {
+                await Swal.FireAsync("Error", "No se pudo eliminar el mensaje", SweetAlertIcon.Error);
+            }
+        }
+    }
+
+    private async Task EliminarMensaje(ST_S_MensajesDTO mensaje)
+    {
+        var resultado = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Eliminar Mensaje",
+                Text = "¿Desea eliminar este mensaje?",
+                Icon = SweetAlertIcon.Info,
+                ShowCancelButton = true
+            });
+
+        if (resultado.IsConfirmed)
+        {
+            // Aquí defines los datos para el backend
+            MENSAJESDTO.iTipoConsulta = 3;
+            MENSAJESDTO.iUsuarioID = Convert.ToInt32(iUsuarioID);
+            MENSAJESDTO.iMensajeID = mensaje.MensajeID;
+            MENSAJESDTO.sMensaje = mensaje.Mensaje;
+
+            // POST al backend
+            var response = await httpClient.PostAsJsonAsync("/api/Usuario/ST_IUD_Mensajes", MENSAJESDTO);
+
+            if (response.IsSuccessStatusCode)
+            {
+
+                await Swal.FireAsync(new SweetAlertOptions
+                    {
+                        Title = "Mensaje Eliminado",
+                        Text = "Se eliminado el mensaje correctamente.",
+                        Icon = SweetAlertIcon.Success
+                    });
+
+                AsigMensajesSinRepetirDTO.UsuarioID = Convert.ToInt32(iUsuarioID);
+                var response2 = await httpClient.PostAsJsonAsync("/api/Usuario/ST_U_AsignarMensajesSinRepetir", AsigMensajesSinRepetirDTO);
+
+                // Recarga la lista de mensajes predeterminados
+                mensajesPredeterminados = await usuarioService.ST_S_Mensajes(Convert.ToInt32(iUsuarioID));
+            }
+            else
+            {
+                await Swal.FireAsync("Error", "No se pudo eliminar el mensaje", SweetAlertIcon.Error);
+            }
+        }
+    }
+
+    private async Task VaciarMensajes()
+    {
+
+        var resultado = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Eliminar Mensajes",
+                Text = "¿Desea eliminar todos los mensajes?",
+                Icon = SweetAlertIcon.Info,
+                ShowCancelButton = true
+            });
+
+        if (resultado.IsConfirmed)
+        {
+            // Aquí defines los datos para el backend
+            MENSAJESDTO.iTipoConsulta = 4;
+            MENSAJESDTO.iUsuarioID = Convert.ToInt32(iUsuarioID);
+            MENSAJESDTO.iMensajeID = 0;
+            MENSAJESDTO.sMensaje = "";
+
+            // POST al backend
+            var response = await httpClient.PostAsJsonAsync("/api/Usuario/ST_IUD_Mensajes", MENSAJESDTO);
+
+            if (response.IsSuccessStatusCode)
+            {
+
+                await Swal.FireAsync(new SweetAlertOptions
+                    {
+                        Title = "Mensajes Eliminados",
+                        Text = "Se han eliminado los mensajes correctamente.",
+                        Icon = SweetAlertIcon.Success
+                    });
+
+                // Recarga la lista de mensajes predeterminados
+                mensajesPredeterminados = await usuarioService.ST_S_Mensajes(Convert.ToInt32(iUsuarioID));
+            }
+            else
+            {
+                await Swal.FireAsync("Error", "No se pudo eliminar el mensaje", SweetAlertIcon.Error);
+            }
+        }
+
+    }
+
+
+
+    async void CheckEnter(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await InsertarMensaje();
+        }
+    }
+
+    void MostrarMenu(ST_S_MensajesDTO mensaje)
+    {
+        // Guarda el mensaje donde está el mouse para mostrar icono o hacer alguna acción adicional
+        mensajeHover = mensaje;
+    }
+
+    void OcultarMenu(ST_S_MensajesDTO mensaje)
+    {
+        // Cuando el mouse salga del mensaje y si no está el menú abierto, quita el hover
+        if (mensajeConMenuVisible != mensaje)
+        {
+            mensajeHover = null;
+        }
+    }
+
+    void ToggleMenu(ST_S_MensajesDTO mensaje)
+    {
+        if (mensajeConMenuVisible == mensaje)
+            mensajeConMenuVisible = null;
+        else
+            mensajeConMenuVisible = mensaje;
+    }
+
+    // Aquí defines tus métodos para cada opción
+    void InfoMensaje(ST_S_MensajesDTO mensaje) { /* lógica aquí */ }    
+    void CopiarMensaje(ST_S_MensajesDTO mensaje) { /* lógica aquí */ }
+
+
+    // -----------------------------------WEB HOOK---------------------------------------------------
+
+    private async Task EnviarWhatsApp()
+    {
+
+        EnviaMensajeID = iUsuarioID;
+        cargando = true;
+        mensaje = null;
+        StateHasChanged();
+
+        try
+        {
+            // Codificar el texto para evitar problemas en la URL
+            var textoCodificado = Uri.EscapeDataString(stexto ?? "");
+            var url = $"https://n8n-whatsapp-n8n.fan1d1.easypanel.host/webhook/a60c62e4-ebf6-4a98-9c00-8d15c04a2936?sUsuarioID={EnviaMensajeID}&stexto={textoCodificado}";
+
+            // Realizar petición GET
+            var response = await httpClient.GetAsync(url);
+
+            cargando = false;
+            StateHasChanged();
+
+            if (response.IsSuccessStatusCode)
+            {               
+                mensaje = "¡Mensajes enviados correctamente!";
+                await Swal.FireAsync(new SweetAlertOptions
+                    {
+                        Title = "Enviado",
+                        Text = mensaje,
+                        Icon = SweetAlertIcon.Success
+                    });
+            }
+            else
+            {                
+                mensaje = $"Error: {response.StatusCode}";
+                await Swal.FireAsync(new SweetAlertOptions
+                    {
+                        Title = "Error",
+                        Text = mensaje,
+                        Icon = SweetAlertIcon.Error
+                    });
+            }
+        }
+        catch (Exception ex)
+        {
+            cargando = false;
+            StateHasChanged();
+            mensaje = "Error de conexión: " + ex.Message;
+            await Swal.FireAsync(new SweetAlertOptions
+                {
+                    Title = "Error",
+                    Text = mensaje,
+                    Icon = SweetAlertIcon.Error
+                });
+        }
+        finally
+        {
+            cargando = false;
+            StateHasChanged();
+        }
+    }
+
+    private void CancelarCarga()
+    {
+        cargando = false;
+    }
+
+    string mensaje;
+    string EnviaMensajeID = ""; // O el valor que necesites
+    string stexto = "hola";
+
+
+}

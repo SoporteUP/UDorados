@@ -1,4 +1,6 @@
 ﻿@page "/prospectos/calendario/{ProspectoID:int}"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Reclutador")]
 @using DoradosBlazor.Shared
 @using Radzen
 @using Radzen.Blazor
@@ -24,15 +26,7 @@
                     Calendario <span class="prospectos-header-title-sub">/ CRM visual</span>
                 </h2>
             </div>
-        </div>
-
-        <div class="prospectos-header-actions">
-            <div class="prospectos-header-buttons">
-                <button class="calendario-header-btn-whats" @onclick="EnviosWhatsapp" title="Nuevo prospecto">
-                    <i class="bi bi-whatsapp"></i> <span class="d-none d-md-inline">Enviar Whats</span>
-                </button>
-            </div>
-        </div>
+        </div>      
     </div>
 </div>
 
@@ -105,9 +99,7 @@
                 <button class="btn btn-success btn-sm" @onclick="VerDetalles">
                     <i class="bi bi-eye"></i> Información de Prospec.
                 </button>
-                <button class="btn btn-success btn-sm" @onclick="EjecutarWorkflow">
-                    <i class="bi bi-eye"></i> Prueba hook.
-                </button>
+                
             }
         }
         else
@@ -492,16 +484,6 @@
 </HeadContent>
 
 
-
-
-@if (cargando)
-{
-    <span>Cargando...</span>
-}
-@if (!string.IsNullOrEmpty(mensaje))
-{
-    <div>@mensaje</div>
-}
 
 
 
@@ -1044,10 +1026,10 @@
         mostrarSidebarAgendar = esComputadora;
     }
 
-    private async Task EnviosWhatsapp()
-    {
-        navManager.NavigateTo($"/envioswhatsapp");
-    }
+    // private async Task EnviosWhatsapp()
+    // {
+    //     navManager.NavigateTo($"/envioswhatsapp");
+    // }
 
     public class CitaProspecto
     {
@@ -1063,40 +1045,7 @@
         public string NombreProspecto { get; set; }
     }
 
-    // -----------------------------------WEB HOOK---------------------------------------------------
-
-    private async Task EjecutarWorkflow()
-    {
-        cargando = true;
-        mensaje = null;
-        StateHasChanged();
-        try
-        {
-            var url = $"https://n8n-whatsapp-n8n.fan1d1.easypanel.host/webhook/a60c62e4-ebf6-4a98-9c00-8d15c04a2936?sUsuarioID={sUsuarioID}&stexto={stexto}";
-            var response = await httpClient.GetAsync(url); // Cambia a GetAsync
-
-            if (response.IsSuccessStatusCode)
-            {
-                mensaje = "¡Workflow ejecutado correctamente!";
-            }
-            else
-            {
-                mensaje = $"Error: {response.StatusCode}";
-            }
-        }
-        catch (Exception ex)
-        {
-            mensaje = "Error de conexión: " + ex.Message;
-        }
-        cargando = false;
-        StateHasChanged();
-    }
-
-
-    bool cargando = false;
-    string mensaje;
-    string sUsuarioID = "13"; // O el valor que necesites
-    string stexto = "Hola que tal: https://www.facebook.com/share/p/1EvSiQNZN3/"; // O el valor que necesites
+    
 
 
 

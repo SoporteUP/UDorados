@@ -1094,7 +1094,7 @@ body {
     .bottom-nav-link:hover {
         background: #273c75;
         color: #fff !important;
-        border-radius: 1.8rem;
+        border-radius: 3.50rem;
         flex: 0.7 0 auto;
     }
 
@@ -1106,9 +1106,9 @@ body {
         }
 
     .bottom-nav-link span {
-        font-size: 0.87rem;
-        margin-top: 0.03rem;
-        letter-spacing: 0.02em;
+        font-size: 0.70rem;
+        margin-top: 0.06rem;
+        letter-spacing: 0.01em;
         font-weight: 600;
     }
 
@@ -3725,4 +3725,6 @@ body.modo-oscuro .prospectos-calendar-modal-cerrar {
     .calendario-header-btn-whats {
         font-size: 0.99rem;
     }
+
+
 

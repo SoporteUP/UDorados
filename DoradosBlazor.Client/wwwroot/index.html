@@ -16,7 +16,8 @@
     <link href="css/app.css" rel="stylesheet" /> <!-- Mueve app.css al final -->
     <link href="css/custom.css" rel="stylesheet" /> <!-- Asegúrate de que esté al final -->
     <link href="https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap" rel="stylesheet">
-    <link href="css/site.css" rel="stylesheet" /> <!-- Asegúrate de que esté al final -->
+    <link href="css/site.css?v=2" rel="stylesheet" />
+    <link href="css/envioswhatsapp.css" rel="stylesheet" />
 </head>
 
 <body>
@@ -272,6 +273,28 @@
         };
     </script>
 
+    <script>
+        window.mensajeswhatsapp = {
+            registerClickOutside: function (containerElement, dotNetHelper) {
+                function onClick(event) {
+                    if (!containerElement.contains(event.target)) {
+                        dotNetHelper.invokeMethodAsync('OcultarMenuGlobal');
+                    }
+                }
+                document.addEventListener('click', onClick);
+
+                // Guardamos la función para poder removerla después
+                window.mensajeswhatsapp._onClickHandler = onClick;
+            },
+            unregisterClickOutside: function () {
+                if (window.mensajeswhatsapp._onClickHandler) {
+                    document.removeEventListener('click', window.mensajeswhatsapp._onClickHandler);
+                    window.mensajeswhatsapp._onClickHandler = null;
+                }
+            }
+        };
+    </script>
+
     <script src="_framework/blazor.webassembly.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/updateCheck.js"></script>
@@ -291,6 +314,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>-->
     <script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
     <script src="js/calendar-utils.js"></script>
+    <script src="js/enviosWhatsappDrag.js"></script>
+
+
 </body>
 
 </html>

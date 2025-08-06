@@ -753,6 +753,88 @@ namespace DoradosBlazorCrud.Server.Controllers
         }
 
 
+        //ST_S_Mensajes Get
+        [HttpGet]
+        [Route("ST_S_Mensajes/{iUsuarioID}")]
+        public async Task<IActionResult> ST_S_Mensajes(int iUsuarioID)
+        {
+            var responseApi = new ResponseAPI<List<ST_S_MensajesDTO>>();
+            var listaProspecto = new List<ST_S_MensajesDTO>();
+
+            var Result = _dbContext.sT_S_Mensajes.FromSql($"ST_S_Mensajes {iUsuarioID}").ToList();
+
+            try
+            {
+                foreach (var item in Result)
+                {
+                    listaProspecto.Add(new ST_S_MensajesDTO
+                    {
+                        MensajeID = item.MensajeID,
+                        Mensaje = item.Mensaje,
+                        UsuarioID = item.UsuarioID,
+                    });
+
+                }
+
+                responseApi.EsCorrecto = true;
+                responseApi.Valor = listaProspecto;
+
+            }
+            catch (Exception ex)
+            {
+
+                responseApi.EsCorrecto = false;
+                responseApi.Mensaje = ex.Message;
+
+            }
+            return Ok(responseApi);
+        }
+
+
+        //ST_S_PreEnvios Get
+        [HttpGet]
+        [Route("ST_S_PreEnvios/{iUsuarioID}")]
+        public async Task<IActionResult> ST_S_PreEnvios(int iUsuarioID)
+        {
+            var responseApi = new ResponseAPI<List<ST_S_PreEnviosDTO>>();
+            var listaProspecto = new List<ST_S_PreEnviosDTO>();
+
+            var Result = _dbContext.sT_S_PreEnvios.FromSql($"ST_S_PreEnvios {iUsuarioID}").ToList();
+
+            try
+            {
+                foreach (var item in Result)
+                {
+                    listaProspecto.Add(new ST_S_PreEnviosDTO
+                    {
+                        Telefono = item.Telefono,
+                        Nombre = item.Nombre,
+                        UsuarioID = item.UsuarioID,
+                        Delay = item.Delay,        
+                        Mensaje = item.Mensaje,
+                        Instancia = item.Instancia,
+                        ApiKey = item.ApiKey,
+                        Usado = item.Usado,
+                        Status = item.Status,
+                    });
+
+                }
+
+                responseApi.EsCorrecto = true;
+                responseApi.Valor = listaProspecto;
+
+            }
+            catch (Exception ex)
+            {
+
+                responseApi.EsCorrecto = false;
+                responseApi.Mensaje = ex.Message;
+
+            }
+            return Ok(responseApi);
+        }
+
+
         [HttpPost]
         [Route("ListaGposEmpaquetados")]
         public async Task<ActionResult> ListaGposEmpaquetados([FromBody] ST_S_GposEmpaquetadosVarDTO sT_S_GposEmpaquetadosVarDTO)
@@ -1528,6 +1610,19 @@ namespace DoradosBlazorCrud.Server.Controllers
         }
 
         [HttpPost]
+        [Route("ST_IUD_Mensajes")]
+        public async Task<ActionResult> ST_IUD_Mensajes([FromBody] ST_IUD_MensajesDTO envia)
+        {
+
+            var Result1 = new List<Respuesta>();
+
+            Result1 = _dbContext.respuesta.FromSql($"ST_IUD_Mensajes {envia.iTipoConsulta},{envia.iUsuarioID},{envia.iMensajeID},{envia.sMensaje}").ToList();
+
+            return StatusCode(StatusCodes.Status200OK, Result1);
+
+        }
+
+        [HttpPost]
         [Route("ST_IUE_ALUMNOSPREINSC")]
         public async Task<ActionResult> ST_IUE_ALUMNOSPREINSC([FromBody] ST_IUE_ALUMNOSPREINSCDTO alumnosp)
         {
@@ -1564,6 +1659,36 @@ namespace DoradosBlazorCrud.Server.Controllers
 
             return StatusCode(StatusCodes.Status200OK, Result1);
         }
+
+
+        [HttpPost]
+        [Route("ST_U_AsignarMensajesSinRepetir")]
+        public async Task<ActionResult> ST_U_AsignarMensajesSinRepetir([FromBody] ST_U_AsignarMensajesSinRepetirDTO uAsignarSinRepetir)
+        {
+
+            var Result1 = new List<Respuesta>();
+
+            Result1 = _dbContext.respuesta.FromSql($"ST_U_AsignarMensajesSinRepetir {uAsignarSinRepetir.UsuarioID}").ToList();
+
+            return StatusCode(StatusCodes.Status200OK, Result1);
+        }
+
+        [HttpPost]
+        [Route("ST_U_PreEnvios")]
+        public async Task<ActionResult> ST_U_PreEnvios([FromBody] ST_U_PreEnviosDTO uPre)
+        {
+
+            var Result1 = new List<Respuesta>();
+
+            Result1 = _dbContext.respuesta.FromSql($"ST_U_PreEnvios {uPre.iTipoOperacion}").ToList();
+
+            return StatusCode(StatusCodes.Status200OK, Result1);
+        }
+
+
+
+
+
 
         [HttpPost]
         [Route("IU_GposEmpaquetados")]

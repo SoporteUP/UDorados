@@ -49,10 +49,18 @@
             </NavLink>
         </Authorized>
     </AuthorizeView>
-    <a href="#" class="bottom-nav-link" @onclick="CerrarSesion">
+    <AuthorizeView Roles="Reclutador">
+        <Authorized>
+            <NavLink href="/envioswhatsapp" class="bottom-nav-link">
+                <i class="bi bi-whatsapp"></i>
+                <span>EnviosWhatsapp</span>
+            </NavLink>
+        </Authorized>
+    </AuthorizeView>
+   @*  <a href="#" class="bottom-nav-link" @onclick="CerrarSesion">
         <i class="bi bi-box-arrow-right"></i>
         <span>Salir</span>
-    </a>
+    </a> *@
 </div>
 
 @code {

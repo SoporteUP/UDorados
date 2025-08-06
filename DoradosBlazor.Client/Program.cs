@@ -24,7 +24,14 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped<DialogService>();
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://localhost:5296/") });
+//builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://localhost:5296/") });
+
+builder.Services.AddScoped(sp =>
+{
+    var client = new HttpClient { BaseAddress = new Uri("http://localhost:5296/") };
+    client.Timeout = TimeSpan.FromMinutes(30); // aumentar timeout a 5 minutos
+    return client;
+});
 
 builder.Services.AddBlazoredSessionStorage();
 builder.Services.AddScoped<AuthenticationStateProvider, AutenticacionExtension>();

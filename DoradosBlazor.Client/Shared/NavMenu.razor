@@ -83,6 +83,15 @@
                 </li>
             </Authorized>
         </AuthorizeView>
+        <AuthorizeView Roles="Reclutador">
+            <Authorized>
+                <li>
+                    <NavLink href="/envioswhatsapp" class="sidebar-icon">
+                        <i class="bi bi-whatsapp"></i>
+                    </NavLink>
+                </li>
+            </Authorized>
+        </AuthorizeView>
         <li>
             <a href="#" class="sidebar-icon" @onclick="() => CerrarSesion.InvokeAsync()">
                 <i class="bi bi-box-arrow-right"></i>
@@ -157,6 +166,16 @@
                     <NavLink href="/prospectos" class="sidebar-link">
                         <i class="bi bi-person-arms-up"></i>
                         <span>Prospectos</span>
+                    </NavLink>
+                </li>
+            </Authorized>
+        </AuthorizeView>
+        <AuthorizeView Roles="Reclutador">
+            <Authorized>
+                <li>
+                    <NavLink href="/envioswhatsapp" class="sidebar-link">
+                        <i class="bi bi-whatsapp"></i>
+                        <span>EnviosWhatsapp</span>
                     </NavLink>
                 </li>
             </Authorized>
@@ -244,6 +263,16 @@
                         <NavLink href="/prospectos" class="sidebar-link" @onclick="CloseDrawer">
                             <i class="bi bi-person-arms-up"></i>
                             <span>Prospectos</span>
+                        </NavLink>
+                    </li>
+                </Authorized>
+            </AuthorizeView>
+            <AuthorizeView Roles="Reclutador">
+                <Authorized>
+                    <li>
+                        <NavLink href="/envioswhatsapp" class="sidebar-link" @onclick="CloseDrawer">
+                            <i class="bi bi-whatsapp"></i>
+                            <span>EnviosWhatsapp</span>
                         </NavLink>
                     </li>
                 </Authorized>

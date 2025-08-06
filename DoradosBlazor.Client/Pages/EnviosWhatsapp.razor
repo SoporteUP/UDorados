@@ -1,7 +1,464 @@
 ﻿@page "/envioswhatsapp"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Reclutador")]
 
-<h3>EnviosWhatsapp</h3>
+@using DoradosBlazor.Shared
+@using DoradosBlazor.Client.Services
+@inject IUsuarioService usuarioService
+@inject SesionUsuario mySesion
+@inject IJSRuntime JS
+@inject SweetAlertService Swal
+@inject HttpClient httpClient
+@inject NavigationManager navManager;
+
+<div id="envios-whatsapp-wrapper">
+
+    <div class="Enviosw-header-glass">
+
+        <div class="Enviosw-header-left">
+            <div class="Enviosw-header-icon">
+                <i class="bi bi-whatsapp"></i>
+            </div>
+            <div>
+                <h2 class="Enviosw-header-title">
+                    PreEnvios <span class="Enviosw-header-title-sub">/ pre envios de whatsapp</span>
+                </h2>
+                <div class="Enviosw-header-subdesc d-none d-md-block">
+                    Selecciona los números que recibiran los mensajes
+                </div>
+            </div>
+        </div>
+
+        <div class="Enviosw-header-actions">
+            <div class="Enviosw-header-filtros-group">
+                <input class="Enviosw-header-buscador"
+                       value="@filtroBusqueda"
+                       @oninput="FiltrarProspecto"
+                       type="text"
+                       placeholder="Buscar nombre, correo, tel..." />
+                <select class="Enviosw-header-select" @bind="Txtfiltro">
+                    <option value="">Filtro por:</option>
+                    @foreach (var FX in listaFiltroX)
+                    {
+                        <option value="@FX">@FX</option>
+                    }
+                </select>
+                <button class="Enviosw-header-limpiar" @onclick="LimpiarFiltros" title="Limpiar filtros">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="envios-whatsapp-tabs">
+        <button class="envios-whatsapp-tab @(tabActivo == 0 ? "activo" : "")" @onclick="() => CambiarTab(0)">
+            <i class="bi bi-people"></i> Prospectos
+        </button>
+        <button class="envios-whatsapp-tab @(tabActivo == 1 ? "activo" : "")" @onclick="() => CambiarTab(1)">
+            <i class="bi bi-clock-history"></i> Lista seleccionados
+        </button>
+    </div>
+
+    @if (tabActivo == 0)
+    {
+        <div id="envios-whatsapp-container">
+            <div id="envios-whatsapp-col-izq">
+                <h6>📋 Prospectos</h6>
+
+                <div class="envios-whatsapp-paginacion mb-2">
+                    @if (paginaActual > 0)
+                    {
+                        <button class="btn btn-sm btn-verdeW me-2" @onclick="PaginaAnterior">
+                            <i class="bi bi-arrow-left-circle"></i> Atrás
+                        </button>
+                    }
+                    <span>Página @(paginaActual + 1) de @TotalPaginas</span>
+                    @if ((paginaActual + 1) < TotalPaginas)
+                    {
+                        <button class="btn btn-sm btn-verdeW ms-2" @onclick="PaginaSiguiente">
+                            Más <i class="bi bi-arrow-right-circle"></i>
+                        </button>
+                    }
+                </div>
+
+                <button id="btn-seleccionar-todos" @onclick="SeleccionarTodos">✅ Seleccionar todos</button>
+
+                @foreach (var prospecto in ProspectosPaginados)
+                {
+                    <div class="envios-whatsapp-chat @(prospectosMarcados.Contains(prospecto.ProspectoID) ? "marcado" : "")"
+                         @onclick="() => ToggleSeleccion(prospecto)"
+                         draggable="true"
+                         @ondragstart="(e => OnDragStart(e, prospecto))"
+                         @key="prospecto.ProspectoID"
+                         tabindex="0">
+                        <div class="envios-whatsapp-avatar">@prospecto.Nombre?[..1]</div>
+                        <div class="envios-whatsapp-texto">
+                            <strong>@prospecto.Nombre</strong>
+                            <small>@prospecto.Telefono</small>
+                        </div>
+                        @if (prospectosMarcados.Contains(prospecto.ProspectoID))
+                        {
+                            <span class="envios-whatsapp-check"><i class="bi bi-check-circle-fill"></i></span>
+                        }
+                    </div>
+                }
+                @if (!ProspectosPaginados.Any())
+                {
+                    <div class="text-muted text-center mt-3">No hay prospectos para mostrar.</div>
+                }
+            </div>
+
+            <div id="envios-whatsapp-col-der"
+                 ondragover="event.preventDefault()"
+                 @ondrop="OnDrop">
+                <h6>📥 Seleccionados</h6>
+                @if (seleccionados.Any())
+                {
+                    <ul class="envios-whatsapp-lista">
+                        @foreach (var p in seleccionados)
+                        {
+                            <li>
+                                <strong>@p.Nombre</strong> - @p.Telefono
+                                <button class="btn btn-link btn-remover-seleccionado" title="Quitar"
+                                        @onclick="() => RemoverSeleccionado(p)">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="text-muted">Arrastra prospectos aquí o usa el botón de seleccionar.</p>
+                }
+            </div>
+        </div>
+
+        <button id="envios-whatsapp-boton"
+                @onclick="EjecutarProceso"
+                disabled="@(!seleccionados.Any() || ejecutando || cargando)">
+            ▶ Ejecutar @seleccionados.Count procesos
+        </button>
+    }
+    else if (tabActivo == 1)
+    {
+        <div id="envios-whatsapp-tab-lista2">
+            <div class="envios-whatsapp-historial-header">
+                <div class="historial-header-ico">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+                <h6>Pre-Envios</h6>
+                @if (!PreEnviosPaginados.Any())
+                {
+                    <button id="btn-seleccionar-todos"><i class="bi bi-x-circle"></i> <i class="bi bi-whatsapp"></i> </button>
+                }
+                else
+                {
+                    <button id="btn-seleccionar-todos" @onclick="MensajesWhatsapp">IR A <i class="bi bi-whatsapp"></i> </button>
+                    <button id="btn-borrar-todos" @onclick="BorrarPreEnvios"><i class="bi bi-trash-fill"></i> Vaciar  </button>
+
+                }
+                
+            </div>
+            <div class="envios-whatsapp-paginacion mb-2 historial-paginacion-custom">
+                @if (paginaPreEnvios > 0)
+                {
+                    <button class="btn-paginacion-wsp" @onclick="PaginaAnteriorPreEnvios" title="Anterior">
+                        <i class="bi bi-arrow-left-circle"></i> Atrás
+                    </button>
+                }
+                <span class="paginacion-actual">Página <strong>@(paginaPreEnvios + 1)</strong> de <strong>@TotalPaginasPreEnvios</strong></span>
+                @if ((paginaPreEnvios + 1) < TotalPaginasPreEnvios)
+                {
+                    <button class="btn-paginacion-wsp" @onclick="PaginaSiguientePreEnvios" title="Siguiente">
+                        Más <i class="bi bi-arrow-right-circle"></i>
+                    </button>
+                }
+            </div>
+
+            @if (!PreEnviosPaginados.Any())
+            {
+                <div class="text-muted text-center mt-4">No hay preenvíos registrados.</div>
+            }
+            else
+            {
+                <div class="envios-whatsapp-historial-lista">
+                    @foreach (var pre in PreEnviosPaginados)
+                    {
+                        <div class="envios-whatsapp-historial-item">
+                            <div class="historial-avatar">
+                                <i class="bi bi-person-circle"></i>
+                            </div>
+                            <div class="historial-detalles">
+                                <div class="historial-titulo">
+                                    <strong>@pre.Nombre</strong>                                    
+                                </div>
+                                <div class="historial-tel">@pre.Telefono</div>                                
+                            </div>
+                            <div class="historial-status @(pre.Status?.ToLower())">
+                                @pre.Status
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+
+
+    @if (prospectosMarcados.Any())
+    {
+        <button class="fab-agregar" @onclick="AgregarMarcados">
+            <i class="bi bi-arrow-right-circle"></i> Agregar seleccionados (@prospectosMarcados.Count)
+        </button>
+    }
+
+
+</div>
+
+<LoadingModal Mostrar="cargando" Mensaje="'Cargando Prospectos...'" />
+<LoadingModal Mostrar="cargando2" Mensaje="'Insertando...'" />
 
 @code {
+    [Parameter] 
+    public string iUsuarioID { get; set; } = "";
+
+    private List<ST_S_PreEnviosDTO> listaPREENVIOS = new();
+    private List<ST_S_ProspecFiltrosDTO> listaPROSPECTOS = new();
+    private List<ST_S_ProspecFiltrosDTO> seleccionados = new();
+    private HashSet<int> prospectosMarcados = new();
+    private ST_S_ProspecFiltrosDTO? prospectoArrastrado;
+
+    private ST_IUD_PreEnviosDTO PreEnvioDTO = new();
+
+    private bool ejecutando = false;
+    bool cargando = false;
+    bool cargando2 = false;
+
+    string filtroBusqueda = "";
+    string Txtfiltro = "";
+
+    int tabActivo = 0;
+
+    List<string> listaFiltroX = new() {
+        "Nombre", "Telefono", "Estatus", "Celular", "Correo", "Localidad", "AreaInteres",
+        "EscuelaProcedencia", "CicloEscolar", "Edad", "MedioseEntero", "Facebook",
+        "CicloEscolar", "Niv_AcademicoInteres", "Base", "Turno", "Institu_Evento"
+    };
+
+    const int PAGE_SIZE = 40;
+    int paginaActual = 0;
+    const int PAGE_SIZE_PREENVIOS = 50;
+    int paginaPreEnvios = 0;
+
+    IEnumerable<ST_S_ProspecFiltrosDTO> ProspectosFiltrados =>
+        listaPROSPECTOS
+        .Where(p => !string.Equals(p.Estatus?.Trim(), "No interesado", StringComparison.OrdinalIgnoreCase))
+        .Where(p => !string.IsNullOrWhiteSpace(p.Telefono))
+        .Where(p => !seleccionados.Any(s => s.ProspectoID == p.ProspectoID));
+
+    IEnumerable<ST_S_ProspecFiltrosDTO> ProspectosPaginados =>
+        ProspectosFiltrados.Skip(paginaActual * PAGE_SIZE).Take(PAGE_SIZE);
+
+    int TotalPaginas => (int)Math.Ceiling(ProspectosFiltrados.Count() / (double)PAGE_SIZE);
+
+    IEnumerable<ST_S_PreEnviosDTO> PreEnviosPaginados =>
+    listaPREENVIOS.Skip(paginaPreEnvios * PAGE_SIZE_PREENVIOS).Take(PAGE_SIZE_PREENVIOS);
+
+    int TotalPaginasPreEnvios => (int)Math.Ceiling(listaPREENVIOS.Count / (double)PAGE_SIZE_PREENVIOS);
+
+    void PaginaSiguiente()
+    {
+        if (paginaActual + 1 < TotalPaginas)
+        {
+            paginaActual++;
+        }
+    }
+    void PaginaAnterior()
+    {
+        if (paginaActual > 0)
+        {
+            paginaActual--;
+        }
+    }
+
+    void PaginaSiguientePreEnvios()
+    {
+        if (paginaPreEnvios + 1 < TotalPaginasPreEnvios)
+            paginaPreEnvios++;
+    }
+    void PaginaAnteriorPreEnvios()
+    {
+        if (paginaPreEnvios > 0)
+            paginaPreEnvios--;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        iUsuarioID = mySesion.UsuarioID;
+        await CargarProspectos();
+    }
+
+    private void OnDragStart(DragEventArgs e, ST_S_ProspecFiltrosDTO prospecto)
+    {
+        prospectoArrastrado = prospecto;
+    }
+
+    private async Task OnDrop(DragEventArgs e)
+    {
+        await JS.InvokeVoidAsync("eval", "document.querySelector('#envios-whatsapp-col-der')?.classList.remove('dragover')");
+        if (prospectoArrastrado != null && !seleccionados.Any(p => p.ProspectoID == prospectoArrastrado.ProspectoID))
+        {
+            seleccionados.Add(prospectoArrastrado);
+            prospectoArrastrado = null;
+            StateHasChanged();
+        }
+    }
+
+    private async Task EjecutarProceso()
+    {
+        if (ejecutando || cargando || !seleccionados.Any())
+            return;
+
+        ejecutando = true;
+        cargando2 = true;
+        StateHasChanged();
+
+        foreach (var p in seleccionados)
+        {
+            PreEnvioDTO.iTipoOperacion = 1;
+            PreEnvioDTO.iUsuarioID = Convert.ToInt32(iUsuarioID);
+            PreEnvioDTO.sNombre = p.Nombre;
+            PreEnvioDTO.sTelefono = p.Telefono;
+            var response = await httpClient.PostAsJsonAsync("/api/Usuario/ST_IUD_PreEnvios", PreEnvioDTO);
+            await Task.Delay(500);
+        }
+
+        ejecutando = false;
+        cargando2 = false;
+        seleccionados.Clear();
+
+        await Swal.FireAsync("✅ Proceso completado", $"Los envíos han sido registrados.", SweetAlertIcon.Success);
+        StateHasChanged();
+
+        await MensajesWhatsapp();
+
+    }
+
+    private async Task MensajesWhatsapp()
+    {
+        navManager.NavigateTo($"/mensajeswhatsapp");
+    }
+
+    private async Task BorrarPreEnvios()
+    {
+        PreEnvioDTO.iTipoOperacion = 3;
+        PreEnvioDTO.iUsuarioID = Convert.ToInt32(iUsuarioID);
+        PreEnvioDTO.sNombre = "";
+        PreEnvioDTO.sTelefono = "";
+        var response = await httpClient.PostAsJsonAsync("/api/Usuario/ST_IUD_PreEnvios", PreEnvioDTO);
+
+        if (response.IsSuccessStatusCode)
+        {
+            listaPREENVIOS = await usuarioService.ST_S_PreEnvios(Convert.ToInt32(iUsuarioID));
+            StateHasChanged();
+        }
+        else
+        {
+            await Swal.FireAsync("Error", $"Error inesperado al vaciar los preEnvios.", SweetAlertIcon.Error);
+            StateHasChanged();
+        }
+
+       
+
+    }
+
+    private void SeleccionarTodos()
+    {
+        foreach (var p in ProspectosPaginados)
+        {
+            if (!seleccionados.Any(x => x.ProspectoID == p.ProspectoID))
+                seleccionados.Add(p);
+        }
+        StateHasChanged();
+    }
+
+    private async Task FiltrarProspecto(ChangeEventArgs e)
+    {
+        filtroBusqueda = e.Value?.ToString() ?? "";
+        var campoFiltro = string.IsNullOrWhiteSpace(Txtfiltro) ? "Nombre" : Txtfiltro;
+        var valorFiltro = filtroBusqueda?.Trim();
+        if (string.IsNullOrWhiteSpace(valorFiltro))
+        {
+            await CargarProspectos();
+            return;
+        }
+        listaPROSPECTOS = (await usuarioService.ST_S_ProspecFiltros(
+            campoFiltro,
+            valorFiltro,
+            "Nombre",
+            "-"
+        ))
+        .Where(p => !string.IsNullOrWhiteSpace(p.Telefono))
+        .ToList();
+        paginaActual = 0;
+    }
+
+    async Task CargarProspectos()
+    {
+        cargando = true;
+        StateHasChanged();
+        listaPROSPECTOS = (await usuarioService.ST_S_ProspecFiltros("Nombre", "-", "Nombre", "-"))
+        .Where(p => !string.IsNullOrWhiteSpace(p.Telefono))
+        .ToList();
+        paginaActual = 0;
+        cargando = false;
+        StateHasChanged();
+    }
+
+    private async Task LimpiarFiltros()
+    {
+        filtroBusqueda = Txtfiltro = "";
+        await CargarProspectos();
+        paginaActual = 0;
+    }
+
+    // --- NUEVO: selección táctil/click ---
+    private void ToggleSeleccion(ST_S_ProspecFiltrosDTO prospecto)
+    {
+        if (prospectosMarcados.Contains(prospecto.ProspectoID))
+            prospectosMarcados.Remove(prospecto.ProspectoID);
+        else
+            prospectosMarcados.Add(prospecto.ProspectoID);
+    }
+
+    private void AgregarMarcados()
+    {
+        var paraAgregar = ProspectosFiltrados.Where(p => prospectosMarcados.Contains(p.ProspectoID));
+        foreach (var p in paraAgregar)
+        {
+            if (!seleccionados.Any(x => x.ProspectoID == p.ProspectoID))
+                seleccionados.Add(p);
+        }
+        prospectosMarcados.Clear();
+        StateHasChanged();
+    }
+
+    private void RemoverSeleccionado(ST_S_ProspecFiltrosDTO prospecto)
+    {
+        seleccionados.Remove(prospecto);
+        StateHasChanged();
+    }
+
+    async Task CambiarTab(int tab)
+    {
+        tabActivo = tab;
+        if (tabActivo == 1)
+        {
+            paginaPreEnvios = 0; // <-- para reiniciar en la página 1 cada vez
+            listaPREENVIOS = await usuarioService.ST_S_PreEnvios(Convert.ToInt32(iUsuarioID));
+            StateHasChanged();
+        }
+    }
 
 }
