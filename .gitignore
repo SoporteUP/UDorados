@@ -1,8 +1,5 @@
-# Archivos de Visual Studio
+bin/
+obj/
 .vs/
 *.user
 *.suo
-
-# Binarios y objetos de compilación
-bin/
-obj/
